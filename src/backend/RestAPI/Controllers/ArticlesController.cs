@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Conduit.RestAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [Tags("Articles")]
 public sealed class ArticlesController : ControllerBase
 {

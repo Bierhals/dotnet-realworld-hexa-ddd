@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 using Microsoft.AspNetCore.Builder;
@@ -46,7 +47,22 @@ static class OpenApiExtension
                     }
                 }
             );
-            x.SwaggerDoc("v1", new OpenApiInfo { Title = "RealWorld API", Version = "v1" });
+            x.SwaggerDoc("v1", new OpenApiInfo 
+            {
+                Title = "RealWorld Conduit API", 
+                Version = "1.0.0",
+                Description = "Conduit API documentation",
+                Contact = new OpenApiContact
+                {
+                    Name = "RealWorld",
+                    Url = new Uri("https://www.realworld.how")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "MIT License",
+                    Url = new Uri("https://opensource.org/licenses/MIT")
+                }
+            });
             //x.CustomSchemaIds(y => y.FullName);
         });
 
@@ -58,6 +74,10 @@ static class OpenApiExtension
         app.UseSwagger(c =>
         {
             c.RouteTemplate = "api-docs/{documentName}/openapi.json";
+            c.PreSerializeFilters.Add((swagger, httpReq) =>
+            {
+                swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/api" } };
+            });
         });
 
         if (app.Environment.IsDevelopment())

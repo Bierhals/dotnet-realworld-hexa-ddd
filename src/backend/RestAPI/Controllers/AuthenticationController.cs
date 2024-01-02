@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Conduit.RestAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("users")]
 [Tags("User and Authentication")]
 [Consumes("application/json")]
 [Produces("application/json")]
@@ -25,6 +25,7 @@ public class AuthenticationController : ControllerBase
     /// <response code="200">Successful login, returns the User that is logged in</response>
     /// <response code="401">Unauthorized, likely because credentials are incorrect</response>
     [HttpPost]
+    [Route("login")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
