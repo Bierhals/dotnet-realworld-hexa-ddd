@@ -5,7 +5,7 @@ using Conduit.RestAPI.ViewModels;
 
 namespace Conduit.RestAPI.ViewModels;
 
-public class LoginUserRequest 
+public class LoginUserRequest
 {
     public LoginUserRequest(LoginUser user)
     {

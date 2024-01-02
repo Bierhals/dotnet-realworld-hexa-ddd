@@ -47,9 +47,9 @@ static class OpenApiExtension
                     }
                 }
             );
-            x.SwaggerDoc("v1", new OpenApiInfo 
+            x.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "RealWorld Conduit API", 
+                Title = "RealWorld Conduit API",
                 Version = "1.0.0",
                 Description = "Conduit API documentation",
                 Contact = new OpenApiContact
