@@ -15,12 +15,6 @@ namespace Conduit.RestAPI.Controllers;
 [Produces("application/json")]
 public class AuthenticationController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Hello()
-    {
-        return Ok("Hello World");
-    }
-
     /// <summary>
     /// Existing user login
     /// </summary>
