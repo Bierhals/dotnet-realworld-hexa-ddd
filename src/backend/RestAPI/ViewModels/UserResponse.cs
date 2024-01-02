@@ -1,15 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+namespace Conduit.RestAPI.ViewModels;
 
-namespace Conduit.RestAPI;
-
-public class UserResponse
+public record UserResponse
 {
-    public UserResponse(User user)
-    {
-        User = user;
-    }
-
-    [Required]
-    public User User { get; init; }
+    public required User User { get; init; }
 }

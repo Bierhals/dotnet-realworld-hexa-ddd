@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 using Conduit.RestAPI.ViewModels;
 
@@ -31,6 +30,17 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public IActionResult Login([FromBody][Required] LoginUserRequest request)
     {
-        return Ok(new UserResponse(new User(request.User.Email, "test", request.User.Email, "test", "Test")));
+        return Ok(
+            new UserResponse
+            {
+                User = new User
+                {
+                    Email = request.User.Email,
+                    Username = request.User.Email,
+                    Token = "Test Token",
+                    Bio = "Test Bio",
+                    Image = "Test"
+                }
+            });
     }
 }

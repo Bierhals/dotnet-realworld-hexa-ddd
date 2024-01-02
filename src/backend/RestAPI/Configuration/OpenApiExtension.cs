@@ -18,6 +18,7 @@ static class OpenApiExtension
         {
             x.IncludeXmlComments(XmlCommentsFilePath);
             x.SupportNonNullableReferenceTypes();
+            x.SchemaFilter<OpenApiRequiredMemberFilter>();
 
             x.AddSecurityDefinition(
                 "Bearer",

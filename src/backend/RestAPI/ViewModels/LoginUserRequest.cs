@@ -1,17 +1,6 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Conduit.RestAPI.ViewModels;
 
-using Conduit.RestAPI.ViewModels;
-
-namespace Conduit.RestAPI.ViewModels;
-
-public class LoginUserRequest
+public record LoginUserRequest
 {
-    public LoginUserRequest(LoginUser user)
-    {
-        User = user;
-    }
-
-    [Required]
-    public LoginUser User { get; init; }
+    public required LoginUser User { get; init; }
 }
