@@ -47,10 +47,7 @@ static class OpenApiExtension
                 }
             );
             x.SwaggerDoc("v1", new OpenApiInfo { Title = "RealWorld API", Version = "v1" });
-            x.CustomSchemaIds(y => y.FullName);
-            /* x.TagActionsBy(
-                y => new List<string>() { y.GroupName ?? throw new InvalidOperationException() }
-            ); */
+            //x.CustomSchemaIds(y => y.FullName);
         });
 
         return services;
