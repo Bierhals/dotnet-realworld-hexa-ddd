@@ -31,8 +31,11 @@ public class AuthenticationController : ControllerBase
     /// <response code="200">Successful login, returns the User that is logged in</response>
     /// <response code="401">Unauthorized, likely because credentials are incorrect</response>
     [HttpPost]
+    [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public IActionResult Login([FromBody][Required] LoginUserRequest request)
     {
-        return Ok("Hello World");
+        return Ok(new UserResponse(new User(request.User.Email, "test", request.User.Email, "test", "Test")));
     }
 }
