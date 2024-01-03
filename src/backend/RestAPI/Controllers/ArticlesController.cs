@@ -23,8 +23,7 @@ public sealed class ArticlesController : ControllerBase
     /// <remarks>
     /// Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
-    /// <param name="offset">The number of items to skip before starting to collect the result set.</param>
-    /// <param name="limit">The numbers of items to return.</param>
+    /// <param name="filter">Filtering options</param>
     /// <response code="200">Successfully queryied articles</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Article request is invalid</response>
@@ -32,7 +31,7 @@ public sealed class ArticlesController : ControllerBase
     [ProducesResponseType<MultipleArticlesResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult GetArticlesFeed([Range(0, double.PositiveInfinity)] uint offset = 0, [Range(1, double.PositiveInfinity)] uint limit = 20)
+    public IActionResult GetArticlesFeed([FromQuery] GetArticlesFeedRequest filter)
     {
         return Ok(
             new MultipleArticlesResponse
@@ -69,11 +68,7 @@ public sealed class ArticlesController : ControllerBase
     /// <remarks>
     /// Get most recent articles globally. Use query parameters to filter results. Auth is optional<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#list-articles">Conduit spec for List Articles Endpoint</a>
     /// </remarks>
-    /// <param name="tag">Filter by tag</param>
-    /// <param name="author">Filter by author (username)</param>
-    /// <param name="favorited">Filter by favorites of a user (username)</param>
-    /// <param name="offset">The number of items to skip before starting to collect the result set.</param>
-    /// <param name="limit">The numbers of items to return.</param>
+    /// <param name="filter">Filtering options</param>
     /// <response code="200">Successfully queryied articles</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Article request is invalid</response>
@@ -81,7 +76,8 @@ public sealed class ArticlesController : ControllerBase
     [ProducesResponseType<MultipleArticlesResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult GetArticles(string? tag, string? author, string? favorited, [Range(0, double.PositiveInfinity)] uint offset = 0, [Range(1, double.PositiveInfinity)] uint limit = 20)
+    //public IActionResult GetArticles(string? tag, string? author, string? favorited, [Range(0, double.PositiveInfinity)] uint offset = 0, [Range(1, double.PositiveInfinity)] uint limit = 20)
+    public IActionResult GetArticles([FromQuery] GetArticlesRequest filter)
     {
         return Ok(
             new MultipleArticlesResponse
