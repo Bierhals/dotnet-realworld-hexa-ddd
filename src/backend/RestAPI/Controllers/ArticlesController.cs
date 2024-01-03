@@ -23,9 +23,9 @@ public sealed class ArticlesController : ControllerBase
     /// Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
     /// <param name="filter">Filtering options</param>
-    /// <response code="200">Successfully queryied articles</response>
+    /// <response code="200">Multiple articles</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Article request is invalid</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet("feed")]
     [ProducesResponseType<MultipleArticlesResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -68,9 +68,9 @@ public sealed class ArticlesController : ControllerBase
     /// Get most recent articles globally. Use query parameters to filter results. Auth is optional<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#list-articles">Conduit spec for List Articles Endpoint</a>
     /// </remarks>
     /// <param name="filter">Filtering options</param>
-    /// <response code="200">Successfully queryied articles</response>
+    /// <response code="200">Multiple articles</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Article request is invalid</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet]
     [ProducesResponseType<MultipleArticlesResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -115,9 +115,9 @@ public sealed class ArticlesController : ControllerBase
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#create-article">Conduit Spec for create article endpoint</a>
     /// </remarks>
     /// <param name="request">Article to create</param>
-    /// <response code="201">Successful creating, returns the created Article</response>
+    /// <response code="201">Single article</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Article was unable to be created</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPost]
     [ProducesResponseType<SingleArticleResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -157,8 +157,8 @@ public sealed class ArticlesController : ControllerBase
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-article">Conduit spec for Get Article endpoint</a>
     /// </remarks>
     /// <param name="slug">Slug of the article to get</param>
-    /// <response code="200">Successful retrieval, returns the Article</response>
-    /// <response code="422">Article was unable to be refrieved</response>
+    /// <response code="200">Single article</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet("{slug}")]
     [ProducesResponseType<SingleArticleResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
@@ -198,9 +198,9 @@ public sealed class ArticlesController : ControllerBase
     /// </remarks>
     /// <param name="request">Comment you want to create</param>
     /// <param name="slug">Slug of the article to update</param>
-    /// <response code="200">Successful update, returns the updated Article</response>
+    /// <response code="200">Single article</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Article was unable to be refrieved</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPut("{slug}")]
     [ProducesResponseType<SingleArticleResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -242,7 +242,7 @@ public sealed class ArticlesController : ControllerBase
     /// <param name="slug">Slug of the article to delete</param>
     /// <response code="200">No Content</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Article deletion request is invalid</response>
+    /// <response code="422">Unexpected error</response>
     [HttpDelete("{slug}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

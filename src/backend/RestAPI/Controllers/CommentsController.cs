@@ -24,9 +24,9 @@ public class CommentsController : ControllerBase
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-comments-from-an-article">Conduit spec for Get All Comments for and Article</a>
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to get comments for</param>
-    /// <response code="200">Successfully retrieved comments</response>
+    /// <response code="200">Multiple comments</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Something went wrong while retrieving the comments</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet]
     [ProducesResponseType<MultipleCommentsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -65,9 +65,9 @@ public class CommentsController : ControllerBase
     /// </remarks>
     /// <param name="request">Comment you want to create</param>
     /// <param name="slug">Slug of the article that you want to create a comment for</param>
-    /// <response code="200">Successful created, returns the created Comment</response>
+    /// <response code="200">Single comment</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Something went wrong while creating the comment</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPost]
     [ProducesResponseType<SingleCommentResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -105,7 +105,7 @@ public class CommentsController : ControllerBase
     /// <param name="id">ID of the comment you want to delete</param>
     /// <response code="200">No Content</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">Something went wrong while deleting the comment</response>
+    /// <response code="422">Unexpected error</response>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

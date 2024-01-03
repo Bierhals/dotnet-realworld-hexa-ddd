@@ -22,8 +22,8 @@ public class AuthenticationController : ControllerBase
     /// </remarks>
     /// <param name="request">Credentials to use</param>
     /// <returns></returns>
-    /// <response code="200">Successful login, returns the User that is logged in</response>
-    /// <response code="401">Unauthorized, likely because credentials are incorrect</response>
+    /// <response code="200">User</response>
+    /// <response code="401">Unauthorized</response>
     [HttpPost("login")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

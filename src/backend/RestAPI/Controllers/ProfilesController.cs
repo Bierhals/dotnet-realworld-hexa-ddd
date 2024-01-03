@@ -20,14 +20,14 @@ public class ProfilesController : ControllerBase
     /// </remarks>
     /// <param name="username">Username of the profile to get</param>
     /// <returns></returns>
-    /// <response code="200">Return the public profile</response>
+    /// <response code="200">Profile</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">The get profile request was invalid</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet("{username}")]
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult GetProfileByUsername([FromQuery] string username)
+    public IActionResult GetProfileByUsername([FromRoute] string username)
     {
         return Ok(
             new ProfileResponse
@@ -50,14 +50,14 @@ public class ProfilesController : ControllerBase
     /// </remarks>
     /// <param name="username">Username of the profile you want to follow</param>
     /// <returns></returns>
-    /// <response code="200">Returns the followed user's detailed profile information</response>
+    /// <response code="200">Profile</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">User not found</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPost("{username}/follow")]
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult FollowUserByUsername([FromQuery] string username)
+    public IActionResult FollowUserByUsername([FromRoute] string username)
     {
         return Ok(
             new ProfileResponse
@@ -80,14 +80,14 @@ public class ProfilesController : ControllerBase
     /// </remarks>
     /// <param name="username">Username of the profile you want to unfollow</param>
     /// <returns></returns>
-    /// <response code="200">Returns the unfollowed user's detailed profile information</response>
+    /// <response code="200">Profile</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">User not found</response>
+    /// <response code="422">Unexpected error</response>
     [HttpDelete("{username}/follow")]
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult UnfollowUserByUsername([FromQuery] string username)
+    public IActionResult UnfollowUserByUsername([FromRoute] string username)
     {
         return Ok(
             new ProfileResponse

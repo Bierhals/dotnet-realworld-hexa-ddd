@@ -22,8 +22,8 @@ public class UsersController : ControllerBase
     /// </remarks>
     /// <param name="request">Details of the new user to register</param>
     /// <returns></returns>
-    /// <response code="201">Returns the newly registered User</response>
-    /// <response code="422">The registration information was not valid (e.g. invalid email, weak password, etc)</response>
+    /// <response code="201">User</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPost]
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
@@ -50,9 +50,9 @@ public class UsersController : ControllerBase
     /// Gets the currently logged-in user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
     /// </remarks>
     /// <returns></returns>
-    /// <response code="200">Returns the currently logged in User</response>
+    /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">The given token was not valid (weird edge case, even possible?)</response>
+    /// <response code="422">Unexpected error</response>
     [HttpGet("/user")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -81,9 +81,9 @@ public class UsersController : ControllerBase
     /// </remarks>
     /// <param name="request">User details to update. At least **one** field is required.</param>
     /// <returns></returns>
-    /// <response code="200">Return the user after update</response>
+    /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">The update request was invalid</response>
+    /// <response code="422">Unexpected error</response>
     [HttpPut("/user")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
