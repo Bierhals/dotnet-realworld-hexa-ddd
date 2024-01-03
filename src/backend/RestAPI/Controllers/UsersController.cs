@@ -51,7 +51,7 @@ public class UsersController : ControllerBase
     /// <returns></returns>
     /// <response code="200">Returns the currently logged in User</response>
     /// <response code="401">Unauthorized</response>
-    /// <response code="422">he given token was not valid (weird edge case, even possible?)</response>
+    /// <response code="422">The given token was not valid (weird edge case, even possible?)</response>
     [HttpGet("/user")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

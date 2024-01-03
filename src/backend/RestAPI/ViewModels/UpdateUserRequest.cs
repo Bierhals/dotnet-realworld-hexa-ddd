@@ -1,4 +1,4 @@
-﻿namespace Conduit.RestAPI;
+﻿namespace Conduit.RestAPI.ViewModels;
 
 public record class UpdateUserRequest
 {
