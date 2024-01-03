@@ -20,13 +20,14 @@ public class UsersController : ControllerBase
     /// <remarks>
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
+    /// <param name="request">Details of the new user to register</param>
     /// <returns></returns>
     /// <response code="201">Returns the newly registered User</response>
     /// <response code="422">The registration information was not valid (e.g. invalid email, weak password, etc)</response>
     [HttpPost]
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult CreateUser([FromBody, SwaggerRequestBody(Description = "Details of the new user to register", Required = true)] NewUserRequest request)
+    public IActionResult CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request)
     {
         return Ok(
             new UserResponse
@@ -78,6 +79,7 @@ public class UsersController : ControllerBase
     /// <remarks>
     /// Updated user information for current user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-user">Conduit spec for Update User</a>
     /// </remarks>
+    /// <param name="request">User details to update. At least **one** field is required.</param>
     /// <returns></returns>
     /// <response code="200">Return the user after update</response>
     /// <response code="401">Unauthorized</response>
@@ -86,7 +88,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult UpdateCurrentUser([FromBody, SwaggerRequestBody(Description = "User details to update. At least **one** field is required.", Required = true)] UpdateUserRequest request)
+    public IActionResult UpdateCurrentUser([FromBody, SwaggerRequestBody(Required = true)] UpdateUserRequest request)
     {
         return Ok(
             new UserResponse
