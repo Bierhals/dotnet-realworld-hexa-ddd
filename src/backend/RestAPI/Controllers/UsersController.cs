@@ -46,7 +46,7 @@ public class UsersController : ControllerBase
     /// Get current user
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
+    /// Gets the currently logged-in user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
     /// </remarks>
     /// <returns></returns>
     /// <response code="200">Returns the currently logged in User</response>
@@ -73,10 +73,10 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Updated user information for current user
+    /// Update current user
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-user">Conduit spec for Update User</a>
+    /// Updated user information for current user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-user">Conduit spec for Update User</a>
     /// </remarks>
     /// <returns></returns>
     /// <response code="200">Return the user after update</response>

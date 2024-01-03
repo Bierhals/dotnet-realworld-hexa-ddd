@@ -15,10 +15,10 @@ namespace Conduit.RestAPI.Controllers;
 public class ProfilesController : ControllerBase
 {
     /// <summary>
-    /// Get a profile of a user of the system. Auth is optional
+    /// Get a profile
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-profile">Conduit spec for Get Profile</a>
+    /// Get a profile of a user of the system. Auth is optional<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-profile">Conduit spec for Get Profile</a>
     /// </remarks>
     /// <param name="username">Username of the profile to get</param>
     /// <returns></returns>
@@ -45,10 +45,10 @@ public class ProfilesController : ControllerBase
     }
 
     /// <summary>
-    /// Follow a user by username
+    /// Follow a user
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#follow-user">Conduit Spec for follow user endpoint</a>
+    /// Follow a user by username<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#follow-user">Conduit Spec for follow user endpoint</a>
     /// </remarks>
     /// <param name="username">Username of the profile you want to follow</param>
     /// <returns></returns>
@@ -78,7 +78,7 @@ public class ProfilesController : ControllerBase
     /// Unfollow a user
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#unfollow-user">Conduit Spec for unfollow user endpoint</a>
+    /// Unfollow a user by username<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#unfollow-user">Conduit Spec for unfollow user endpoint</a>
     /// </remarks>
     /// <param name="username">Username of the profile you want to unfollow</param>
     /// <returns></returns>

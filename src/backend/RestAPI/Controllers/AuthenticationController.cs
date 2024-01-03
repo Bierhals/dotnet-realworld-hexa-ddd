@@ -15,10 +15,10 @@ namespace Conduit.RestAPI.Controllers;
 public class AuthenticationController : ControllerBase
 {
     /// <summary>
-    /// Login for existing user
+    /// Existing user login
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#authentication">Conduit Spec for login endpoint</a>
+    /// Login for existing user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#authentication">Conduit Spec for login endpoint</a>
     /// </remarks>
     /// <returns></returns>
     /// <response code="200">Successful login, returns the User that is logged in</response>
