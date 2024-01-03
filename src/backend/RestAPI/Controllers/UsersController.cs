@@ -8,7 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Conduit.RestAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("users")]
 [Tags("User and Authentication")]
 [Consumes("application/json")]
 [Produces("application/json")]
