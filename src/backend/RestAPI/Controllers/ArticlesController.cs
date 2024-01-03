@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 using Conduit.RestAPI.ViewModels;
 
@@ -148,5 +147,108 @@ public sealed class ArticlesController : ControllerBase
                     }
                 }
             });
+    }
+
+    /// <summary>
+    /// Get an article
+    /// </summary>
+    /// <remarks>
+    /// Get an article. Auth not required<br/>
+    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-article">Conduit spec for Get Article endpoint</a>
+    /// </remarks>
+    /// <param name="slug">Slug of the article to get</param>
+    /// <response code="200">Successful retrieval, returns the Article</response>
+    /// <response code="422">Article was unable to be refrieved</response>
+    [HttpGet("{slug}")]
+    [ProducesResponseType<SingleArticleResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public IActionResult GetArticle([FromRoute] string slug)
+    {
+        return Ok(
+            new SingleArticleResponse
+            {
+                Article = new Article
+                {
+                    Slug = "slug",
+                    Title = "title",
+                    Description = "description",
+                    Body = "body",
+                    tagList = new[] { "Test" },
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Favorited = true,
+                    FavoritesCount = 3,
+                    Author = new Profile
+                    {
+                        Username = "username",
+                        Bio = "bio",
+                        Image = "image",
+                        Following = false
+                    }
+                }
+            });
+    }
+
+    /// <summary>
+    /// Update an article
+    /// </summary>
+    /// <remarks>
+    /// Update an article. Auth is required<br/>
+    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-article">Conduit spec for Update Article endpoint</a>
+    /// </remarks>
+    /// <param name="request">Comment you want to create</param>
+    /// <param name="slug">Slug of the article to update</param>
+    /// <response code="200">Successful update, returns the updated Article</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="422">Article was unable to be refrieved</response>
+    [HttpPut("{slug}")]
+    [ProducesResponseType<SingleArticleResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public IActionResult UpdateArticle([FromBody, SwaggerRequestBody(Required = true)] UpdateArticleRequest request, [FromRoute] string slug)
+    {
+        return Ok(
+            new SingleArticleResponse
+            {
+                Article = new Article
+                {
+                    Slug = "slug",
+                    Title = "title",
+                    Description = "description",
+                    Body = "body",
+                    tagList = new[] { "Test" },
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Favorited = true,
+                    FavoritesCount = 3,
+                    Author = new Profile
+                    {
+                        Username = "username",
+                        Bio = "bio",
+                        Image = "image",
+                        Following = false
+                    }
+                }
+            });
+    }
+
+    /// <summary>
+    /// Delete an article
+    /// </summary>
+    /// <remarks>
+    /// Delete an article. Auth is required<br/>
+    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#delete-article">Conduit spec for Delete Article endpoint</a>
+    /// </remarks>
+    /// <param name="slug">Slug of the article to delete</param>
+    /// <response code="200">Successful delete</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="422">Article deletion request is invalid</response>
+    [HttpDelete("{slug}")]
+    [ProducesResponseType<EmptyOkResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public IActionResult DeleteArticle([FromRoute] string slug)
+    {
+        return Ok();
     }
 }

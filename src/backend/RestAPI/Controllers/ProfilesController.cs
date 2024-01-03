@@ -27,7 +27,7 @@ public class ProfilesController : ControllerBase
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult GetProfileByUsername(string username)
+    public IActionResult GetProfileByUsername([FromQuery] string username)
     {
         return Ok(
             new ProfileResponse
@@ -57,7 +57,7 @@ public class ProfilesController : ControllerBase
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult FollowUserByUsername(string username)
+    public IActionResult FollowUserByUsername([FromQuery] string username)
     {
         return Ok(
             new ProfileResponse
@@ -87,7 +87,7 @@ public class ProfilesController : ControllerBase
     [ProducesResponseType<ProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult UnfollowUserByUsername(string username)
+    public IActionResult UnfollowUserByUsername([FromQuery] string username)
     {
         return Ok(
             new ProfileResponse

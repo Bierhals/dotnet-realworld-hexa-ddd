@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Conduit.RestAPI;
+namespace Conduit.RestAPI.ViewModels;
 
 public record GetArticlesRequest
 {
