@@ -240,11 +240,11 @@ public sealed class ArticlesController : ControllerBase
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#delete-article">Conduit spec for Delete Article endpoint</a>
     /// </remarks>
     /// <param name="slug">Slug of the article to delete</param>
-    /// <response code="200">Successful delete</response>
+    /// <response code="200">No Content</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Article deletion request is invalid</response>
     [HttpDelete("{slug}")]
-    [ProducesResponseType<EmptyOkResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public IActionResult DeleteArticle([FromRoute] string slug)

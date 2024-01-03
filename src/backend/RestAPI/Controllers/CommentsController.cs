@@ -103,11 +103,11 @@ public class CommentsController : ControllerBase
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to delete a comment for</param>
     /// <param name="id">ID of the comment you want to delete</param>
-    /// <response code="200">Successfully deleted</response>
+    /// <response code="200">No Content</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Something went wrong while deleting the comment</response>
     [HttpDelete("{id}")]
-    [ProducesResponseType<EmptyOkResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public IActionResult DeleteArticleComment([FromRoute] string slug, [FromRoute] int id)
