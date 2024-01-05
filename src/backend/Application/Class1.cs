@@ -1,4 +1,4 @@
-﻿namespace Conduit.Application;
+namespace Conduit.Application;
 
 public class Class1
 {
