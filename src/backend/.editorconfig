@@ -87,6 +87,7 @@ dotnet_diagnostic.IDE0110.severity = warning # Remove unnecessary discard
 dotnet_diagnostic.IDE0120.severity = warning # Simplify LINQ expression
 
 # code quality / design rules
+dotnet_diagnostic.CS1591.severity = none # XML comments are optional
 dotnet_diagnostic.CA1050.severity = warning # Declare types in namespaces
 dotnet_diagnostic.CA1051.severity = warning # Do not declare visible instance fields
 dotnet_diagnostic.CA1064.severity = warning # Exceptions should be public

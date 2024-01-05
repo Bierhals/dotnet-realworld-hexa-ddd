@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Conduit.RestAPI.Configuration;
 
-public class OpenApiRequiredMemberFilter : ISchemaFilter
+class OpenApiRequiredMemberFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {

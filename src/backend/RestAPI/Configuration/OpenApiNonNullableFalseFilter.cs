@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Conduit.RestAPI;
 
-public class OpenApiNonNullableFalseFilter : ISchemaFilter
+class OpenApiNonNullableFalseFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
