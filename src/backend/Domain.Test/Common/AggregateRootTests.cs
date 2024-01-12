@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Conduit.Domain.Common;
 using FluentAssertions;
@@ -49,7 +49,7 @@ public class AggregateRootTests
         act.Should().Throw<BusinessRuleValidationException>();
     }
 
-    
+
     public class MyAggregate : AggregateRoot<MyId>
     {
         public MyAggregate(MyId? id) : base(id)
@@ -121,7 +121,7 @@ public class AggregateRootTests
             _error = error;
         }
 
-        public string Message 
+        public string Message
         {
             get
             {

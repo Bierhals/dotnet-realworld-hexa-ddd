@@ -1,4 +1,4 @@
-﻿using Conduit.Domain.Common;
+using Conduit.Domain.Common;
 using FluentAssertions;
 using Xunit;
 
@@ -41,7 +41,7 @@ public class BusinessRuleValidationExceptionTests
             _error = error;
         }
 
-        public string Message 
+        public string Message
         {
             get
             {
