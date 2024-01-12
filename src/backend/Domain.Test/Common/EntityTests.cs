@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Conduit.Domain.Common;
 using FluentAssertions;
 using Xunit;
 
-namespace Conduit.Domain.Test;
+namespace Conduit.Domain.Test.Common;
 
-public class BasicTests
+public class EntityTests
 {
     [Fact]
     public void Derived_entities_are_not_equal()

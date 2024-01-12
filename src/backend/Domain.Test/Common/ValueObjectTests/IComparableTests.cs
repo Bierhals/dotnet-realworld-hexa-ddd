@@ -12,14 +12,12 @@ public class IComparableTests
     [Fact]
     public void Can_sort_simple_value_objects()
     {
-        var name3 = new NameSuffix(3);
-        var name1 = new NameSuffix(1);
-        var name4 = new NameSuffix(4);
-        var name2 = new NameSuffix(2);
+        NameSuffix name3 = new(3);
+        NameSuffix name1 = new(1);
+        NameSuffix name4 = new(4);
+        NameSuffix name2 = new(2);
 
-        var nameSuffixes = new[] { name3, name1, name4, name2 }
-            .OrderBy(x => x)
-            .ToArray();
+        NameSuffix[] nameSuffixes = [.. new[] { name3, name1, name4, name2 }.OrderBy(x => x)];
 
         nameSuffixes[0].Should().BeSameAs(name1);
         nameSuffixes[1].Should().BeSameAs(name2);
@@ -30,14 +28,14 @@ public class IComparableTests
     [Fact]
     public void Can_sort_complex_value_objects()
     {
-        var name112 = new Name("111", "111", new NameSuffix(2));
-        var name111 = new Name("111", "111", new NameSuffix(1));
-        var name221 = new Name("222", "222", new NameSuffix(1));
-        var name222 = new Name("222", "222", new NameSuffix(2));
-        var name121 = new Name("111", "222", new NameSuffix(1));
-        var name122 = new Name("111", "222", new NameSuffix(2));
-        var name212 = new Name("222", "111", new NameSuffix(2));
-        var name211 = new Name("222", "111", new NameSuffix(1));
+        Name name112 = new("111", "111", new NameSuffix(2));
+        Name name111 = new("111", "111", new NameSuffix(1));
+        Name name221 = new("222", "222", new NameSuffix(1));
+        Name name222 = new("222", "222", new NameSuffix(2));
+        Name name121 = new("111", "222", new NameSuffix(1));
+        Name name122 = new("111", "222", new NameSuffix(2));
+        Name name212 = new("222", "111", new NameSuffix(2));
+        Name name211 = new("222", "111", new NameSuffix(1));
 
         Name[] names = [.. new[] { name112, name111, name221, name222, name121, name122, name212, name211 }.OrderBy(x => x)];
 
@@ -54,8 +52,8 @@ public class IComparableTests
     [Fact]
     public void Can_sort_value_objects_containing_nulls()
     {
-        var name2 = new Name("1", "1", new NameSuffix(1));
-        var name1 = new Name("1", null, new NameSuffix(1));
+        Name name2 = new("1", "1", new NameSuffix(1));
+        Name name1 = new("1", null, new NameSuffix(1));
 
         Name?[] names = [.. new[] { name1, name2, null }.OrderBy(x => x)];
 
@@ -67,11 +65,11 @@ public class IComparableTests
     [Fact]
     public void Two_value_objects_are_not_equal_if_they_contain_non_comparable_components_of_different_values()
     {
-        var vo1 = new VOWithObjectProperty(new object());
-        var vo2 = new VOWithObjectProperty(new object());
+        VOWithObjectProperty vo1 = new(new object());
+        VOWithObjectProperty vo2 = new(new object());
 
-        var result1 = vo1.CompareTo(vo2);
-        var result2 = vo2.CompareTo(vo1);
+        int result1 = vo1.CompareTo(vo2);
+        int result2 = vo2.CompareTo(vo1);
 
         result1.Should().NotBe(0);
         result2.Should().NotBe(0);
@@ -81,11 +79,11 @@ public class IComparableTests
     [Fact]
     public void Can_compare_value_objects_with_collections()
     {
-        var vo1 = new VOWithCollection("one", "two");
-        var vo2 = new VOWithCollection("one", "three");
+        VOWithCollection vo1 = new("one", "two");
+        VOWithCollection vo2 = new("one", "three");
 
-        var result1 = vo1.CompareTo(vo2);
-        var result2 = vo2.CompareTo(vo1);
+        int result1 = vo1.CompareTo(vo2);
+        int result2 = vo2.CompareTo(vo1);
 
         result1.Should().NotBe(0);
         result2.Should().NotBe(0);
@@ -95,11 +93,11 @@ public class IComparableTests
     [Fact]
     public void Can_compare_value_objects_with_collections_of_variable_size()
     {
-        var vo1 = new VOWithCollection("one", "two");
-        var vo2 = new VOWithCollection("one", "two", "three");
+        VOWithCollection vo1 = new("one", "two");
+        VOWithCollection vo2 = new("one", "two", "three");
 
-        var result1 = vo1.CompareTo(vo2);
-        var result2 = vo2.CompareTo(vo1);
+        int result1 = vo1.CompareTo(vo2);
+        int result2 = vo2.CompareTo(vo1);
 
         result1.Should().NotBe(0);
         result2.Should().NotBe(0);
@@ -109,11 +107,11 @@ public class IComparableTests
     [Fact]
     public void Can_compare_value_objects_with_different_types()
     {
-        var intValueObject = new VOIntType(1);
-        var stringValueObject = new VOStringType("2");
+        VOIntType intValueObject = new(1);
+        VOStringType stringValueObject = new("2");
 
-        var result1 = intValueObject.CompareTo(stringValueObject);
-        var result2 = stringValueObject.CompareTo(intValueObject);
+        int result1 = intValueObject.CompareTo(stringValueObject);
+        int result2 = stringValueObject.CompareTo(intValueObject);
 
         result1.Should().BeLessOrEqualTo(-1);
         result2.Should().BeGreaterOrEqualTo(-1);
