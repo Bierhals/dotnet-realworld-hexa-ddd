@@ -38,13 +38,9 @@ jobs:
     - name: Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
       with:
-        reports: 'src/**/coverage.cobertura.xml'
-        targetdir: 'coveragereport'
+        reports: 'src/backend/**/coverage.cobertura.xml'
+        targetdir: 'src/backend/coveragereport'
         reporttypes: 'MarkdownSummaryGithub'
-        verbosity: Verbose
-  
-    - name: show directory
-      run: ls >> $GITHUB_STEP_SUMMARY
 
     - name: Add coverage to job summary
       run: cat 'coveragereport/SummaryGithub.md' >> $GITHUB_STEP_SUMMARY
