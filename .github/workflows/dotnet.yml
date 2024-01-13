@@ -41,17 +41,17 @@ jobs:
         reports: 'src/**/coverage.cobertura.xml'
         targetdir: 'coveragereport'
         reporttypes: 'MarkdownSummaryGithub'
+  
+    - name: show directory
+      run: ls >> $GITHUB_STEP_SUMMARY
+
+    - name: Add coverage to job summary
+      run: cat 'coveragereport/SummaryGithub.md' >> $GITHUB_STEP_SUMMARY
 
     - name: Add coverage pr comment
       uses: marocchino/sticky-pull-request-comment@v2.8.0
       with:
         path: coveragereport/SummaryGithub.md
 
-    - name: show directory
-      run: ls >> $GITHUB_STEP_SUMMARY
-
-    - name: Add coverage to job summary
-      run: cat 'coveragereport/SummaryGithub.md' >> $GITHUB_STEP_SUMMARY
-      
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
