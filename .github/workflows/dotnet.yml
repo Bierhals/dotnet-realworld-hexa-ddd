@@ -51,7 +51,7 @@ jobs:
       run: ls >> $GITHUB_STEP_SUMMARY
 
     - name: Add coverage to job summary
-      run: cat ./coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      run: cat 'coveragereport/SummaryGithub.md' >> $GITHUB_STEP_SUMMARY
       
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
