@@ -43,12 +43,12 @@ jobs:
         reporttypes: 'MarkdownSummaryGithub'
 
     - name: Add coverage to job summary
-      run: cat 'coveragereport/SummaryGithub.md' >> $GITHUB_STEP_SUMMARY
+      run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
     - name: Add coverage pr comment
       uses: marocchino/sticky-pull-request-comment@v2.8.0
       with:
-        path: coveragereport/SummaryGithub.md
+        path: src/backend/coveragereport/SummaryGithub.md
 
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
