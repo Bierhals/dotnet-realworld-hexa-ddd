@@ -50,6 +50,19 @@ jobs:
       with:
         recreate: true
         path: code-coverage-results.md
-    
+
+    - name: Code Coverage Report
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+      with:
+        reports: 'src/**/coverage.cobertura.xml'
+        targetdir: 'coveragereport'
+        reporttypes: 'HtmlInline'
+
+    - name: Upload Code Coverage Report artifact
+      uses: actions/upload-artifact@v2.2.3
+      with:
+        name: CoverageReport    
+        path: coveragereport
+
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
