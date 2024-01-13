@@ -48,7 +48,7 @@ jobs:
         path: coveragereport/SummaryGithub.md
 
     - name: Add coverage to job summary
-      run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      run: cat ./src/**/coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
