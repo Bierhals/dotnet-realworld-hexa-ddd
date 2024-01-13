@@ -41,6 +41,7 @@ jobs:
         reports: 'src/**/coverage.cobertura.xml'
         targetdir: 'coveragereport'
         reporttypes: 'MarkdownSummaryGithub'
+        verbosity: Verbose
   
     - name: show directory
       run: ls >> $GITHUB_STEP_SUMMARY
