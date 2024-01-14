@@ -50,6 +50,9 @@ jobs:
         historydir: 'src/backend/coveragehistory'
         reporttypes: 'MarkdownSummaryGithub;HtmlInline;Cobertura'
 
+    - name: debug ls
+      run: ls
+
     - name: Change report headlines
       run: |
         sed -i 's/# Summary/## Code Coverage/g' coveragereport/SummaryGithub.md
