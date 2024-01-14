@@ -71,7 +71,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: CoverageReport
-        path: coveragereport
+        path: src/backend/coveragereport
 
     - name: Upload coverage history
       uses: actions/cache/save@v3
