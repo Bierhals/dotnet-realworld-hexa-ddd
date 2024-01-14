@@ -38,8 +38,8 @@ jobs:
     - name: Restore coverage history
       uses: actions/download-artifact@v4
       with:
+        name: CoverageHistory
         path: src/backend/coveragehistory
-        key: CoverageHistory
       continue-on-error: true
 
     - name: Coverage Report
@@ -74,8 +74,8 @@ jobs:
       uses: actions/upload-artifact@v4
       if: github.ref == 'refs/heads/master'
       with:
+        name: CoverageHistory
         path: src/backend/coveragehistory
-        key: CoverageHistory
 
     - name: Format
       run: dotnet format --verify-no-changes --verbosity diagnostic
