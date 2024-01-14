@@ -36,7 +36,7 @@ jobs:
       run: dotnet test --no-build --verbosity minimal --configuration Release --collect:"XPlat Code Coverage" --results-directory ./coverage
 
     - name: Restore coverage history
-      uses: actions/cache/restore@v3
+      uses: actions/download-artifact@v4
       with:
         path: src/backend/coveragehistory
         key: CoverageHistory
@@ -71,7 +71,7 @@ jobs:
         path: src/backend/coveragereport
 
     - name: Upload coverage history
-      uses: actions/cache/save@v3
+      uses: actions/upload-artifact@v4
       if: github.ref == 'refs/heads/master'
       with:
         path: src/backend/coveragehistory
