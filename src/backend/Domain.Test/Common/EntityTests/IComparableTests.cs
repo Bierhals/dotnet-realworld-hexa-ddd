@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Conduit.Domain.Common;
@@ -31,7 +31,7 @@ public class IComparableTests
     public void Compare_against_null_object_returns_1()
     {
         MyEntity entity = new(new IntId(1));
-        
+
         int result = entity.CompareTo(null);
 
         result.Should().Be(1);
@@ -88,7 +88,7 @@ public class IComparableTests
         entities[1].Should().BeSameAs(entity1);
         entities[2].Should().BeSameAs(entity2);
     }
-    
+
     private class MyEntity : Entity<IntId>
     {
         public MyEntity(IntId id)
@@ -96,7 +96,7 @@ public class IComparableTests
         {
         }
     }
-    
+
     private class MyOtherEntity : Entity<GuidId>
     {
         public MyOtherEntity(GuidId id)

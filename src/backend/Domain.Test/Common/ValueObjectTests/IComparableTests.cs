@@ -29,7 +29,7 @@ public class IComparableTests
     public void Compare_against_null_object_returns_1()
     {
         NameSuffix name = new(3);
-        
+
         int result = name.CompareTo(null);
 
         result.Should().Be(1);
