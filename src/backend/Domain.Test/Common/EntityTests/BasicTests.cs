@@ -4,9 +4,9 @@ using Conduit.Domain.Common;
 using FluentAssertions;
 using Xunit;
 
-namespace Conduit.Domain.Test.Common;
+namespace Conduit.Domain.Test.Common.EntityTests;
 
-public class EntityTests
+public class BasicTests
 {
     [Fact]
     public void Derived_entities_are_not_equal()
