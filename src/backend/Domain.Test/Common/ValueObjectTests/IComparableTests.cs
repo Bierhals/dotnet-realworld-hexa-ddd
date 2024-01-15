@@ -36,7 +36,7 @@ public class IComparableTests
     }
 
     [Fact]
-    public void compare_same_objects_returns_0()
+    public void Compare_same_objects_returns_0()
     {
         NameSuffix name = new(3);
 

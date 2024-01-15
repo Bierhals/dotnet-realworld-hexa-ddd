@@ -28,6 +28,42 @@ public class IComparableTests
     }
 
     [Fact]
+    public void Compare_against_null_object_returns_1()
+    {
+        MyEntity entity = new(new IntId(1));
+        
+        int result = entity.CompareTo(null);
+
+        result.Should().Be(1);
+    }
+
+    [Fact]
+    public void Compare_same_objects_returns_0()
+    {
+        MyEntity entity = new(new IntId(1));
+
+        int result = entity.CompareTo(entity);
+
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public void Compare_entities_with_nullable_id()
+    {
+        NullableEntity entity1 = new();
+        NullableEntity entity2 = new();
+        NullableEntity entity3 = new(new NullableId(1));
+
+        int result1 = entity1.CompareTo(entity2);
+        int result2 = entity1.CompareTo(entity3);
+        int result3 = entity3.CompareTo(entity1);
+
+        result1.Should().Be(0);
+        result2.Should().Be(-1);
+        result3.Should().Be(1);
+    }
+
+    [Fact]
     public void Entities_with_different_id_types_are_comparatively_null()
     {
         MyEntity longEntity = new(new IntId(1));
@@ -69,6 +105,18 @@ public class IComparableTests
         }
     }
 
+    private class NullableEntity : Entity<NullableId>
+    {
+        public NullableEntity() : base(null)
+        {
+        }
+
+        public NullableEntity(NullableId id)
+            : base(id)
+        {
+        }
+    }
+
     public class IntId : ValueObject
     {
         public int Value
@@ -95,6 +143,28 @@ public class IComparableTests
         }
 
         public GuidId(Guid value)
+        {
+            Value = value;
+        }
+
+        protected override IEnumerable<IComparable?> GetAtomicValues()
+        {
+            yield return Value;
+        }
+    }
+
+    public class NullableId : ValueObject
+    {
+        public int? Value
+        {
+            get;
+        }
+
+        public NullableId()
+        {
+        }
+
+        public NullableId(int value)
         {
             Value = value;
         }
