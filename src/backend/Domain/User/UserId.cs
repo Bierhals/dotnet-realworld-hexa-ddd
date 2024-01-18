@@ -1,23 +1,25 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Conduit.Domain.Common;
 
 namespace Conduit.Domain.User;
 
-public class UserId : ValueObject
+public class UserEmail : ValueObject
 {
-        public string Email
-        {
-            get;
-        }
+    public string Value
+    {
+        get;
+    }
 
-        public UserId(string email)
-        {
-            Email = email;
-        }
+    public UserEmail(string email)
+    {
+        CheckRule(new UserEmailMustBeValidRule(email));
+
+        Value = email;
+    }
 
     protected override IEnumerable<IComparable?> GetAtomicValues()
     {
-        yield return Email;
+        yield return Value;
     }
 }

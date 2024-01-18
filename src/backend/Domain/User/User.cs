@@ -1,20 +1,32 @@
-﻿using Conduit.Domain.Common;
+using Conduit.Domain.Common;
 using Conduit.Domain.User.Events;
 using Conduit.Domain.User.Rules;
 
 namespace Conduit.Domain.User;
 
-public class User : AggregateRoot<UserId>
+public class User : AggregateRoot<UserEmail>
 {
-    public string Username { get; private set;}
-    public string Password { get; private set; }
-    public string Bio { get; }
-    public string Image { get; }
+    public string Username
+    {
+        get; private set;
+    }
+    public string HashedPassword
+    {
+        get; private set;
+    }
+    public string Bio
+    {
+        get;
+    }
+    public string Image
+    {
+        get;
+    }
 
-    User(UserId id, string username, string password, string bio, string image) : base(id)
+    User(UserEmail id, string username, string hashedPassword, string bio, string image) : base(id)
     {
         Username = username;
-        Password = password;
+        HashedPassword = hashedPassword;
         Bio = bio;
         Image = image;
     }
@@ -22,12 +34,11 @@ public class User : AggregateRoot<UserId>
     public static User RegisterNewUser(string email, string username, string clearTextPassword, IUsersCounter usersCounter, IPasswordHasher passwordHasher)
     {
         string emailLowercase = email.ToLower();
-        UserId id = new (emailLowercase);
+        UserEmail id = new(emailLowercase);
         string hashedPassword = passwordHasher.HashPassword(clearTextPassword);
-        
-        User newUser = new (id, username, hashedPassword, string.Empty, string.Empty);
-        
-        newUser.CheckRule(new UserEmailMustBeValidRule(email));
+
+        User newUser = new(id, username, hashedPassword, string.Empty, string.Empty);
+
         newUser.CheckRule(new UsernameMustBeProvidedRule(username));
         newUser.CheckRule(new UsernameCanOnlyContainLettersAndNumbersRule(username));
         newUser.CheckRule(new UserPasswordIsToShortRule(clearTextPassword.Length));
@@ -45,7 +56,7 @@ public class User : AggregateRoot<UserId>
         CheckRule(new UserPasswordIsToShortRule(newClearTextPassword.Length));
         CheckRule(new UserPasswordIsBlacklistedRule(newClearTextPassword));
 
-        Password = passwordHasher.HashPassword(newClearTextPassword);
+        HashedPassword = passwordHasher.HashPassword(newClearTextPassword);
 
         AddDomainEvent(new PasswordChangedDomainEvent(Username));
     }
