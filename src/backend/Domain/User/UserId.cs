@@ -6,10 +6,7 @@ namespace Conduit.Domain.User;
 
 public class UserEmail : ValueObject
 {
-    public string Value
-    {
-        get;
-    }
+    public string Value { get; }
 
     public UserEmail(string email)
     {

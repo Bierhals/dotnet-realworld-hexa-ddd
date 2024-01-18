@@ -6,22 +6,10 @@ namespace Conduit.Domain.User;
 
 public class User : AggregateRoot<UserEmail>
 {
-    public string Username
-    {
-        get; private set;
-    }
-    public string HashedPassword
-    {
-        get; private set;
-    }
-    public string Bio
-    {
-        get;
-    }
-    public string Image
-    {
-        get;
-    }
+    public string Username { get; private set; }
+    public string HashedPassword { get; private set; }
+    public string Bio { get; }
+    public string Image { get; }
 
     User(UserEmail id, string username, string hashedPassword, string bio, string image) : base(id)
     {
