@@ -1,6 +1,6 @@
-﻿namespace Conduit.Domain.User.Rules;
+namespace Conduit.Domain.User.Rules;
 
-public class UsernameMustBeProvidedRule: IBusinessRule
+public class UsernameMustBeProvidedRule : IBusinessRule
 {
     readonly string _username;
 

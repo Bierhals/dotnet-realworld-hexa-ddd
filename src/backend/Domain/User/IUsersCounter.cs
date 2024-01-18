@@ -1,4 +1,4 @@
-﻿namespace Conduit.Domain.User;
+namespace Conduit.Domain.User;
 
 public interface IUsersCounter
 {

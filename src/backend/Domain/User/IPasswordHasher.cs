@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace Conduit.Domain;
 
 public interface IPasswordHasher

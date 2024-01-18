@@ -1,4 +1,4 @@
-﻿namespace Conduit.Domain.User.Rules;
+namespace Conduit.Domain.User.Rules;
 
 public class UserPasswordIsToShortRule : IBusinessRule
 {
