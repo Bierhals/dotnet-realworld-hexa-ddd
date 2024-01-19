@@ -1,4 +1,9 @@
+using System.Threading;
+using System.Threading.Tasks;
+using Conduit.Application.Users.Commands.Dtos;
+using Conduit.Application.Users.Commands.RegisterNewUser;
 using Conduit.RestAPI.ViewModels;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -12,6 +17,13 @@ namespace Conduit.RestAPI.Controllers;
 [Produces("application/json")]
 public class UsersController : ControllerBase
 {
+    readonly IMediator _mediator;
+
+    public UsersController(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     /// <summary>
     /// Register a new user
     /// </summary>
@@ -25,18 +37,25 @@ public class UsersController : ControllerBase
     [HttpPost]
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request)
+    public async Task<IActionResult> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
     {
+        UserDto registrationResult = await _mediator.Send(new RegisterNewUserCommand
+        {
+            Email = request.User.Email, 
+            Username = request.User.Username, 
+            Password = request.User.Password
+        }, cancellationToken);
+
         return Ok(
             new UserResponse
             {
                 User = new User
                 {
-                    Email = request.User.Email,
-                    Username = request.User.Email,
-                    Token = "Test Token",
-                    Bio = "Test Bio",
-                    Image = "Test"
+                    Email = registrationResult.Email,
+                    Username = registrationResult.Email,
+                    Token = registrationResult.Token,
+                    Bio = registrationResult.Bio,
+                    Image = registrationResult.Image
                 }
             });
     }
