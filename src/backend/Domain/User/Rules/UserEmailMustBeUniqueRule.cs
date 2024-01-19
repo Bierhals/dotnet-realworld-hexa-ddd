@@ -3,9 +3,9 @@ namespace Conduit.Domain.User.Rules;
 public class UserEmailMustBeUniqueRule : IBusinessRule
 {
     readonly IUsersCounter _usersCounter;
-    readonly string _email;
+    readonly UserEmail _email;
 
-    public UserEmailMustBeUniqueRule(string email, IUsersCounter usersCounter)
+    public UserEmailMustBeUniqueRule(UserEmail email, IUsersCounter usersCounter)
     {
         _email = email;
         _usersCounter = usersCounter;
@@ -15,6 +15,6 @@ public class UserEmailMustBeUniqueRule : IBusinessRule
 
     public bool IsBroken()
     {
-        return _usersCounter.CountUsersWithEmail(_email) > 0;
+        return _usersCounter.CountUsersWithEmailAsync(_email, default).GetAwaiter().GetResult() > 0;
     }
 }

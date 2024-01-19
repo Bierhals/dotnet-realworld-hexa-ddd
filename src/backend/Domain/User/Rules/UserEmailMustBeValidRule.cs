@@ -15,7 +15,7 @@ public partial class UserEmailMustBeValidRule : IBusinessRule
 
     public bool IsBroken()
     {
-        return ValidEmailRegEx().IsMatch(_email);
+        return ValidEmailRegEx().IsMatch(_email) == false;
     }
 
     [GeneratedRegex(@"^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$", RegexOptions.IgnoreCase)]

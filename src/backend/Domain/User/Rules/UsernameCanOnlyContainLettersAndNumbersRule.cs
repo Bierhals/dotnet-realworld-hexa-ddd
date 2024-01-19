@@ -15,7 +15,7 @@ public partial class UsernameCanOnlyContainLettersAndNumbersRule : IBusinessRule
 
     public bool IsBroken()
     {
-        return ValidUsernameRegEx().IsMatch(_username);
+        return ValidUsernameRegEx().IsMatch(_username) == false;
     }
 
     [GeneratedRegex("^[a-zA-Z0-9]*$")]

@@ -31,6 +31,7 @@ public class UsersController : ControllerBase
     /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
     /// <param name="request">Details of the new user to register</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">User</response>
     /// <response code="422">Unexpected error</response>
@@ -41,8 +42,8 @@ public class UsersController : ControllerBase
     {
         UserDto registrationResult = await _mediator.Send(new RegisterNewUserCommand
         {
-            Email = request.User.Email, 
-            Username = request.User.Username, 
+            Email = request.User.Email,
+            Username = request.User.Username,
             Password = request.User.Password
         }, cancellationToken);
 

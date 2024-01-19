@@ -15,6 +15,6 @@ public class UsernameMustBeUniqueRule : IBusinessRule
 
     public bool IsBroken()
     {
-        return _usersCounter.CountUsersWithUsername(_username) > 0;
+        return _usersCounter.CountUsersWithUsernameAsync(_username, default).GetAwaiter().GetResult() > 0;
     }
 }

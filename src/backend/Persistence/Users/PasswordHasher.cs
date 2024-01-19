@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Conduit.Domain;
 
-namespace Conduit.Persistence;
+namespace Conduit.Persistence.Users;
 
 public class PasswordHasher : IPasswordHasher
 {
@@ -28,7 +28,7 @@ public class PasswordHasher : IPasswordHasher
         Span<byte> hashedPasswordBytes = stackalloc byte[hashedPasswordByteCount];
 
         Span<byte> saltBytes = hashedPasswordBytes.Slice(
-            start: 1, 
+            start: 1,
             length: currentVersion.SaltSize);
         Span<byte> keyBytes = hashedPasswordBytes.Slice(
             start: 1 + currentVersion.SaltSize,
@@ -47,7 +47,7 @@ public class PasswordHasher : IPasswordHasher
         PasswordHasherVersion usedVersion = Versions[hashedPasswordBytes[0]];
 
         Span<byte> saltBytes = hashedPasswordBytes.Slice(
-            start: 1, 
+            start: 1,
             length: usedVersion.SaltSize);
         Span<byte> expectedKeyBytes = hashedPasswordBytes.Slice(
             start: 1 + usedVersion.SaltSize,

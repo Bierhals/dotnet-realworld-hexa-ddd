@@ -31,7 +31,7 @@ public class User : AggregateRoot<UserEmail>
         newUser.CheckRule(new UsernameCanOnlyContainLettersAndNumbersRule(username));
         newUser.CheckRule(new UserPasswordIsToShortRule(clearTextPassword.Length));
         newUser.CheckRule(new UserPasswordIsBlacklistedRule(clearTextPassword));
-        newUser.CheckRule(new UserEmailMustBeUniqueRule(email, usersCounter));
+        newUser.CheckRule(new UserEmailMustBeUniqueRule(id, usersCounter));
         newUser.CheckRule(new UsernameMustBeUniqueRule(username, usersCounter));
 
         newUser.AddDomainEvent(new NewUserRegisteredDomainEvent(emailLowercase, username));

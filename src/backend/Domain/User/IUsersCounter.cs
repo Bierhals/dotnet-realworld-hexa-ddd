@@ -1,9 +1,10 @@
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Conduit.Domain.User;
 
 public interface IUsersCounter
 {
-    uint CountUsersWithEmail(string email, CancellationToken cancellationToken);
-    uint CountUsersWithUsername(string username, CancellationToken cancellationToken);
+    Task<int> CountUsersWithEmailAsync(UserEmail email, CancellationToken cancellationToken);
+    Task<int> CountUsersWithUsernameAsync(string username, CancellationToken cancellationToken);
 }

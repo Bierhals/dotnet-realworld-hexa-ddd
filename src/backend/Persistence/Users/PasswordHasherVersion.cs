@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 
-namespace Conduit.Persistence;
+namespace Conduit.Persistence.Users;
 
 record PasswordHasherVersion
 {
