@@ -15,6 +15,6 @@ public class UserEmailMustBeUniqueRule : IBusinessRule
 
     public bool IsBroken()
     {
-        return _usersCounter.CountUsersWithEmailAsync(_email, default).GetAwaiter().GetResult() > 0;
+        return _usersCounter.CountUsersWithEmailAsync(_email).GetAwaiter().GetResult() > 0;
     }
 }

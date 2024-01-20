@@ -22,7 +22,7 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Us
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
     }
-    public async Task<UserDto> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken)
+    public async Task<UserDto> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
     {
         User newUser = User.RegisterNewUser(request.Email, request.Username, request.Password, _usersCounter, _passwordHasher);
 

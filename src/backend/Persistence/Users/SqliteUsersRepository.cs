@@ -14,12 +14,12 @@ public class SqliteUsersRepository : IUsersRepository
         _context = context;
     }
 
-    public async Task AddAsync(User user, CancellationToken cancellationToken)
+    public async Task AddAsync(User user, CancellationToken cancellationToken = default)
     {
         await _context.Users.AddAsync(user, cancellationToken);
     }
 
-    public Task<User> GetByIdAsync(UserEmail id, CancellationToken cancellationToken)
+    public Task<User> GetByIdAsync(UserEmail id, CancellationToken cancellationToken = default)
     {
         return _context.Users.FirstAsync(u => u.Id == id, cancellationToken);
     }
