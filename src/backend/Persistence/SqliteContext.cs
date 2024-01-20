@@ -17,6 +17,12 @@ public class SqliteContext : DbContext
 
     public DbSet<User> Users { get; set; } = null!;
 
+    public SqliteContext()
+    {
+        // for ef tools
+        _mediator = null!;
+    }
+
     public SqliteContext(DbContextOptions<SqliteContext> options,
         IMediator mediator)
         : base(options)
