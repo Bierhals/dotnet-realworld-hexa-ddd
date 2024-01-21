@@ -66,7 +66,7 @@ public class SqliteContext : DbContext
         }
     }
 
-    IDomainEvent [] GetNewDomainEvents()
+    IDomainEvent[] GetNewDomainEvents()
     {
         return ChangeTracker
             .Entries<IAggregateRoot>()

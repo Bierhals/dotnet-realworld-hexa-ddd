@@ -2,9 +2,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Users.Commands.Dtos;
 using Conduit.Application.Users.Commands.RegisterNewUser;
+using Conduit.Domain.Common;
 using Conduit.RestAPI.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -37,28 +39,45 @@ public class UsersController : ControllerBase
     /// <response code="422">Unexpected error</response>
     [HttpPost]
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType<GenericErrorModel>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<Results<UnprocessableEntity<GenericErrorModel>, Created<UserResponse>>> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
     {
-        UserDto registrationResult = await _mediator.Send(new RegisterNewUserCommand
+        try
         {
-            Email = request.User.Email,
-            Username = request.User.Username,
-            Password = request.User.Password
-        }, cancellationToken);
-
-        return Ok(
-            new UserResponse
+            UserDto registrationResult = await _mediator.Send(new RegisterNewUserCommand
             {
-                User = new User
+                Email = request.User.Email,
+                Username = request.User.Username,
+                Password = request.User.Password
+            }, cancellationToken);
+
+            return TypedResults.Created(
+                (string?)null,
+                new UserResponse
                 {
-                    Email = registrationResult.Email,
-                    Username = registrationResult.Email,
-                    Token = registrationResult.Token,
-                    Bio = registrationResult.Bio,
-                    Image = registrationResult.Image
-                }
-            });
+                    User = new User
+                    {
+                        Email = registrationResult.Email,
+                        Username = registrationResult.Username,
+                        Token = registrationResult.Token,
+                        Bio = registrationResult.Bio,
+                        Image = registrationResult.Image
+                    }
+                });
+        }
+        catch (BusinessRuleValidationException ex)
+        {
+            return TypedResults.UnprocessableEntity(
+                new GenericErrorModel
+                {
+                    Errors = new Errors
+                    {
+                        Body = new[] {
+                            ex.BrokenRule.Message
+                        }
+                    }
+                });
+        }
     }
 
     /// <summary>
