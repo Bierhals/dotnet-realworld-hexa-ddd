@@ -26,11 +26,15 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<UserDto, Error>
     {
         string emailLowerCase = request.Email.ToLower();
         bool loginIsValid = await _authenticationService.ValidateLoginAsync(emailLowerCase, request.Password, cancellationToken);
+
         if (!loginIsValid)
         {
-            return Result.Failure<UserDto, Error>(new Error(errorCode: "login.is.invalid", message: "Login is invalid"));
+            return Result.Failure<UserDto, Error>(LoginErrors.LoginIsInvalid());
         }
 
-        return await _usersQueryRepository.GetByEmailAsync(emailLowerCase, cancellationToken);
+        UserDto user = await _usersQueryRepository.GetByEmailAsync(emailLowerCase, cancellationToken);
+        user.Token = _authenticationService.GenerateJwtToken(user.Email);
+
+        return user;
     }
 }

@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Common;
 using Conduit.Application.Users.Dtos;
+using Conduit.Application.Users.Services;
 using Conduit.Domain.Common;
 using Conduit.Domain.User;
 using CSharpFunctionalExtensions;
@@ -16,13 +17,15 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
     readonly IUsersCounter _usersCounter;
     readonly IUsersRepository _userRepository;
     readonly IPasswordHasher _passwordHasher;
+    readonly IAuthenticationService _authenticationService;
 
-    public RegisterNewUserHandler(IUnitOfWork unitOfWork, IUsersCounter usersCounter, IPasswordHasher passwordHasher, IUsersRepository userRepository)
+    public RegisterNewUserHandler(IUnitOfWork unitOfWork, IUsersCounter usersCounter, IPasswordHasher passwordHasher, IUsersRepository userRepository, IAuthenticationService authenticationService)
     {
         _userRepository = userRepository;
         _usersCounter = usersCounter;
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
+        _authenticationService = authenticationService;
     }
 
     public async Task<Result<UserDto, Error>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
@@ -41,9 +44,9 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
                 {
                     Email = newUser.Email.Value,
                     Username = newUser.Username.Value,
-                    Bio = string.Empty,
-                    Image = string.Empty,
-                    Token = string.Empty
+                    Bio = newUser.Bio,
+                    Image = newUser.Image,
+                    Token = _authenticationService.GenerateJwtToken(newUser.Email.Value)
                 };
             });
     }
