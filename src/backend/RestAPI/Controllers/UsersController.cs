@@ -9,6 +9,7 @@ using Conduit.RestAPI.ViewModels;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -93,6 +94,7 @@ public class UsersController : ControllerBase
     /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Unexpected error</response>
+    [Authorize]
     [HttpGet("/user")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
