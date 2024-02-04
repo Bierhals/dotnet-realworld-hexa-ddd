@@ -1,4 +1,4 @@
-using Conduit.Application.Users.Commands.Dtos;
+using Conduit.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;

@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Common;
-using Conduit.Application.Users.Commands.Dtos;
+using Conduit.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using Conduit.Domain.User;
 using CSharpFunctionalExtensions;
@@ -24,6 +24,7 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
     }
+
     public async Task<Result<UserDto, Error>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
     {
         Result<UserEmail, Error> email = UserEmail.Create(request.Email);
@@ -38,7 +39,7 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
 
                 return new UserDto
                 {
-                    Email = newUser.Id.Value,
+                    Email = newUser.Email.Value,
                     Username = newUser.Username.Value,
                     Bio = string.Empty,
                     Image = string.Empty,
