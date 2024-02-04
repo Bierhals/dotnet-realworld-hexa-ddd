@@ -44,7 +44,7 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> Login([FromBody, SwaggerRequestBody(Required = true)] LoginUserRequest request, CancellationToken cancellationToken)
     {
-        Result<UserDto, Error> loginResult = await _mediator.Send(new LoginCommand
+        Result<UserDto, Error> loginResult = await _mediator.Send(new LoginQuery
         {
             Email = request.User.Email,
             Password = request.User.Password

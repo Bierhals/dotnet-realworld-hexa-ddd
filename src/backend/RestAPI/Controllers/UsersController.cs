@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Application;
 using Conduit.Application.Users.Commands.RegisterNewUser;
 using Conduit.Application.Users.Dtos;
 using Conduit.Domain.Common;
@@ -87,6 +88,7 @@ public class UsersController : ControllerBase
     /// <remarks>
     /// Gets the currently logged-in user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
     /// </remarks>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
@@ -95,19 +97,38 @@ public class UsersController : ControllerBase
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        return Ok(
-            new UserResponse
+        Result<UserDto, Error> registrationResult = await _mediator.Send(new CurrentUserQuery
+        { }, cancellationToken);
+
+        return registrationResult.Match(
+            onSuccess: (newUser) =>
             {
-                User = new User
-                {
-                    Email = "@mail.com",
-                    Username = "name",
-                    Token = "Test Token",
-                    Bio = "Test Bio",
-                    Image = "Test"
-                }
+                return (IActionResult)Created(
+                    (string?)null,
+                    new UserResponse
+                    {
+                        User = new User
+                        {
+                            Email = newUser.Email,
+                            Username = newUser.Username,
+                            Token = newUser.Token,
+                            Bio = newUser.Bio,
+                            Image = newUser.Image
+                        }
+                    });
+            },
+            onFailure: (error) =>
+            {
+                return UnprocessableEntity(
+                    new GenericErrorModel
+                    {
+                        Errors = new()
+                        {
+                            Body = error.Messages.Select(m => m.Message).ToArray()
+                        }
+                    });
             });
     }
 

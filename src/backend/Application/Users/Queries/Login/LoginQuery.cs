@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Conduit.Application.Users.Queries.Login;
 
-public class LoginCommand : IRequest<Result<UserDto, Error>>
+public class LoginQuery : IRequest<Result<UserDto, Error>>
 {
     public required string Email { get; init; }
     public required string Password { get; init; }

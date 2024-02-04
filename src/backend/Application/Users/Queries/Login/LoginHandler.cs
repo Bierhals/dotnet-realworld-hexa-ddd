@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Conduit.Application.Users.Queries.Login;
 
-public class LoginHandler : IRequestHandler<LoginCommand, Result<UserDto, Error>>
+public class LoginHandler : IRequestHandler<LoginQuery, Result<UserDto, Error>>
 {
     readonly IAuthenticationService _authenticationService;
     readonly IUsersQueryRepository _usersQueryRepository;
@@ -22,7 +22,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, Result<UserDto, Error>
         _usersQueryRepository = usersQueryRepository;
     }
 
-    public async Task<Result<UserDto, Error>> Handle(LoginCommand request, CancellationToken cancellationToken = default)
+    public async Task<Result<UserDto, Error>> Handle(LoginQuery request, CancellationToken cancellationToken = default)
     {
         string emailLowerCase = request.Email.ToLower();
         bool loginIsValid = await _authenticationService.ValidateLoginAsync(emailLowerCase, request.Password, cancellationToken);
