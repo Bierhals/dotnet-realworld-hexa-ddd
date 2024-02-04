@@ -1,15 +1,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Application.Users.Commands.Dtos;
 using Conduit.Application.Users.Commands.RegisterNewUser;
+using Conduit.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using Conduit.RestAPI.ViewModels;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -43,7 +42,7 @@ public class UsersController : ControllerBase
     [HttpPost]
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<GenericErrorModel>(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<Results<UnprocessableEntity<GenericErrorModel>, Created<UserResponse>>> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
     {
         Result<UserDto, Error> registrationResult = await _mediator.Send(new RegisterNewUserCommand
         {
@@ -55,7 +54,7 @@ public class UsersController : ControllerBase
         return registrationResult.Match(
             onSuccess: (newUser) =>
             {
-                return (Results<UnprocessableEntity<GenericErrorModel>, Created<UserResponse>>)TypedResults.Created(
+                return (IActionResult)Created(
                     (string?)null,
                     new UserResponse
                     {
@@ -71,7 +70,7 @@ public class UsersController : ControllerBase
             },
             onFailure: (error) =>
             {
-                return (Results<UnprocessableEntity<GenericErrorModel>, Created<UserResponse>>)TypedResults.UnprocessableEntity(
+                return UnprocessableEntity(
                     new GenericErrorModel
                     {
                         Errors = new()

@@ -1,4 +1,6 @@
 using Conduit.Application.Common;
+using Conduit.Application.Users.Repositories;
+using Conduit.Application.Users.Services;
 using Conduit.Domain.User;
 using Conduit.Persistence;
 using Conduit.Persistence.Users;
@@ -13,6 +15,8 @@ static class CoreServicesExtension
     {
         services.AddScoped<IUsersCounter, SqliteUsersCounter>();
         services.AddScoped<IUsersRepository, SqliteUsersRepository>();
+        services.AddScoped<IUsersQueryRepository, SqliteUsersQueryRepository>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUnitOfWork, SqliteUnitOfWork>();
 

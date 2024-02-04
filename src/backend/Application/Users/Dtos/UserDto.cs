@@ -1,4 +1,4 @@
-namespace Conduit.Application.Users.Commands.Dtos;
+namespace Conduit.Application.Users.Dtos;
 
 public record UserDto
 {
