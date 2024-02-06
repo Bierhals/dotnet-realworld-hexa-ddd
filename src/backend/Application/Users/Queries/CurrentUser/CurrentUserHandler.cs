@@ -31,7 +31,7 @@ public class CurrentUserHandler : IRequestHandler<CurrentUserQuery, Result<UserD
         AuthenticatedUserDto? authUser = _authenticatedUserService.GetAuthenticatedUser();
         if (authUser == null)
         {
-            return Result.Failure<UserDto, Error>(new Error("user.is.not.authenticated", "The user is not authenticated"));
+            return Result.Failure<UserDto, Error>(AuthenticationErrors.UserIsNotAuthorized());
         }
 
         UserDto user = await _usersQueryRepository.GetByEmailAsync(authUser.EMail, cancellationToken);
