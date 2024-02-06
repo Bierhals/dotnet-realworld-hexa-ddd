@@ -1,6 +1,6 @@
-using Conduit.Application.Common;
 using Conduit.Application.Services;
 using Conduit.Application.Users.Repositories;
+using Conduit.Domain.Common;
 using Conduit.Domain.User;
 using Conduit.Persistence;
 using Conduit.Persistence.Users;
