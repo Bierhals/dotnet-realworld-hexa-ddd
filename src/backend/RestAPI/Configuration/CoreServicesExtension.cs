@@ -7,7 +7,6 @@ using Conduit.Persistence.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace Conduit.RestAPI.Configuration;
 
 static class CoreServicesExtension
