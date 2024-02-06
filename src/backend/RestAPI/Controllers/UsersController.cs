@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Application;
 using Conduit.Application.Users.Commands.RegisterNewUser;
 using Conduit.Application.Users.Dtos;
+using Conduit.Application.Users.Queries.CurrentUser;
 using Conduit.Domain.Common;
 using Conduit.RestAPI.ViewModels;
 using CSharpFunctionalExtensions;

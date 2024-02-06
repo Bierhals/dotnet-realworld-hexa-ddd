@@ -1,4 +1,4 @@
-namespace Conduit.Application.Users.Services;
+namespace Conduit.Application.Dtos;
 
 public record JwtOptions
 {

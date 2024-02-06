@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Conduit.Application.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -57,7 +56,7 @@ static class AuthenticationExtension
         return app;
     }
 
-        public static WebApplication UseConduitAuthorization(this WebApplication app)
+    public static WebApplication UseConduitAuthorization(this WebApplication app)
     {
         app
             .UseAuthorization();

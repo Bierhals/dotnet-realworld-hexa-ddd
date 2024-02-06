@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Conduit.Application.Users.Services;
+namespace Conduit.Application.Services;
 
 public interface IAuthenticationService
 {

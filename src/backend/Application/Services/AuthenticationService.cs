@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Application.Dtos;
 using Conduit.Application.Users.Dtos;
 using Conduit.Application.Users.Repositories;
 using Conduit.Domain.User;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Conduit.Application.Users.Services;
+namespace Conduit.Application.Services;
 
 public class AuthenticationService : IAuthenticationService
 {

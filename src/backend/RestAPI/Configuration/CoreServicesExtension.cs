@@ -1,9 +1,10 @@
 using Conduit.Application.Common;
+using Conduit.Application.Services;
 using Conduit.Application.Users.Repositories;
-using Conduit.Application.Users.Services;
 using Conduit.Domain.User;
 using Conduit.Persistence;
 using Conduit.Persistence.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -13,11 +14,13 @@ static class CoreServicesExtension
 {
     public static IServiceCollection AddConduitServices(this IServiceCollection services)
     {
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<IAuthenticatedUserService, AppContextService>();
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUsersCounter, SqliteUsersCounter>();
         services.AddScoped<IUsersRepository, SqliteUsersRepository>();
         services.AddScoped<IUsersQueryRepository, SqliteUsersQueryRepository>();
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUnitOfWork, SqliteUnitOfWork>();
 
         return services;

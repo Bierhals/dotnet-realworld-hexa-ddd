@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Common;
+using Conduit.Application.Services;
 using Conduit.Application.Users.Dtos;
-using Conduit.Application.Users.Services;
 using Conduit.Domain.Common;
 using Conduit.Domain.User;
 using CSharpFunctionalExtensions;

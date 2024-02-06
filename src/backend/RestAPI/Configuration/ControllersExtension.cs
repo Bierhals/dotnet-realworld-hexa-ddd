@@ -33,7 +33,7 @@ static class ControllersExtension
         return app;
     }
 
-        public static WebApplication UseConduitRouting(this WebApplication app)
+    public static WebApplication UseConduitRouting(this WebApplication app)
     {
         app
             .UsePathBase("/api")
