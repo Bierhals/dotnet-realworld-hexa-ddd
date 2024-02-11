@@ -129,6 +129,7 @@ public class UsersController : ControllerBase
     /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
     /// <response code="422">Unexpected error</response>
+    [Authorize]
     [HttpPut("/user")]
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
