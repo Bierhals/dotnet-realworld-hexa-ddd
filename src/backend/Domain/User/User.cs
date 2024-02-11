@@ -1,4 +1,3 @@
-using System;
 using Conduit.Domain.Common;
 using Conduit.Domain.User.Events;
 using Conduit.Domain.User.Rules;
@@ -6,25 +5,13 @@ using CSharpFunctionalExtensions;
 
 namespace Conduit.Domain.User;
 
-public class User : AggregateRoot<string>
+public class User : AggregateRoot<UserId>
 {
-    public override string Id
-    {
-        get => Email.Value;
-        protected set
-        {
-            UserEmail.Create(value)
-                .Match(
-                    onSuccess: (userEmail) => Email = userEmail,
-                    onFailure: (error) => throw new ArgumentException("The persisted email is invalid", "Email")
-                );
-        }
-    }
     public UserEmail Email { get; protected set; }
     public Username Username { get; protected set; }
     public string HashedPassword { get; private set; }
-    public string Bio { get; }
-    public string Image { get; }
+    public string Bio { get; private set; }
+    public string Image { get; private set; }
 
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
     User()
@@ -33,7 +20,7 @@ public class User : AggregateRoot<string>
     }
 #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 
-    User(UserEmail userEmail, Username username, string hashedPassword, string bio, string image)
+    User(UserId id, UserEmail userEmail, Username username, string hashedPassword, string bio, string image) : base(id)
     {
         Email = userEmail;
         Username = username;
@@ -50,8 +37,9 @@ public class User : AggregateRoot<string>
                 onSuccess: () =>
                 {
                     string hashedPassword = passwordHasher.HashPassword(clearTextPassword);
+                    UserId id = UserId.Create();
 
-                    User newUser = new(email, username, hashedPassword, string.Empty, string.Empty);
+                    User newUser = new(id, email, username, hashedPassword, string.Empty, string.Empty);
 
                     newUser.AddDomainEvent(new NewUserRegisteredDomainEvent(email.Value, username.Value));
 
@@ -76,7 +64,7 @@ public class User : AggregateRoot<string>
                 onSuccess: () =>
                 {
                     HashedPassword = passwordHasher.HashPassword(newClearTextPassword);
-                    AddDomainEvent(new PasswordChangedDomainEvent(Username.Value));
+                    AddDomainEvent(new PasswordChangedDomainEvent(Email.Value));
 
                     return UnitResult.Success<Error>();
                 });
@@ -99,7 +87,7 @@ public class User : AggregateRoot<string>
                     string oldUsername = Username.Value;
                     Username = newUsername;
 
-                    AddDomainEvent(new UsernameChangedDomainEvent(oldUsername, Username.Value));
+                    AddDomainEvent(new UsernameChangedDomainEvent(Email.Value, oldUsername, Username.Value));
 
                     return UnitResult.Success<Error>();
                 });
@@ -108,5 +96,40 @@ public class User : AggregateRoot<string>
     static UnitResult<Error> CanChangeUsername(Username newUsername, IUsersCounter usersCounter)
     {
         return UserRules.UsernameMustBeUniqueRule(newUsername, usersCounter);
+    }
+
+    public UnitResult<Error> ChangeEMail(UserEmail newUserEMail, IUsersCounter usersCounter)
+    {
+        return CanChangeEMail(newUserEMail, usersCounter)
+            .Match(
+                onFailure: error => error,
+                onSuccess: () =>
+                {
+                    string oldUserEMail = Email.Value;
+                    Email = newUserEMail;
+
+                    AddDomainEvent(new UserEMailChangedDomainEvent(oldUserEMail, Email.Value));
+
+                    return UnitResult.Success<Error>();
+                });
+    }
+
+    static UnitResult<Error> CanChangeEMail(UserEmail newUserEMail, IUsersCounter usersCounter)
+    {
+        return UserRules.EmailMustBeUniqueRule(newUserEMail, usersCounter);
+    }
+
+    public void ChangeImage(string image)
+    {
+        string oldImage = Image;
+        Image = image;
+        AddDomainEvent(new UserImageChangedDomainEvent(Email.Value, oldImage, image));
+    }
+
+    public void ChangeBio(string newBio)
+    {
+        string oldBio = newBio;
+        Bio = newBio;
+        AddDomainEvent(new UserBioChangedDomainEvent(Email.Value, oldBio, Bio));
     }
 }

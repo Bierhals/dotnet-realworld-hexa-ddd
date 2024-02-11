@@ -2,9 +2,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Users.Commands.RegisterNewUser;
-using Conduit.Application.Users.Dtos;
+using Conduit.Application.Users.Commands.UpdateUser;
 using Conduit.Application.Users.Queries.CurrentUser;
-using Conduit.Domain.Common;
 using Conduit.RestAPI.ViewModels;
 using CSharpFunctionalExtensions;
 using CSharpFunctionalExtensions.ValueTasks;
@@ -46,17 +45,14 @@ public class UsersController : ControllerBase
     [ProducesResponseType<GenericErrorModel>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> CreateUser([FromBody, SwaggerRequestBody(Required = true)] NewUserRequest request, CancellationToken cancellationToken)
     {
-        Result<UserDto, Error> registrationResult = await _mediator.Send(new RegisterNewUserCommand
+        return await _mediator.Send(new RegisterNewUserCommand
         {
             Email = request.User.Email,
             Username = request.User.Username,
             Password = request.User.Password
-        }, cancellationToken);
-
-        return registrationResult.Match(
-            onSuccess: (newUser) =>
-            {
-                return (IActionResult)Created(
+        }, cancellationToken)
+            .Match(
+                onSuccess: (newUser) => (IActionResult)Created(
                     (string?)null,
                     new UserResponse
                     {
@@ -68,19 +64,15 @@ public class UsersController : ControllerBase
                             Bio = newUser.Bio,
                             Image = newUser.Image
                         }
-                    });
-            },
-            onFailure: (error) =>
-            {
-                return UnprocessableEntity(
+                    }),
+                onFailure: (error) => UnprocessableEntity(
                     new GenericErrorModel
                     {
                         Errors = new()
                         {
                             Body = error.Messages.Select(m => m.Message).ToArray()
                         }
-                    });
-            });
+                    }));
     }
 
     /// <summary>
@@ -101,14 +93,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        Result<UserDto, Error> registrationResult = await _mediator.Send(new CurrentUserQuery
-        { }, cancellationToken);
-
-        return registrationResult.Match(
-            onSuccess: (newUser) =>
-            {
-                return (IActionResult)Created(
-                    (string?)null,
+        return await _mediator.Send(new CurrentUserQuery { }, cancellationToken)
+            .Match(
+                onSuccess: (newUser) => (IActionResult)Ok(
                     new UserResponse
                     {
                         User = new User
@@ -119,19 +106,15 @@ public class UsersController : ControllerBase
                             Bio = newUser.Bio,
                             Image = newUser.Image
                         }
-                    });
-            },
-            onFailure: (error) =>
-            {
-                return UnprocessableEntity(
+                    }),
+                onFailure: (error) => UnprocessableEntity(
                     new GenericErrorModel
                     {
                         Errors = new()
                         {
                             Body = error.Messages.Select(m => m.Message).ToArray()
                         }
-                    });
-            });
+                    }));
     }
 
     /// <summary>
@@ -141,6 +124,7 @@ public class UsersController : ControllerBase
     /// Updated user information for current user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-user">Conduit spec for Update User</a>
     /// </remarks>
     /// <param name="request">User details to update. At least **one** field is required.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">User</response>
     /// <response code="401">Unauthorized</response>
@@ -149,19 +133,36 @@ public class UsersController : ControllerBase
     [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public IActionResult UpdateCurrentUser([FromBody, SwaggerRequestBody(Required = true)] UpdateUserRequest request)
+    public async Task<IActionResult> UpdateCurrentUser([FromBody, SwaggerRequestBody(Required = true)] UpdateUserRequest request, CancellationToken cancellationToken)
     {
-        return Ok(
-            new UserResponse
-            {
-                User = new User
-                {
-                    Email = "@mail.com",
-                    Username = "name",
-                    Token = "Test Token",
-                    Bio = "Test Bio",
-                    Image = "Test"
-                }
-            });
+        return await _mediator.Send(new UpdateUserCommand
+        {
+            Email = request.User.Email,
+            Username = request.User.Username,
+            Password = request.User.Password,
+            Bio = request.User.Bio,
+            Image = request.User.Image
+        }, cancellationToken)
+            .Match(
+                onSuccess: (newUser) => (IActionResult)Ok(
+                    new UserResponse
+                    {
+                        User = new User
+                        {
+                            Email = newUser.Email,
+                            Username = newUser.Username,
+                            Token = newUser.Token,
+                            Bio = newUser.Bio,
+                            Image = newUser.Image
+                        }
+                    }),
+                onFailure: (error) => UnprocessableEntity(
+                    new GenericErrorModel
+                    {
+                        Errors = new()
+                        {
+                            Body = error.Messages.Select(m => m.Message).ToArray()
+                        }
+                    }));
     }
 }
