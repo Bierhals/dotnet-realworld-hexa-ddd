@@ -31,7 +31,7 @@ public class SqliteContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlite($"Data Source=conduit.db");
+        options.UseSqlite($"Data Source=db/conduit.db");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

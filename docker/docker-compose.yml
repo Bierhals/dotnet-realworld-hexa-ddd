@@ -7,6 +7,10 @@ services:
     image: conduit/rest-api
     build:
       context: ../
-      dockerfile: conduit-rest-api/Dockerfile
+      dockerfile: docker/conduit-rest-api/Dockerfile
     ports:
       - 8080:8080
+    volumes:
+      - db-data:/app/db
+volumes:
+  db-data:

@@ -1,0 +1,164 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/backend/Conduit.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/src/backend/Conduit.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/src/backend/Conduit.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build: debug",
+            "dependsOn": [
+                "build"
+            ],
+            "dockerBuild": {
+                "tag": "conduit/rest-api:dev",
+                //"target": "base",
+                "dockerfile": "${workspaceFolder}/docker/conduit-rest-api/Dockerfile",
+                "context": "${workspaceFolder}",
+                "platform": {
+                    "os": "linux",
+                    "architecture": "amd64"
+                },
+                "buildArgs": {
+                    "configuration": "Debug"
+                },
+                "pull": true                
+            },
+            "netCore": {
+                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+            }
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build: release",
+            "dependsOn": [
+                "build"
+            ],
+            "dockerBuild": {
+
+                "tag": "conduit/rest-api:latest",
+                "dockerfile": "${workspaceFolder}/docker/conduit-rest-api/Dockerfile",
+                "context": "${workspaceFolder}",
+                "platform": {
+                    "os": "linux",
+                    "architecture": "amd64"
+                },
+                "pull": true
+            },
+            "netCore": {
+                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+            }
+        },
+        {
+            "type": "docker-run",
+            "label": "docker-run: debug",
+            "dependsOn": [
+                "docker-build: debug"
+            ],
+            "dockerRun": {},
+            "netCore": {
+                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj",
+                "enableDebugging": true
+            }
+        },
+        {
+            "type": "docker-run",
+            "label": "docker-run: release",
+            "dependsOn": [
+                "docker-build: release"
+            ],
+            "dockerRun": {},
+            "netCore": {
+                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+            }
+        },
+        {
+            "type": "docker-compose",
+            "label": "docker-compose-up: debug",
+            "dependsOn": [
+                "docker-build: debug"
+            ],
+            "dockerCompose": {
+                "up": {
+                    "detached": true,
+                    "build": false    
+                },
+                "files": [
+                    "${workspaceFolder}/docker/docker-compose.debug.yml"
+                ]
+            },           
+        },
+        {
+            "type": "docker-compose",
+            "label": "docker-compose-down: debug",
+            "dockerCompose": {
+                "down": {
+                },
+                "files": [
+                    "${workspaceFolder}/docker/docker-compose.debug.yml"
+                ]
+            },           
+        }
+        ,
+        {
+            "type": "docker-compose",
+            "label": "docker-compose-up: release",
+            "dependsOn": [
+                "docker-build: release"
+            ],
+            "dockerCompose": {
+                "up": {
+                    "detached": true,
+                    "build": false    
+                },
+                "files": [
+                    "${workspaceFolder}/docker/docker-compose.yml"
+                ]
+            },           
+        },
+        {
+            "type": "docker-compose",
+            "label": "docker-compose-down: release",
+            "dockerCompose": {
+                "down": {
+                },
+                "files": [
+                    "${workspaceFolder}/docker/docker-compose.yml"
+                ]
+            },           
+        }
+    ]
+}

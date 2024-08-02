@@ -4,15 +4,18 @@ version: '3.4'
 
 services:
   restapi:
-    image: conduit/rest-api
+    image: conduit/rest-api:dev
     build:
       context: ../
-      dockerfile: conduit-rest-api/Dockerfile
+      dockerfile: docker/conduit-rest-api/Dockerfile
       args:
-        - configuration=Debug
+      - configuration=Debug
     ports:
-      - 8080:8080
+    - 8080:8080
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-#    volumes:
-#      - ~/.vsdbg:/remote_debugger:rw
+    - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+    #- ~/.vsdbg:/remote_debugger:rw
+    - db-data:/app/db
+volumes:
+  db-data:
