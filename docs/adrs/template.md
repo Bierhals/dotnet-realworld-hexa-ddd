@@ -1,72 +1,54 @@
-# [short title of solved problem and solution]
+# [Kurztitel des gelösten Problems und der Lösung]
 
-* Status: [proposed | rejected | accepted | deprecated | … | superseded by [ADR-0005](0005-example.md)] <!-- optional -->
-* Deciders: [list everyone involved in the decision] <!-- optional -->
-* Date: [YYYY-MM-DD when the decision was last updated] <!-- optional -->
+* Status: [vorgeschlagen | abgelehnt | akzeptiert | veraltet | ... | ersetzt durch [ADR-005](005-example.md)]
+* Entscheider: [alle an der Entscheidung Beteiligten auflisten] <!-- optional -->
+* Datum: [YYYY-MM-DD wann die Entscheidung zuletzt aktualisiert wurde]
 
-Technical Story: [description | ticket/issue URL] <!-- optional -->
+Technical Story: [Beschreibung | Tickete/Aufgabe URL] <!-- optional -->
 
-## Context and Problem Statement
+## Kontext und Problemstellung
 
-[Describe the context and problem statement, e.g., in free form using two to three sentences. You may want to articulate the problem in form of a question.]
+[Beschreiben Sie den Kontext und die Problemstellung, z. B. in freier Form in zwei bis drei Sätzen. Vielleicht möchten Sie das Problem in Form einer Frage formulieren.]
 
-## Decision Drivers <!-- optional -->
+## Optionen
 
-* [driver 1, e.g., a force, facing concern, …]
-* [driver 2, e.g., a force, facing concern, …]
-* … <!-- numbers of drivers can vary -->
+* [Option 1]
+* [Option 2]
+* [Option 3]
+* … <!-- die Anzahl der Optionen kann variieren -->
 
-## Considered Options
+## Entscheidung
 
-* [option 1]
-* [option 2]
-* [option 3]
-* … <!-- numbers of options can vary -->
+Gewählte Option: "[Option 1]", weil [Begründung. z.B., einzige Option, die das K.O.-Kriterium XYZ erfüllt (siehe unten)].
 
-## Decision Outcome
+### [Option 1]
 
-Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … | comes out best (see below)].
+[Beispiel | Beschreibung | Verweis auf weitere Informationen | ...] <!-- optional -->
 
-### Positive Consequences <!-- optional -->
+* Gut, weil [Argument a]
+* Gut, weil [Argument b]
+* Schlecht, weil [Argument c]
+* … <!-- die Anzahl der Vor- und Nachteile kann variieren -->
 
-* [e.g., improvement of quality attribute satisfaction, follow-up decisions required, …]
-* …
+### [Option 2]
 
-### Negative Consequences <!-- optional -->
+[Beispiel | Beschreibung | Verweis auf weitere Informationen | ...] <!-- optional -->
 
-* [e.g., compromising quality attribute, follow-up decisions required, …]
-* …
+* Gut, weil [Argument a]
+* Gut, weil [Argument b]
+* Schlecht, weil [Argument c]
+* … <!-- die Anzahl der Vor- und Nachteile kann variieren -->
 
-## Pros and Cons of the Options <!-- optional -->
+### [Option 3]
 
-### [option 1]
+[Beispiel | Beschreibung | Verweis auf weitere Informationen | ...] <!-- optional -->
 
-[example | description | pointer to more information | …] <!-- optional -->
-
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
-
-### [option 2]
-
-[example | description | pointer to more information | …] <!-- optional -->
-
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
-
-### [option 3]
-
-[example | description | pointer to more information | …] <!-- optional -->
-
-* Good, because [argument a]
-* Good, because [argument b]
-* Bad, because [argument c]
-* … <!-- numbers of pros and cons can vary -->
+* Gut, weil [Argument a]
+* Gut, weil [Argument b]
+* Schlecht, weil [Argument c]
+* … <!-- die Anzahl der Vor- und Nachteile kann variieren -->
 
 ## Links <!-- optional -->
 
-* [Link type] [Link to ADR] <!-- example: Refined by [ADR-0005](0005-example.md) -->
-* … <!-- numbers of links can vary -->
+* [Link-Typ] [Link zum ADR] <!-- Beispiel: Verfeinert durch [ADR-0005](0005-Beispiel.md) -->
+* ... <!-- Anzahl der Links kann variieren -->
