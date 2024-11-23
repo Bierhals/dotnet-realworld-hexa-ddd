@@ -11,7 +11,11 @@ indent_size = 2
 end_of_line = lf
 
 #### .NET Coding Conventions ####
+[*.{sln,csproj}]
+end_of_line = crlf
+
 [*.{cs,vb}]
+end_of_line = crlf
 trim_trailing_whitespace = true
 max_line_length = 140
 
@@ -20,7 +24,6 @@ indent_size = 4
 tab_width = 4
 
 # New line preferences
-end_of_line = crlf
 insert_final_newline = true
 
 # Organize usings

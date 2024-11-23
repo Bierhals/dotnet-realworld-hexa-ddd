@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 
-namespace Conduit.Domain;
+namespace Conduit.Domain.User;
 
-public class UserId : ValueObject
+public class UserId : ComparableValueObject
 {
     public string Value { get; }
 
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-    protected UserId()
+    private UserId()
     {
         //for ef only
     }
 #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 
-    protected UserId(string id)
+    private UserId(string id)
     {
         Value = id;
     }
@@ -30,7 +30,7 @@ public class UserId : ValueObject
         return new UserId(id);
     }
 
-    protected override IEnumerable<IComparable> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
         yield return Value;
     }

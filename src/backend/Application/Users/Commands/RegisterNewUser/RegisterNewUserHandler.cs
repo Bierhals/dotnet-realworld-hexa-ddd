@@ -27,12 +27,12 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
         _authenticationService = authenticationService;
     }
 
-    public async Task<Result<UserDto, Error>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
+    public Task<Result<UserDto, Error>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
     {
         Result<UserEmail, Error> email = UserEmail.Create(request.Email);
         Result<Username, Error> username = Username.Create(request.Username);
 
-        return await Task.FromResult(Result.Combine<Error>(email, username))
+        return Task.FromResult(Result.Combine<Error>(email, username))
             .Bind(() => User.RegisterNewUser(email.Value, username.Value, request.Password, _usersCounter, _passwordHasher))
             .Map(async (newUser) =>
             {

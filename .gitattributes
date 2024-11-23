@@ -1,0 +1,16 @@
+###############################
+# Git Line Endings            #
+###############################
+
+# Set default behaviour to automatically normalize line endings.
+* text=auto
+
+# Force bash scripts to always use LF line endings so that if a repo is accessed
+# in Unix via a file share from Windows, the scripts will work.
+*.sh text eol=lf
+
+*.cs       text diff=csharp eol=crlf
+*.cshtml   text diff=html
+*.csx      text diff=csharp eol=crlf
+*.sln      text eol=crlf
+*.csproj   text eol=crlf

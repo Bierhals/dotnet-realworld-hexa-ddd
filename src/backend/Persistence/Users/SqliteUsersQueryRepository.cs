@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Users.Dtos;
 using Conduit.Application.Users.Repositories;
-using Conduit.Domain;
+using Conduit.Domain.User;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 

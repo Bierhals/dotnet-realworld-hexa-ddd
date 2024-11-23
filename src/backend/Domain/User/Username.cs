@@ -11,13 +11,13 @@ public class Username : ValueObject
     public string Value { get; }
 
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-    protected Username()
+    private Username()
     {
         //for ef only
     }
 #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 
-    protected Username(string email)
+    private Username(string email)
     {
         Value = email;
     }

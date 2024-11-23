@@ -1,4 +1,3 @@
-using Conduit.Domain;
 using Conduit.Domain.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
