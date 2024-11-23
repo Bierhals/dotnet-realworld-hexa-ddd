@@ -18,7 +18,7 @@ public class CommentsController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Get the comments for an article. Auth is optional<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-comments-from-an-article">Conduit spec for Get All Comments for and Article</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#get-comments-from-an-article">Conduit spec for Get All Comments for and Article</a>
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to get comments for</param>
     /// <response code="200">Multiple comments</response>
@@ -58,7 +58,7 @@ public class CommentsController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Create a comment for an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#add-comments-to-an-article">Conduit spec for Add Comments to an Article</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints#add-comments-to-an-article">Conduit spec for Add Comments to an Article</a>
     /// </remarks>
     /// <param name="request">Comment you want to create</param>
     /// <param name="slug">Slug of the article that you want to create a comment for</param>
@@ -96,7 +96,7 @@ public class CommentsController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Delete a comment for an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#delete-comment">Conduit spec for Delete Comment to an Article</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#delete-comment">Conduit spec for Delete Comment to an Article</a>
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to delete a comment for</param>
     /// <param name="id">ID of the comment you want to delete</param>

@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
     /// Register a new user
     /// </summary>
     /// <remarks>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
     /// <param name="request">Details of the new user to register</param>
     /// <param name="cancellationToken"></param>
@@ -79,7 +79,7 @@ public class UsersController : ControllerBase
     /// Get current user
     /// </summary>
     /// <remarks>
-    /// Gets the currently logged-in user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
+    /// Gets the currently logged-in user<br/><a href="https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user">Conduit spec for Get Current User endpoint</a>
     /// </remarks>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -121,7 +121,7 @@ public class UsersController : ControllerBase
     /// Update current user
     /// </summary>
     /// <remarks>
-    /// Updated user information for current user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-user">Conduit spec for Update User</a>
+    /// Updated user information for current user<br/><a href="https://realworld-docs.netlify.app/specifications/backend/endpoints#update-user">Conduit spec for Update User</a>
     /// </remarks>
     /// <param name="request">User details to update. At least **one** field is required.</param>
     /// <param name="cancellationToken"></param>

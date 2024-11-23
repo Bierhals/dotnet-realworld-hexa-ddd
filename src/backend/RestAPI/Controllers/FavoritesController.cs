@@ -17,7 +17,7 @@ public class FavoritesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Favorite an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#favorite-article">Conduit spec for favorite article endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#favorite-article">Conduit spec for favorite article endpoint</a>
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to favorite</param>
     /// <response code="200">Single article</response>
@@ -59,7 +59,7 @@ public class FavoritesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Unfavorite an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#unfavorite-article">Conduit spec for Unfavorite article</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#unfavorite-article">Conduit spec for Unfavorite article</a>
     /// </remarks>
     /// <param name="slug">Slug of the article that you want to unfavorite</param>
     /// <response code="200">Single article</response>

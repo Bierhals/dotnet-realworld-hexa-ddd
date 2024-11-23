@@ -29,7 +29,7 @@ public class AuthenticationController : ControllerBase
     /// Existing user login
     /// </summary>
     /// <remarks>
-    /// Login for existing user<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#authentication">Conduit Spec for login endpoint</a>
+    /// Login for existing user<br/><a href="https://realworld-docs.netlify.app/specifications/backend/endpoints#authentication">Conduit Spec for login endpoint</a>
     /// </remarks>
     /// <param name="request">Credentials to use</param>
     /// <param name="cancellationToken"></param>

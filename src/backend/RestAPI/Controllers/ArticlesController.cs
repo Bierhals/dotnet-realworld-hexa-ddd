@@ -17,7 +17,7 @@ public sealed class ArticlesController : ControllerBase
     /// Get recent articles from users you follow
     /// </summary>
     /// <remarks>
-    /// Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#registration">Conduit Spec for registration endpoint</a>
+    /// Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend/endpoints/#registration">Conduit Spec for registration endpoint</a>
     /// </remarks>
     /// <param name="filter">Filtering options</param>
     /// <response code="200">Multiple articles</response>
@@ -62,7 +62,7 @@ public sealed class ArticlesController : ControllerBase
     /// Get recent articles globally
     /// </summary>
     /// <remarks>
-    /// Get most recent articles globally. Use query parameters to filter results. Auth is optional<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#list-articles">Conduit spec for List Articles Endpoint</a>
+    /// Get most recent articles globally. Use query parameters to filter results. Auth is optional<br/><a href="https://realworld-docs.netlify.app/docs/specs/backend/endpoints#list-articles">Conduit spec for List Articles Endpoint</a>
     /// </remarks>
     /// <param name="filter">Filtering options</param>
     /// <response code="200">Multiple articles</response>
@@ -109,7 +109,8 @@ public sealed class ArticlesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Create an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#create-article">Conduit Spec for create article endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#create-article">Conduit Spec for create article endpoint</a>
+    ///          https://realworld-docs.netlify.app/specifications/backend/endpoints/#create-article
     /// </remarks>
     /// <param name="request">Article to create</param>
     /// <response code="201">Single article</response>
@@ -151,7 +152,7 @@ public sealed class ArticlesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Get an article. Auth not required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-article">Conduit spec for Get Article endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#get-article">Conduit spec for Get Article endpoint</a>
     /// </remarks>
     /// <param name="slug">Slug of the article to get</param>
     /// <response code="200">Single article</response>
@@ -191,7 +192,7 @@ public sealed class ArticlesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Update an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints#update-article">Conduit spec for Update Article endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints#update-article">Conduit spec for Update Article endpoint</a>
     /// </remarks>
     /// <param name="request">Comment you want to create</param>
     /// <param name="slug">Slug of the article to update</param>
@@ -234,7 +235,7 @@ public sealed class ArticlesController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Delete an article. Auth is required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#delete-article">Conduit spec for Delete Article endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#delete-article">Conduit spec for Delete Article endpoint</a>
     /// </remarks>
     /// <param name="slug">Slug of the article to delete</param>
     /// <response code="200">No Content</response>

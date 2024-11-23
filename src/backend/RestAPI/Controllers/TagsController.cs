@@ -16,7 +16,7 @@ public class TagsController : ControllerBase
     /// </summary>
     /// <remarks>
     /// Get tags. Auth not required<br/>
-    /// <a href="https://realworld-docs.netlify.app/docs/specs/backend-specs/endpoints/#get-tags">Conduit Spec for get tags endpoint</a>
+    /// <a href="https://realworld-docs.netlify.app/specifications/backend/endpoints/#get-tags">Conduit Spec for get tags endpoint</a>
     /// </remarks>
     /// <response code="200">Tags</response>
     /// <response code="422">Unexpected error</response>
