@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Conduit.Application.Dtos;
 using Conduit.Application.Services;
 using Conduit.Application.Users.Dtos;
-using Conduit.Domain;
 using Conduit.Domain.Common;
 using Conduit.Domain.User;
 using CSharpFunctionalExtensions;

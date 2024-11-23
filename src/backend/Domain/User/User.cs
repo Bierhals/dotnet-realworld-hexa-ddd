@@ -14,13 +14,13 @@ public class User : AggregateRoot<UserId>
     public string Image { get; private set; }
 
 #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-    User()
+    private User()
     {
         //for ef only
     }
 #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
 
-    User(UserId id, UserEmail userEmail, Username username, string hashedPassword, string bio, string image) : base(id)
+    private User(UserId id, UserEmail userEmail, Username username, string hashedPassword, string bio, string image) : base(id)
     {
         Email = userEmail;
         Username = username;

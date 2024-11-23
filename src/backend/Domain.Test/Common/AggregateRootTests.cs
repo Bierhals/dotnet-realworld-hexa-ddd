@@ -42,7 +42,7 @@ public class AggregateRootTests
         }
     }
 
-    public class MyId : ValueObject
+    public class MyId : ComparableValueObject
     {
         public int Value
         {
@@ -54,7 +54,7 @@ public class AggregateRootTests
             Value = value;
         }
 
-        protected override IEnumerable<IComparable> GetEqualityComponents()
+        protected override IEnumerable<IComparable> GetComparableEqualityComponents()
         {
             yield return Value;
         }
