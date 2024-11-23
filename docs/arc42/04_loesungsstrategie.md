@@ -1,5 +1,11 @@
 # Lösungsstrategie
 
+- Zwei Domönen (Authentifizerung, Aritkelverwaltung)
+- .Net 8
+- DDD
+- Hexagonale Architektur
+- 90% Unit-Tests in Application und Domain
+
 **Inhalt**
 
 Kurzer Überblick über die grundlegenden Entscheidungen und
