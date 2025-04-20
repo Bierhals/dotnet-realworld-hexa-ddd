@@ -40,13 +40,10 @@
         {
             "type": "docker-build",
             "label": "docker-build: debug",
-            "dependsOn": [
-                "build"
-            ],
             "dockerBuild": {
                 "tag": "conduit/rest-api:dev",
                 //"target": "base",
-                "dockerfile": "${workspaceFolder}/docker/conduit-rest-api/Dockerfile",
+                "dockerfile": "${workspaceFolder}/src/backend/Host/Dockerfile",
                 "context": "${workspaceFolder}",
                 "platform": {
                     "os": "linux",
@@ -58,7 +55,7 @@
                 "pull": true                
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+                "appProject": "${workspaceFolder}/src/backend/Host/Host.csproj"
             }
         },
         {
