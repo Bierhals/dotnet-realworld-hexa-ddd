@@ -32,6 +32,6 @@ Die folgende Tabelle beschreibt die zentralen Qualitätsziele, wobei die Reihenf
 | Rolle | Erwartungshaltung |
 |----|----|
 | RealWorl-Projekt | Erwartet eine mit anderen Immplentierungen kompatible Umsetzung. siehe [Dokumentation](https://realworld-docs.netlify.app/docs/implementation-creation/expectations) |
-| Architekten | Ein einfach zu warten System, welches auch nach Jahren noch weiterentwickelt werden kann. |
+| Architekten | Ein einfach zu wartendes System, welches auch nach Jahren noch weiterentwickelt werden kann. |
 | Entwickler | Überbllick über mögliche Umsetzungsmuster |
 

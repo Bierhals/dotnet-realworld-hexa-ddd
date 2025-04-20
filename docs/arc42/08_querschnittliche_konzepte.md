@@ -64,7 +64,7 @@ den Gruppen nicht immer eindeutig ist):
 -   Betriebskonzepte
 
 ![Possible topics for crosscutting
-concepts](.images/08-Crosscutting-Concepts-Structure-DE.png)
+concepts](.media/08-Crosscutting-Concepts-Structure-DE.png)
 
 Siehe [Querschnittliche Konzepte](https://docs.arc42.org/section-8/) in
 der online-Dokumentation (auf Englisch).
