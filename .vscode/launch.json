@@ -20,16 +20,16 @@
             "name": "C#: Conduit Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+            "projectPath": "${workspaceFolder}/src/backend/WebApi/WebApi.csproj"
         },
         {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/src/backend/RestAPI/bin/Debug/net8.0/Conduit.RestAPI.dll",
+            "program": "${workspaceFolder}/src/backend/WebApi/bin/Debug/net9.0/Conduit.WebApi.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/backend/RestAPI",
+            "cwd": "${workspaceFolder}/src/backend/WebApi",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -53,7 +53,7 @@
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
             "netCore": {
-                "appProject": "${workspaceFolder}/src/backend/RestAPI/RestAPI.csproj"
+                "appProject": "${workspaceFolder}/src/backend/WebApi/WebApi.csproj"
             }
         }
     ]

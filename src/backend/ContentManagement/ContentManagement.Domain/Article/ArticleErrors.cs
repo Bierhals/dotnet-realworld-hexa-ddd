@@ -1,4 +1,4 @@
-using Conduit.Users.Domain.Common;
+/* using Conduit.Users.Domain.Common;
 
 namespace Conduit.Users.Domain.Article;
 
@@ -12,3 +12,4 @@ static class ArticleErrors
         );
     }
 }
+ */

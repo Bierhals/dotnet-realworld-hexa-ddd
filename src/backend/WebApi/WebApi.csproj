@@ -2,13 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="../CommentsManagement/CommentsManagement.ApiEndpoints/CommentsManagement.ApiEndpoints.csproj" />
+      <ProjectReference Include="../ContentManagement/ContentManagement.ApiEndpoints/ContentManagement.ApiEndpoints.csproj" />
+      <ProjectReference Include="../UsersManagement/UsersManagement.ApiEndpoints/UsersManagement.ApiEndpoints.csproj" />
     </ItemGroup>
 
 </Project>

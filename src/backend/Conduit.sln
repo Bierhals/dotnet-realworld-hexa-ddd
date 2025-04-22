@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Application
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Domain", "UsersManagement\UsersManagement.Domain\UsersManagement.Domain.csproj", "{D8EEB222-DEE3-44B0-99CE-ABCFC8E63902}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UsersManagement", "UsersManagement\UsersManagement", "{ECCD3411-05F8-40D7-ABEA-B80F50DC7BE9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UsersManagement", "UsersManagement", "{ECCD3411-05F8-40D7-ABEA-B80F50DC7BE9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContentManagement", "ContentManagement", "{731D8DB3-18E1-4056-8B3B-FD7AB0A344D2}"
 EndProject
@@ -21,9 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\docker-compose.debug.yml = ..\..\docker-compose.debug.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Domain.Tests", "UsersManagement\UsersManagement.Domain.Tests\UsersManagement.Domain.Tests.csproj", "{964280F7-CC53-4953-814F-333C6323180F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Domain.UnitTests", "UsersManagement\UsersManagement.Domain.UnitTests\UsersManagement.Domain.UnitTests.csproj", "{964280F7-CC53-4953-814F-333C6323180F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Application.Tests", "UsersManagement\UsersManagement.Application.Tests\UsersManagement.Application.Tests.csproj", "{AD93C062-449A-4C0A-B73F-420BD6EE85D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Application.UnitTests", "UsersManagement\UsersManagement.Application.UnitTests\UsersManagement.Application.UnitTests.csproj", "{AD93C062-449A-4C0A-B73F-420BD6EE85D6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{397D831C-24B9-42CF-AC9C-FE7FE584D3EB}"
 EndProject
@@ -53,13 +53,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaptersInbound", "Adapters
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaptersOutbound", "AdaptersOutbound", "{2E2742E8-9618-C3DA-828E-104B336F38A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.RestAPI", "UsersManagement\UsersManagement.RestApi\UsersManagement.RestAPI.csproj", "{93312292-759A-4E68-B275-1EF42CE31E62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.ApiEndpoints", "UsersManagement\UsersManagement.ApiEndpoints\UsersManagement.ApiEndpoints.csproj", "{93312292-759A-4E68-B275-1EF42CE31E62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.RestAPI.Tests", "UsersManagement\UsersManagement.RestApi.Tests\UsersManagement.RestAPI.Tests.csproj", "{51443258-B0E9-4226-A3D3-386893B66413}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.ApiEndpoints.UnitTests", "UsersManagement\UsersManagement.ApiEndpoints.UnitTests\UsersManagement.ApiEndpoints.UnitTests.csproj", "{51443258-B0E9-4226-A3D3-386893B66413}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Persistence", "UsersManagement\UsersManagement.Persistence\UsersManagement.Persistence.csproj", "{33F71B09-637A-4B06-8A83-56CA4BFA2A30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Persistence.Tests", "UsersManagement\UsersManagement.Persistence.Tests\UsersManagement.Persistence.Tests.csproj", "{EC499DE4-D9AA-4999-B9BF-C313E20AFE04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.Persistence.UnitTests", "UsersManagement\UsersManagement.Persistence.UnitTests\UsersManagement.Persistence.UnitTests.csproj", "{EC499DE4-D9AA-4999-B9BF-C313E20AFE04}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdaptersInbound", "AdaptersInbound", "{7E261B41-1AAC-D047-9AF7-99BBF8AE7AAA}"
 EndProject
@@ -94,6 +94,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentManagement.InterModuleApi.UnitTests", "ContentManagement\ContentManagement.InterModuleApi.UnitTests\ContentManagement.InterModuleApi.UnitTests.csproj", "{22223E9A-6487-4DCF-8D08-AC7EE699308D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentManagement.Persistence.UnitTests", "ContentManagement\ContentManagement.Persistence.UnitTests\ContentManagement.Persistence.UnitTests.csproj", "{7DE49320-1D9E-4AE2-B31A-C8A7B13DDBFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.InterModuleApi", "UsersManagement\UsersManagement.InterModuleApi\UsersManagement.InterModuleApi.csproj", "{72F74ADA-AE9A-4455-831C-1D6050C585E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersManagement.InterModuleApi.UnitTests", "UsersManagement\UsersManagement.InterModuleApi.UnitTests\UsersManagement.InterModuleApi.UnitTests.csproj", "{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -477,6 +481,30 @@ Global
 		{7DE49320-1D9E-4AE2-B31A-C8A7B13DDBFD}.Release|x64.Build.0 = Release|Any CPU
 		{7DE49320-1D9E-4AE2-B31A-C8A7B13DDBFD}.Release|x86.ActiveCfg = Release|Any CPU
 		{7DE49320-1D9E-4AE2-B31A-C8A7B13DDBFD}.Release|x86.Build.0 = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|x64.Build.0 = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Debug|x86.Build.0 = Debug|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|x64.ActiveCfg = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|x64.Build.0 = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|x86.ActiveCfg = Release|Any CPU
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4}.Release|x86.Build.0 = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|x64.Build.0 = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Debug|x86.Build.0 = Debug|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|x64.ActiveCfg = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|x64.Build.0 = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|x86.ActiveCfg = Release|Any CPU
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -518,5 +546,7 @@ Global
 		{46427489-CA54-488F-AE6C-3FC44CB08933} = {08509F07-78A1-8CA6-C7C5-9A8CAF394109}
 		{22223E9A-6487-4DCF-8D08-AC7EE699308D} = {08509F07-78A1-8CA6-C7C5-9A8CAF394109}
 		{7DE49320-1D9E-4AE2-B31A-C8A7B13DDBFD} = {39D3CBF3-457A-9498-4547-383B20190014}
+		{72F74ADA-AE9A-4455-831C-1D6050C585E4} = {1BAC1DF4-7315-8E24-BBDC-8E549C4BF72D}
+		{5B1F79E4-8274-49BD-B153-EBAC4C2E989F} = {1BAC1DF4-7315-8E24-BBDC-8E549C4BF72D}
 	EndGlobalSection
 EndGlobal

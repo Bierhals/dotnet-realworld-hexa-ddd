@@ -1,4 +1,4 @@
-using Conduit.Users.Application.Users.Dtos;
+/* using Conduit.Users.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;
@@ -9,3 +9,4 @@ public class CurrentUserQuery : IRequest<Result<UserDto, Error>>
 {
 
 }
+ */

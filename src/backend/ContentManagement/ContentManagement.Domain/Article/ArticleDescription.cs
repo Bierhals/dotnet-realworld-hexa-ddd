@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Collections.Generic;
 using Conduit.Users.Domain.Common;
 using CSharpFunctionalExtensions;
@@ -31,3 +31,4 @@ public class ArticleDescription : ValueObject
         yield return Value;
     }
 }
+ */

@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Users.Application.Users.Dtos;
 
@@ -10,3 +10,4 @@ public interface IUsersQueryRepository
     Task<UserDto> GetByIdAsync(string id, CancellationToken cancellationToken = default);
     Task<UserDto> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 }
+ */

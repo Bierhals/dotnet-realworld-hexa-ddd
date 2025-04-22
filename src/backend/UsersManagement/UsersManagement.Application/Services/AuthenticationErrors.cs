@@ -1,4 +1,4 @@
-using Conduit.Domain.Common;
+/* using Conduit.Domain.Common;
 
 namespace Conduit.Users.Application.Services;
 
@@ -12,3 +12,4 @@ static class AuthenticationErrors
         );
     }
 }
+ */

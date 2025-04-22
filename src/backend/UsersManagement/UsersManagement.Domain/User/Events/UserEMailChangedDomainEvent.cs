@@ -1,4 +1,4 @@
-using Conduit.Shared.Domain;
+/* using Conduit.Shared.Domain;
 
 namespace Conduit.Domain.User.Events;
 
@@ -13,3 +13,4 @@ public class UserEMailChangedDomainEvent : DomainEvent
         OldEmail = oldEmail;
     }
 }
+ */

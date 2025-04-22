@@ -1,4 +1,4 @@
-namespace Conduit.Users.Application.Dtos;
+/* namespace Conduit.Users.Application.Dtos;
 
 public record JwtOptions
 {
@@ -7,3 +7,4 @@ public record JwtOptions
     public required string SigningKey { get; init; }
     public required uint ExpirationSeconds { get; init; }
 }
+ */

@@ -1,4 +1,4 @@
-using Conduit.Shared.Domain;
+/* using Conduit.Shared.Domain;
 
 namespace Conduit.Domain.User.Events;
 
@@ -15,3 +15,4 @@ public class UserImageChangedDomainEvent : DomainEvent
         OldImage = oldImage;
     }
 }
+ */

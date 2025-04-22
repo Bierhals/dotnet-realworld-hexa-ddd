@@ -1,4 +1,4 @@
-using Conduit.Domain.Common;
+/* using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;
 
@@ -8,3 +8,4 @@ public class GetArticleQuery : IRequest<Result<string, Error>>
 {
     public required string Slug { get; init; }
 }
+ */

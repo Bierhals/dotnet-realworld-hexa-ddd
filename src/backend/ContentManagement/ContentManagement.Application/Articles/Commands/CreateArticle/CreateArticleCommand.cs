@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+/* using System.Collections.Generic;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;
@@ -12,3 +12,4 @@ public class CreateArticleCommand : IRequest<Result<string, Error>>
     public required string Body { get; init; }
     public IEnumerable<string>? TagList { get; init; }
 }
+ */

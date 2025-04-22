@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using Conduit.Application.Articles.Commands.Dtos;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
@@ -11,3 +11,4 @@ public class GetArticleHandler : IRequestHandler<GetArticleQuery, Result<Article
 
 
 }
+ */

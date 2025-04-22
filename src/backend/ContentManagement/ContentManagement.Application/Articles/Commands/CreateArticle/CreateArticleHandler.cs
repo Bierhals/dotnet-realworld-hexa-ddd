@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Dtos;
 using Conduit.Application.Services;
@@ -62,3 +62,4 @@ public class CreateArticleHandler : IRequestHandler<CreateArticleCommand, Result
             });
     }
 }
+ */

@@ -1,4 +1,4 @@
-using Conduit.Domain.Common;
+/* using Conduit.Domain.Common;
 
 namespace Conduit.Users.Application.Users.Queries.Login;
 
@@ -11,3 +11,4 @@ static class LoginErrors
             message: "Login is invalid");
     }
 }
+ */

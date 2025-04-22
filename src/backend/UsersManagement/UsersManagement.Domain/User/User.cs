@@ -1,4 +1,4 @@
-using Conduit.Shared.Domain;
+/* using Conduit.Shared.Domain;
 using Conduit.Domain.User.Events;
 using Conduit.Domain.User.Rules;
 using ErrorOr;
@@ -133,3 +133,4 @@ public class User : AggregateRoot<UserId>
         AddDomainEvent(new UserBioChangedDomainEvent(Email.Value, oldBio, Bio));
     }
 }
+ */

@@ -1,4 +1,4 @@
-using Conduit.Application.Users.Dtos;
+/* using Conduit.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;
@@ -13,3 +13,4 @@ public class UpdateUserCommand : IRequest<Result<UserDto, Error>>
     public string? Bio { get; init; }
     public string? Image { get; init; }
 }
+ */

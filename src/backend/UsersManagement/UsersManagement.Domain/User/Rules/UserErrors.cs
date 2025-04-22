@@ -1,4 +1,4 @@
-using Conduit.Domain.Common;
+/* using Conduit.Domain.Common;
 using ErrorOr;
 
 namespace Conduit.Domain.User.Rules;
@@ -60,3 +60,4 @@ static class UserErrors
         );
     }
 }
+ */

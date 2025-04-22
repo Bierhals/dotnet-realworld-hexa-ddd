@@ -1,4 +1,4 @@
-using Conduit.Users.Domain.Common;
+/* using Conduit.Users.Domain.Common;
 using CSharpFunctionalExtensions;
 
 namespace Conduit.Users.Domain.Article;
@@ -29,3 +29,4 @@ static class ArticleRules
         }
     }
 }
+ */

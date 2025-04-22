@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Users.Application.Dtos;
 using Conduit.Users.Application.Services;
@@ -40,3 +40,4 @@ public class CurrentUserHandler : IRequestHandler<CurrentUserQuery, Result<UserD
         return user;
     }
 }
+ */

@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Dtos;
 using Conduit.Application.Services;
@@ -73,3 +73,4 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Result<UserD
             });
     }
 }
+ */

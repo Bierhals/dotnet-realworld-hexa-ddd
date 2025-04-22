@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Users.Application.Services;
 using Conduit.Users.Application.Users.Dtos;
@@ -38,3 +38,4 @@ public class LoginHandler : IRequestHandler<LoginQuery, Result<UserDto, Error>>
         return user;
     }
 }
+ */

@@ -1,4 +1,4 @@
-using Conduit.Users.Application.Users.Dtos;
+/* using Conduit.Users.Application.Users.Dtos;
 using Conduit.Domain.Common;
 using CSharpFunctionalExtensions;
 using MediatR;
@@ -11,3 +11,4 @@ public class RegisterNewUserCommand : IRequest<Result<UserDto, Error>>
     public required string Username { get; init; }
     public required string Password { get; init; }
 }
+ */

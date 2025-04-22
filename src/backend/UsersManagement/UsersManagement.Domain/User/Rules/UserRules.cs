@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Conduit.Domain.Common;
@@ -98,3 +98,4 @@ static partial class UserRules
     [GeneratedRegex("^[a-zA-Z0-9]*$")]
     private static partial Regex ValidUsernameRegEx();
 }
+ */

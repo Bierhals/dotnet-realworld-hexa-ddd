@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Collections.Generic;
 using Conduit.Users.Domain.Article.Events;
 using Conduit.Users.Domain.Common;
@@ -66,3 +66,4 @@ public class Article: AggregateRoot<ArticleId>
             ArticleRules.TitleMustBeUniqueRule(title, articleCounter));
     }
 }
+ */

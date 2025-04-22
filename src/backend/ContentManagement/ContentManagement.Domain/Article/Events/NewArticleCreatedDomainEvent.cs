@@ -1,4 +1,4 @@
-using Conduit.Users.Domain.Common;
+/* using Conduit.Users.Domain.Common;
 
 namespace Conduit.Users.Domain.Article.Events;
 
@@ -11,3 +11,4 @@ public class NewArticleCreatedDomainEvent : DomainEvent
         Slug = slug;
     }
 }
+ */

@@ -1,4 +1,4 @@
-using System;
+/* using System;
 using System.Collections;
 
 namespace Conduit.Users.Application.Articles.Commands.Dtos;
@@ -17,3 +17,4 @@ public record ArticleDto
     public required int FavoritesCount { get; init; }
     //public required Profile Author { get; init; }
 }
+ */
