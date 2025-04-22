@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ErrorOr;
 
 namespace Conduit.Shared.Domain.BuildingBlocks;
 
@@ -12,6 +13,8 @@ public abstract class ValueObject : IEquatable<ValueObject>
     {
         return obj is ValueObject other && Equals(other);
     }
+
+    protected static ErrorOr<Success> Check(params IBusinessRule[] rules) => BusinessRuleChecker.Check(rules);
 
     public bool Equals(ValueObject? other)
     {

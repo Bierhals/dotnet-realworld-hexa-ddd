@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using ErrorOr;
 
 namespace Conduit.Shared.Domain.BuildingBlocks;
 
@@ -15,6 +17,8 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>> where TId : notnull
     {
         Id = id;
     }
+
+    protected static ErrorOr<Success> Check(params IBusinessRule[] rules) => BusinessRuleChecker.Check(rules);
 
     public override bool Equals(object? obj)
     {

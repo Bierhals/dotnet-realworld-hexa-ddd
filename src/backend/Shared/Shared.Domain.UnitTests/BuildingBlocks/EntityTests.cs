@@ -1,4 +1,5 @@
 using Conduit.Shared.Domain.BuildingBlocks;
+using ErrorOr;
 using Shouldly;
 
 namespace Conduit.Shared.Domain.UnitTests.BuildingBlocks;
@@ -87,6 +88,40 @@ public class EntityTests
         entity1.ShouldNotBe<Entity<int>>(entity2);
     }
 
+    [Fact]
+    public void Entity_WithValidRules_ReturnsSuccess()
+    {
+        var entity = new TestEntity(1, "Entity A");
+        var rules = new IBusinessRule[]
+        {
+            new AlwaysValidRule(),
+            new AlwaysValidRule()
+        };
+
+        var result = entity.CheckRules(rules);
+
+        result.IsError.ShouldBeFalse();
+        result.Value.ShouldBeOfType<Success>();
+    }
+
+    [Fact]
+    public void Entity_WithInvalidRule_ReturnsError()
+    {
+        var entity = new TestEntity(1, "Entity A");
+        var rules = new IBusinessRule[]
+        {
+            new AlwaysInvalidRule("SomeRule", "Some rule failed")
+        };
+
+        var result = entity.CheckRules(rules);
+
+        result.IsError.ShouldBeTrue();
+        var errors = result.Errors;
+        errors.Count.ShouldBe(1);
+        errors[0].Code.ShouldBe("SomeRule");
+        errors[0].Description.ShouldBe("Some rule failed");
+    }
+
     private class TestEntity : Entity<int>
     {
         public string Name { get; }
@@ -99,6 +134,11 @@ public class EntityTests
         public TestEntity(string name) : base()
         {
             Name = name;
+        }
+
+        public ErrorOr<Success> CheckRules(params IBusinessRule[] rules)
+        {
+            return Check(rules);
         }
     }
 
@@ -115,5 +155,22 @@ public class EntityTests
         {
             Name = name;
         }
+    }
+
+    private class AlwaysValidRule : IBusinessRule
+    {
+        public ErrorOr<Success> Check() => Result.Success;
+    }
+
+    private class AlwaysInvalidRule : IBusinessRule
+    {
+        private readonly Error _error;
+
+        public AlwaysInvalidRule(string code = "RuleViolated", string description = "Rule violated")
+        {
+            _error = Error.Validation(code, description);
+        }
+
+        public ErrorOr<Success> Check() => _error;
     }
 }

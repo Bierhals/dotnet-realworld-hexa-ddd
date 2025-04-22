@@ -8,8 +8,4 @@
       <PackageReference Include="ErrorOr" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="BuildingBlocks/" />
-    </ItemGroup>
-
 </Project>

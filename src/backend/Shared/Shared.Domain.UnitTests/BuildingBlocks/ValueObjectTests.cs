@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Conduit.Shared.Domain.BuildingBlocks;
+using ErrorOr;
 using Shouldly;
 
 namespace Conduit.Shared.Domain.UnitTests.BuildingBlocks;
@@ -65,6 +66,38 @@ public class ValueObjectTests
         (obj1 != obj2).ShouldBeTrue();
     }
 
+    [Fact]
+    public void ValueObject_WithValidRules_ReturnsCreatedObject()
+    {
+        var rules = new IBusinessRule[]
+        {
+            new AlwaysValidRule(),
+            new AlwaysValidRule()
+        };
+
+        var result = TestValueObject.CreateWithRuleCheck(rules);
+
+        result.IsError.ShouldBeFalse();
+        result.Value.ShouldBeOfType<TestValueObject>();
+    }
+
+    [Fact]
+    public void ValueObject_WithInvalidRule_ReturnsError()
+    {
+        var rules = new IBusinessRule[]
+        {
+            new AlwaysInvalidRule("SomeRule", "Some rule failed")
+        };
+
+        var result = TestValueObject.CreateWithRuleCheck(rules);
+
+        result.IsError.ShouldBeTrue();
+        var errors = result.Errors;
+        errors.Count.ShouldBe(1);
+        errors[0].Code.ShouldBe("SomeRule");
+        errors[0].Description.ShouldBe("Some rule failed");
+    }
+
     private class TestValueObject : ValueObject
     {
         public int Number { get; }
@@ -74,6 +107,16 @@ public class ValueObjectTests
         {
             Number = number;
             Text = text;
+        }
+
+        public static ErrorOr<TestValueObject> CreateWithRuleCheck(params IBusinessRule[] rules)
+        {
+            var result = Check(rules);
+
+            if (result.IsError)
+                return result.Errors;
+
+            return new TestValueObject(42, "Hello");
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
@@ -99,5 +142,22 @@ public class ValueObjectTests
             yield return Number;
             yield return Text;
         }
+    }
+
+    private class AlwaysValidRule : IBusinessRule
+    {
+        public ErrorOr<Success> Check() => Result.Success;
+    }
+
+    private class AlwaysInvalidRule : IBusinessRule
+    {
+        private readonly Error _error;
+
+        public AlwaysInvalidRule(string code = "RuleViolated", string description = "Rule violated")
+        {
+            _error = Error.Validation(code, description);
+        }
+
+        public ErrorOr<Success> Check() => _error;
     }
 }
