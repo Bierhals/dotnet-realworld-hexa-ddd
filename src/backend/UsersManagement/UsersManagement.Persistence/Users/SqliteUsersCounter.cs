@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain.User;
 using Microsoft.EntityFrameworkCore;
@@ -24,3 +24,4 @@ public class SqliteUsersCounter : IUsersCounter
         return _context.Users.CountAsync(u => u.Username.Value == username.Value, cancellationToken);
     }
 }
+ */

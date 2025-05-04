@@ -1,0 +1,70 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/CommentsManagement/">
+    <Project Path="CommentsManagement/CommentsManagement.Application.UnitTests/CommentsManagement.Application.UnitTests.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.Application/CommentsManagement.Application.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.Domain.UnitTests/CommentsManagement.Domain.UnitTests.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.Domain/CommentsManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/CommentsManagement/AdaptersInbound/">
+    <Project Path="CommentsManagement/CommentsManagement.ApiEndpoints.UnitTests/CommentsManagement.ApiEndpoints.UnitTests.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.ApiEndpoints/CommentsManagement.ApiEndpoints.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.InterModuleApi.UnitTests/CommentsManagement.InterModuleApi.UnitTests.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.InterModuleApi/CommentsManagement.InterModuleApi.csproj" />
+  </Folder>
+  <Folder Name="/CommentsManagement/AdaptersOutbound/">
+    <Project Path="CommentsManagement/CommentsManagement.Persistence.UnitTests/CommentsManagement.Persistence.UnitTests.csproj" />
+    <Project Path="CommentsManagement/CommentsManagement.Persistence/CommentsManagement.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/ContentManagement/">
+    <Project Path="ContentManagement/ContentManagement.Application.UnitTests/ContentManagement.Application.UnitTests.csproj" />
+    <Project Path="ContentManagement/ContentManagement.Application/ContentManagement.Application.csproj" />
+    <Project Path="ContentManagement/ContentManagement.Domain.UnitTests/ContentManagement.Domain.UnitTests.csproj" />
+    <Project Path="ContentManagement/ContentManagement.Domain/ContentManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/ContentManagement/AdapterInbound/">
+    <Project Path="ContentManagement/ContentManagement.ApiEndpoints.UnitTests/ContentManagement.ApiEndpoints.UnitTests.csproj" />
+    <Project Path="ContentManagement/ContentManagement.ApiEndpoints/ContentManagement.ApiEndpoints.csproj" />
+    <Project Path="ContentManagement/ContentManagement.InterModuleApi.UnitTests/ContentManagement.InterModuleApi.UnitTests.csproj" />
+    <Project Path="ContentManagement/ContentManagement.InterModuleApi/ContentManagement.InterModuleApi.csproj" />
+  </Folder>
+  <Folder Name="/ContentManagement/AdapterOutbound/">
+    <Project Path="ContentManagement/ContentManagement.Persistence.UnitTests/ContentManagement.Persistence.UnitTests.csproj" />
+    <Project Path="ContentManagement/ContentManagement.Persistence/ContentManagement.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Shared/Shared.Domain.UnitTests/Shared.Domain.UnitTests.csproj" />
+    <Project Path="Shared/Shared.Domain/Shared.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../../.gitignore" />
+    <File Path="../../docker-compose.debug.yml" />
+    <File Path="../../docker-compose.yml" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/UsersManagement/">
+    <Project Path="UsersManagement/UsersManagement.Application.UnitTests/UsersManagement.Application.UnitTests.csproj" />
+    <Project Path="UsersManagement/UsersManagement.Application/UsersManagement.Application.csproj" />
+    <Project Path="UsersManagement/UsersManagement.Domain.UnitTests/UsersManagement.Domain.UnitTests.csproj" />
+    <Project Path="UsersManagement/UsersManagement.Domain/UsersManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/UsersManagement/AdaptersInbound/">
+    <Project Path="UsersManagement/UsersManagement.ApiEndpoints.UnitTests/UsersManagement.ApiEndpoints.UnitTests.csproj" />
+    <Project Path="UsersManagement/UsersManagement.ApiEndpoints/UsersManagement.ApiEndpoints.csproj" />
+    <Project Path="UsersManagement/UsersManagement.InterModuleApi.UnitTests/UsersManagement.InterModuleApi.UnitTests.csproj" />
+    <Project Path="UsersManagement/UsersManagement.InterModuleApi/UsersManagement.InterModuleApi.csproj" />
+  </Folder>
+  <Folder Name="/UsersManagement/AdaptersOutbound/">
+    <Project Path="UsersManagement/UsersManagement.Persistence.UnitTests/UsersManagement.Persistence.UnitTests.csproj" />
+    <Project Path="UsersManagement/UsersManagement.Persistence/UsersManagement.Persistence.csproj" />
+  </Folder>
+  <Project Path="AppHost/AppHost.csproj" />
+  <Project Path="ServiceDefaults/ServiceDefaults.csproj" />
+  <Project Path="WebApi/WebApi.csproj" />
+</Solution>

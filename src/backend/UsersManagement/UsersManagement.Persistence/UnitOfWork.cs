@@ -1,45 +1,29 @@
-/* using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Domain.Common;
-using Conduit.Domain.User;
-using Conduit.Persistence.ContextConfiguration;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.Domain.BuildingBlocks;
+//using Conduit.Domain.Common;
 
-namespace Conduit.Persistence;
+namespace Conduit.UsersManagement.Persistence;
 
-public class SqliteContext : DbContext
+public class UnitOfWork : IUnitOfWork
 {
-    readonly IMediator _mediator;
+    readonly UsersManagementContext _context;
 
-    public DbSet<User> Users { get; set; } = null!;
-
-    public SqliteContext()
+    public UnitOfWork(UsersManagementContext context)
     {
-        // for ef tools
-        _mediator = null!;
+        _context = context;
     }
 
-    public SqliteContext(DbContextOptions<SqliteContext> options,
-        IMediator mediator)
-        : base(options)
+    public Task<int> CommitAsync()
     {
-        _mediator = mediator;
+        return _context.SaveChangesAsync();
     }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    public void Rollback()
     {
-        options.UseSqlite($"Data Source=db/conduit.db");
+        _context.ChangeTracker.Clear();
     }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityTypeConfiguration).Assembly);
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    
+    /*public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         // When should you publish domain events?
         //
@@ -79,6 +63,5 @@ public class SqliteContext : DbContext
                 return domainEvents;
             })
             .ToArray();
-    }
+    }*/
 }
- */

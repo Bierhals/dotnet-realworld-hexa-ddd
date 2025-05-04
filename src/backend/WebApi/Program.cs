@@ -1,6 +1,25 @@
+using Conduit.UsersManagement.ApiEndpoints.Users;
+using FastEndpoints;
+using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddFastEndpoints(o =>
+        o.Assemblies = new[]
+        {
+            typeof(GetCurrentUserEndpoint).Assembly
+        })
+    .SwaggerDocument(o =>
+    {
+        o.DocumentSettings = s =>
+        {
+            s.DocumentName = "Conduit.WebApi";
+            s.Title = "Conduit.WebApi";
+            s.Version = "v1";
+        };
+        o.ShortSchemaNames = true;
+    });
 
 /*builder.AddConduitConfiguration();
 
@@ -15,6 +34,12 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseFastEndpoints(c =>
+    {
+        c.Endpoints.ShortNames = true;
+    })
+    .UseSwaggerGen();
+
 /* app
     .UseConduitPersistence()
     .UseConduitAuthentication()
@@ -23,7 +48,5 @@ var app = builder.Build();
     .UseConduitAuthorization()
     .UseConduitControllers()
     .UseConduitCors(); */
-
-app.MapGet("/", () => "Hello World!");
 
 app.Run();

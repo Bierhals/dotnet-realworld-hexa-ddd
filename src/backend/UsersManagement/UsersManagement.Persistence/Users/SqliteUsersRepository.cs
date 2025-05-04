@@ -1,4 +1,4 @@
-using System.Threading;
+/* using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain.User;
 using Microsoft.EntityFrameworkCore;
@@ -29,3 +29,4 @@ public class SqliteUsersRepository : IUsersRepository
         return _context.Users.FirstAsync(u => u.Email.Value == email.Value, cancellationToken);
     }
 }
+ */

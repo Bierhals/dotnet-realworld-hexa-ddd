@@ -1,4 +1,4 @@
-using System.Linq;
+/* using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Application.Users.Dtos;
@@ -42,3 +42,4 @@ public class SqliteUsersQueryRepository : IUsersQueryRepository
             .SingleAsync(cancellationToken);
     }
 }
+ */

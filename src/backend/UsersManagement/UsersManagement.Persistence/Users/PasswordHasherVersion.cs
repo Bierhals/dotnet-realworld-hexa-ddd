@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+/* using System.Security.Cryptography;
 
 namespace Conduit.Persistence.Users;
 
@@ -9,3 +9,4 @@ record PasswordHasherVersion
     public required int KeySize { get; init; }
     public required int Iterations { get; init; }
 }
+ */
