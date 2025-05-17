@@ -1,25 +1,18 @@
-using Conduit.UsersManagement.ApiEndpoints.Users;
-using FastEndpoints;
-using FastEndpoints.Swagger;
+using System.Text.Json.Serialization;
+using Conduit.UsersManagement.ApiEndpoints;
+using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.Services.AddFastEndpoints(o =>
-        o.Assemblies = new[]
-        {
-            typeof(GetCurrentUserEndpoint).Assembly
-        })
-    .SwaggerDocument(o =>
-    {
-        o.DocumentSettings = s =>
-        {
-            s.DocumentName = "Conduit.WebApi";
-            s.Title = "Conduit.WebApi";
-            s.Version = "v1";
-        };
-        o.ShortSchemaNames = true;
-    });
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+});
+
+builder.Services.AddOpenApi();
 
 /*builder.AddConduitConfiguration();
 
@@ -34,11 +27,10 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseFastEndpoints(c =>
-    {
-        c.Endpoints.ShortNames = true;
-    })
-    .UseSwaggerGen();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 /* app
     .UseConduitPersistence()
@@ -49,4 +41,13 @@ app.UseFastEndpoints(c =>
     .UseConduitControllers()
     .UseConduitCors(); */
 
+app.RegisterUserManagementEndpoints();
+
 app.Run();
+
+[JsonSerializable(typeof(UserResponse))]
+[JsonSerializable(typeof(User))]
+internal partial class AppJsonSerializerContext : JsonSerializerContext
+{
+
+}

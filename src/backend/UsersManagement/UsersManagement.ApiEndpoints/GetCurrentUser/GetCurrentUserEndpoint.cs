@@ -2,14 +2,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
-using FastEndpoints;
+using ErrorOr;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
 
 namespace Conduit.UsersManagement.ApiEndpoints.Users;
 
-public class GetCurrentUserEndpoint : EndpointWithoutRequest<UserResponse>
+internal static class GetCurrentUserEndpoint
 {
-    public override void Configure()
+    /* public static void MapGetUser(this Microsoft.AspNetCore.Routing.RouteGroupBuilder route)
     {
         Get("/api/user");
         Description(b => b
@@ -22,20 +24,21 @@ public class GetCurrentUserEndpoint : EndpointWithoutRequest<UserResponse>
             s.Responses[422] = "Unprocessable Content";
         });
         AllowAnonymous();
-    }
+    } */
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public static Task<Results<Ok<UserResponse>, NotFound>> HandleAsync(CancellationToken ct)
     {
-        await SendAsync(new()
-        {
-            User = new()
+        return Task.FromResult<Results<Ok<UserResponse>, NotFound>>(
+            TypedResults.Ok(new UserResponse()
             {
-                Email = "test@test.de",
-                Token = "Token",
-                Username = "Username",
-                Bio = "Bio",
-                Image = "Image"
-            }
-        });
+                User = new()
+                {
+                    Email = "test@test.de",
+                    Token = "Token",
+                    Username = "Username",
+                    Bio = "Bio",
+                    Image = "Image"
+                }
+            }));
     }
 }
