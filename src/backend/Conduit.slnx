@@ -37,6 +37,7 @@
     <Project Path="ContentManagement/ContentManagement.Persistence/ContentManagement.Persistence.csproj" />
   </Folder>
   <Folder Name="/Shared/">
+    <Project Path="Shared/Shared.ApiEndpoints/Shared.ApiEndpoints.csproj" />
     <Project Path="Shared/Shared.Domain.UnitTests/Shared.Domain.UnitTests.csproj" />
     <Project Path="Shared/Shared.Domain/Shared.Domain.csproj" />
   </Folder>

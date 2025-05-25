@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Conduit.UsersManagement.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -12,7 +13,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
 });
 
-builder.Services.AddOpenApi();
+builder.Services
+    .AddOpenApi()
+    .AddProblemDetails();
 
 /*builder.AddConduitConfiguration();
 
@@ -26,6 +29,9 @@ builder.Services
     .AddConduitOpenApiSetup(); */
 
 var app = builder.Build();
+
+app.UseExceptionHandler()
+    .UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
@@ -41,12 +47,13 @@ if (app.Environment.IsDevelopment())
     .UseConduitControllers()
     .UseConduitCors(); */
 
-app.RegisterUserManagementEndpoints();
+app.MapUserManagementEndpoints();
 
 app.Run();
 
 [JsonSerializable(typeof(UserResponse))]
 [JsonSerializable(typeof(User))]
+[JsonSerializable(typeof(ValidationProblemDetails))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 

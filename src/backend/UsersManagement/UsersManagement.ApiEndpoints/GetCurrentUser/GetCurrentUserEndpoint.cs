@@ -1,16 +1,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Shared.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.UsersManagement.ApiEndpoints.Users;
 
-internal static class GetCurrentUserEndpoint
+internal sealed class GetCurrentUserEndpoint : IEndpoint
 {
+    public static void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/user", HandleAsync)
+            .WithSummary("Get current user")
+            .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit spec for Get Current User endpoint</a>")
+            .WithTags("User and Authentication");
+    }
     /* public static void MapGetUser(this Microsoft.AspNetCore.Routing.RouteGroupBuilder route)
     {
         Get("/api/user");
@@ -26,9 +36,9 @@ internal static class GetCurrentUserEndpoint
         AllowAnonymous();
     } */
 
-    public static Task<Results<Ok<UserResponse>, NotFound>> HandleAsync(CancellationToken ct)
+    private static Task<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>, InternalServerError<ProblemDetails>>> HandleAsync(CancellationToken ct)
     {
-        return Task.FromResult<Results<Ok<UserResponse>, NotFound>>(
+        return Task.FromResult<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>, InternalServerError<ProblemDetails>>>(
             TypedResults.Ok(new UserResponse()
             {
                 User = new()
