@@ -36,9 +36,9 @@ internal sealed class GetCurrentUserEndpoint : IEndpoint
         AllowAnonymous();
     } */
 
-    private static Task<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>, InternalServerError<ProblemDetails>>> HandleAsync(CancellationToken ct)
+    private static Task<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync(CancellationToken ct)
     {
-        return Task.FromResult<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>, InternalServerError<ProblemDetails>>>(
+        return Task.FromResult<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>>(
             TypedResults.Ok(new UserResponse()
             {
                 User = new()

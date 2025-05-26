@@ -1,12 +1,18 @@
+using System;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Conduit.UsersManagement.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
+using Conduit.WebApi.Configuration;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateSlimBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -14,7 +20,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 builder.Services
-    .AddOpenApi()
+    .AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthorization()
+    .AddConduitOpenApiSetup()
     .AddProblemDetails();
 
 /*builder.AddConduitConfiguration();
@@ -30,12 +38,14 @@ builder.Services
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 app.UseExceptionHandler()
     .UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapConduitOpenApi();
 }
 
 /* app
