@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../ServiceDefaults/ServiceDefaults.csproj" />
+    <ProjectReference Include="../ServiceDefaults/ServiceDefaults.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="../WebApi/WebApi.csproj" />
   </ItemGroup>
 
