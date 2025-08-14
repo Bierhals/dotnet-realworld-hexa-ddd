@@ -19,4 +19,8 @@
     <ProjectReference Include="../UsersManagement.Domain/UsersManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
 </Project>
