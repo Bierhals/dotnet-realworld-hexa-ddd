@@ -2,7 +2,7 @@ using System;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Conduit.UsersManagement.ApiEndpoints;
-using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
+using Conduit.UsersManagement.ApiEndpoints.Models;
 using Conduit.WebApi.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -63,6 +63,8 @@ app.Run();
 
 [JsonSerializable(typeof(UserResponse))]
 [JsonSerializable(typeof(User))]
+[JsonSerializable(typeof(NewUserRequest))]
+[JsonSerializable(typeof(NewUser))]
 [JsonSerializable(typeof(ValidationProblemDetails))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {

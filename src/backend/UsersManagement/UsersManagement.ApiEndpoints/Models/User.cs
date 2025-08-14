@@ -1,4 +1,4 @@
-namespace Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
+namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
 public record User
 {

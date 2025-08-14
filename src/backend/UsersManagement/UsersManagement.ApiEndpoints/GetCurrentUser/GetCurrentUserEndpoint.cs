@@ -2,13 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Shared.ApiEndpoints;
-using Conduit.UsersManagement.ApiEndpoints.GetCurrentUser;
+using Conduit.UsersManagement.ApiEndpoints.Models;
 using ErrorOr;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace Conduit.UsersManagement.ApiEndpoints.Users;
 
@@ -19,22 +19,9 @@ internal sealed class GetCurrentUserEndpoint : IEndpoint
         app.MapGet("/user", HandleAsync)
             .WithSummary("Get current user")
             .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit spec for Get Current User endpoint</a>")
-            .WithTags("User and Authentication");
+            .WithTags("User and Authentication")
+            .RequireAuthorization();
     }
-    /* public static void MapGetUser(this Microsoft.AspNetCore.Routing.RouteGroupBuilder route)
-    {
-        Get("/api/user");
-        Description(b => b
-            .Produces(401)
-            .ProducesProblemFE(422) //shortcut for .Produces<ErrorResponse>(422)
-            .ProducesProblemFE<InternalErrorResponse>(500));
-        Summary(s => {
-            s.Summary = "Get current user";
-            s.Description = "Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit spec for Get Current User endpoint</a>";
-            s.Responses[422] = "Unprocessable Content";
-        });
-        AllowAnonymous();
-    } */
 
     private static Task<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync(CancellationToken ct)
     {

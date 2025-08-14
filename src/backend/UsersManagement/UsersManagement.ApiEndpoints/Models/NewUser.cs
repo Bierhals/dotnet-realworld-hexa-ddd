@@ -1,4 +1,4 @@
-/* namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
 public record NewUser
 {
@@ -6,4 +6,3 @@ public record NewUser
     public required string Username { get; init; }
     public required string Password { get; init; }
 }
- */
