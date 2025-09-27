@@ -22,9 +22,9 @@ internal sealed class CreateUserEndpoint : IEndpoint
             .WithTags("User and Authentication");
     }
 
-    private static Task<Results<Created<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] NewUserRequest request, CancellationToken ct)
+    private static Task<Results<Created<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] NewUserRequest request, CancellationToken ct)
     {
-        return Task.FromResult<Results<Created<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>>(
+        return Task.FromResult<Results<Created<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
             TypedResults.Created((string?)null, new UserResponse()
             {
                 User = new()

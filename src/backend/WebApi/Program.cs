@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Conduit.UsersManagement.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.Models;
 using Conduit.WebApi.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

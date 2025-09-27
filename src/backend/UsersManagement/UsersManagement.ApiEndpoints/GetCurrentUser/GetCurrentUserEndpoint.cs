@@ -19,13 +19,14 @@ internal sealed class GetCurrentUserEndpoint : IEndpoint
         app.MapGet("/user", HandleAsync)
             .WithSummary("Get current user")
             .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit spec for Get Current User endpoint</a>")
+            .Produces(StatusCodes.Status401Unauthorized)
             .WithTags("User and Authentication")
             .RequireAuthorization();
     }
 
-    private static Task<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync(CancellationToken ct)
+    private static Task<Results<Ok<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync(CancellationToken ct)
     {
-        return Task.FromResult<Results<Ok<UserResponse>, UnauthorizedHttpResult, UnprocessableEntity<ValidationProblemDetails>>>(
+        return Task.FromResult<Results<Ok<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
             TypedResults.Ok(new UserResponse()
             {
                 User = new()

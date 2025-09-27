@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi;
 
 
 namespace Conduit.WebApi.Configuration;
@@ -23,10 +26,10 @@ static class OpenApiExtension
 
     internal static WebApplication MapConduitOpenApi(this WebApplication app)
     {
-        app.MapOpenApi();
+        app.MapOpenApi("openapi/v1.json");
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/openapi/v1.json", "v1");
+            options.SwaggerEndpoint("openapi/v1.json", "v1");
         });
 
         return app;
@@ -52,6 +55,7 @@ static class OpenApiExtension
                     Url = new Uri("https://opensource.org/licenses/MIT")
                 }
             };
+
             return Task.CompletedTask;
         });
 
@@ -60,7 +64,7 @@ static class OpenApiExtension
 
     static OpenApiOptions UseJwtBearerAuthentication(this OpenApiOptions options)
     {
-        var scheme = new OpenApiSecurityScheme()
+        var securityScheme = new OpenApiSecurityScheme()
         {
             Name = "Authorization",
             Description = @"For accessing the protected API resources, you must have received a a valid JWT token after registering or logging in. This JWT token must then be used for all protected resources by passing it in via the 'Authorization' header.
@@ -78,121 +82,32 @@ The following format must be in the 'Authorization' header :
 
         options.AddDocumentTransformer((document, context, CancellationToken) =>
         {
-            document.Security ??= new();
-            document.Security.Add(new OpenApiSecurityRequirement() { { new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme), [] } });
             document.Components ??= new();
-            document.Components.SecuritySchemes ??= [];
-            document.Components.SecuritySchemes.Add(JwtBearerDefaults.AuthenticationScheme, scheme);
+            document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+            {
+                ["Token"] = securityScheme
+            };
+
             return Task.CompletedTask;
         });
 
         options.AddOperationTransformer((operation, context, CancellationToken) =>
         {
-            if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
+            var hasAuthorize = context.Description.ActionDescriptor.EndpointMetadata
+                            .OfType<AuthorizeAttribute>().Any();
+
+            if (hasAuthorize)
             {
-                operation.Security = [new() { { new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme), [] } }];
+                operation.Security ??= new List<OpenApiSecurityRequirement>();
+                operation.Security.Add(new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("Token", context.Document)] = []
+                });
             }
+
             return Task.CompletedTask;
         });
 
         return options;
     }
 }
-
-/* 
-static class OpenApiExtension
-{
-    public static IServiceCollection AddConduitOpenApiSetup(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(x =>
-        {
-            x.IncludeXmlComments(XmlCommentsFilePath);
-            x.SupportNonNullableReferenceTypes();
-            x.SchemaFilter<OpenApiNonNullableFalseFilter>();
-            x.SchemaFilter<OpenApiRequiredMemberFilter>();
-            x.EnableAnnotations();
-
-            x.AddSecurityDefinition(
-                "Bearer",
-                new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    BearerFormat = "JWT"
-                }
-            );
-
-            x.AddSecurityRequirement(
-                new OpenApiSecurityRequirement()
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                }
-            );
-            x.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "RealWorld Conduit API",
-                Version = "1.0.0",
-                Description = "Conduit API documentation",
-                Contact = new OpenApiContact
-                {
-                    Name = "RealWorld",
-                    Url = new Uri("https://www.realworld.how")
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "MIT License",
-                    Url = new Uri("https://opensource.org/licenses/MIT")
-                }
-            });
-            //x.CustomSchemaIds(y => y.FullName);
-        });
-
-        return services;
-    }
-
-    public static WebApplication UseConduitOpenApi(this WebApplication app)
-    {
-        app.UseSwagger(c =>
-        {
-            c.RouteTemplate = "api-docs/{documentName}/openapi.json";
-            c.PreSerializeFilters.Add((swagger, httpReq) =>
-            {
-                swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}/api" } };
-            });
-        });
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwaggerUI(c =>
-            {
-                c.RoutePrefix = "api-docs";
-                c.SwaggerEndpoint("v1/openapi.json", "RealWorld API V1");
-            });
-        }
-
-        return app;
-    }
-
-    private static string XmlCommentsFilePath
-    {
-        get
-        {
-            string basePath = AppContext.BaseDirectory;
-            string fileName = typeof(Program).Assembly.GetName().Name + ".xml";
-            return Path.Combine(basePath, fileName);
-        }
-    }
-}
- */
