@@ -15,7 +15,7 @@ namespace Conduit.WebApi.Configuration;
 
 static class OpenApiExtension
 {
-    internal static IServiceCollection AddConduitOpenApiSetup(this IServiceCollection services)
+    internal static IServiceCollection AddConduitOpenApi(this IServiceCollection services)
     {
         return services.AddOpenApi(options =>
         {

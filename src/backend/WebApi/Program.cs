@@ -17,13 +17,15 @@ builder.AddServiceDefaults();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppSerializerContext.Default);
 });
+builder.Services.ConfigureUserManagementJsonOptions();
+
 
 builder.Services
     .AddAuthentication().AddJwtBearer();
 builder.Services.AddAuthorization()
-    .AddConduitOpenApiSetup()
+    .AddConduitOpenApi()
     .AddProblemDetails();
 
 /*builder.AddConduitConfiguration();
@@ -62,18 +64,8 @@ app.MapUserManagementEndpoints();
 
 app.Run();
 
-
-// TODO: In Adapter verlagern, damit die internen Modelle nicht öffentlich gemacht werden müssen
-[JsonSerializable(typeof(LoginUser))]
-[JsonSerializable(typeof(LoginUserRequest))]
-[JsonSerializable(typeof(UserResponse))]
-[JsonSerializable(typeof(User))]
-[JsonSerializable(typeof(NewUserRequest))]
-[JsonSerializable(typeof(NewUser))]
-[JsonSerializable(typeof(UpdateUser))]
-[JsonSerializable(typeof(UpdateUserRequest))]
 [JsonSerializable(typeof(ValidationProblemDetails))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
+public partial class AppSerializerContext : JsonSerializerContext
 {
 
 }

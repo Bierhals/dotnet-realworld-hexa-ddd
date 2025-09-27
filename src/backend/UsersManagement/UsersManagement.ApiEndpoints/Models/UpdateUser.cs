@@ -1,6 +1,6 @@
 namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
-public sealed record UpdateUser
+internal sealed record UpdateUser
 {
     public string? Email { get; init; }
     public string? Password { get; init; }
