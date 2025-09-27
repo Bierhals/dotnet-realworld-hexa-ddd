@@ -62,10 +62,16 @@ app.MapUserManagementEndpoints();
 
 app.Run();
 
+
+// TODO: In Adapter verlagern, damit die internen Modelle nicht öffentlich gemacht werden müssen
+[JsonSerializable(typeof(LoginUser))]
+[JsonSerializable(typeof(LoginUserRequest))]
 [JsonSerializable(typeof(UserResponse))]
 [JsonSerializable(typeof(User))]
 [JsonSerializable(typeof(NewUserRequest))]
 [JsonSerializable(typeof(NewUser))]
+[JsonSerializable(typeof(UpdateUser))]
+[JsonSerializable(typeof(UpdateUserRequest))]
 [JsonSerializable(typeof(ValidationProblemDetails))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {

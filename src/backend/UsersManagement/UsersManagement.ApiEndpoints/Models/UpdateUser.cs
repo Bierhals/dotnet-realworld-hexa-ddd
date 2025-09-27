@@ -1,6 +1,6 @@
-/* namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
-public record UpdateUser
+public sealed record UpdateUser
 {
     public string? Email { get; init; }
     public string? Password { get; init; }
@@ -8,4 +8,3 @@ public record UpdateUser
     public string? Bio { get; init; }
     public string? Image { get; init; }
 }
- */

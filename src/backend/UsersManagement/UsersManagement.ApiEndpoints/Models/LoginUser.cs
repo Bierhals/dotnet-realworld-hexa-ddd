@@ -1,8 +1,7 @@
-/* namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
-public record LoginUser
+public sealed record LoginUser
 {
     public required string Email { get; init; }
     public required string Password { get; init; }
 }
- */

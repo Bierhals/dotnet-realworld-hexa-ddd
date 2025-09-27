@@ -1,6 +1,6 @@
 namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
-public record User
+public sealed record User
 {
     public required string Email { get; init; }
     public required string Token { get; init; }

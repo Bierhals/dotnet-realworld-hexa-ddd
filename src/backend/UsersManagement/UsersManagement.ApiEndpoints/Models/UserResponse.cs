@@ -1,6 +1,6 @@
 namespace Conduit.UsersManagement.ApiEndpoints.Models;
 
-public record UserResponse
+public sealed record UserResponse
 {
     public required User User { get; init; }
 }

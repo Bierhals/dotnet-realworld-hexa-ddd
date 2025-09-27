@@ -1,5 +1,7 @@
 using Conduit.Shared.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.CreateUser;
+using Conduit.UsersManagement.ApiEndpoints.Login;
+using Conduit.UsersManagement.ApiEndpoints.UpdateCurrentUser;
 using Conduit.UsersManagement.ApiEndpoints.Users;
 using Microsoft.AspNetCore.Routing;
 
@@ -11,5 +13,7 @@ public static class ConfigurationExtension
     {
         app.AddEndpoint<GetCurrentUserEndpoint>();
         app.AddEndpoint<CreateUserEndpoint>();
+        app.AddEndpoint<LoginEndpoint>();
+        app.AddEndpoint<UpdateCurrentUserEndpoint>();
     }
 }
