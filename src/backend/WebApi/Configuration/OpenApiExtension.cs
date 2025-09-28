@@ -29,7 +29,8 @@ static class OpenApiExtension
         app.MapOpenApi("openapi/v1.json");
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("openapi/v1.json", "v1");
+            options.RoutePrefix = "openapi";
+            options.SwaggerEndpoint("v1.json", "v1");
         });
 
         return app;
