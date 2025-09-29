@@ -12,6 +12,8 @@ namespace Conduit.UsersManagement.ApiEndpoints;
 [JsonSerializable(typeof(NewUser))]
 [JsonSerializable(typeof(UpdateUser))]
 [JsonSerializable(typeof(UpdateUserRequest))]
+[JsonSerializable(typeof(ProfileResponse))]
+[JsonSerializable(typeof(Profile))]
 internal partial class UserManagementSerializerContext : JsonSerializerContext
 {
 

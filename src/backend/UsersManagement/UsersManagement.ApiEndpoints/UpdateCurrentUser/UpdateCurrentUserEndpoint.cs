@@ -16,12 +16,11 @@ internal sealed class UpdateCurrentUserEndpoint : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("/user", HandleAsync)
+        app.MapPut(string.Empty, HandleAsync)
             .WithSummary("Update current user")
             .WithDescription("Updated user information for current user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#update-user\">Conduit spec for Update User</a>")
             .RequireAuthorization()
-            .Produces(StatusCodes.Status401Unauthorized)
-            .WithTags("User and Authentication");
+            .Produces(StatusCodes.Status401Unauthorized);
     }
 
     private static Task<Results<Ok<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] UpdateUserRequest request, CancellationToken ct)

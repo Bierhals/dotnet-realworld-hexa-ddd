@@ -16,10 +16,9 @@ internal sealed class CreateUserEndpoint : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/user", HandleAsync)
+        app.MapPost(string.Empty, HandleAsync)
             .WithSummary("Register a new user")
-            .WithDescription("<a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints/#registration\">Conduit Spec for registration endpoint</a>")
-            .WithTags("User and Authentication");
+            .WithDescription("<a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints/#registration\">Conduit Spec for registration endpoint</a>");
     }
 
     private static Task<Results<Created<UserResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] NewUserRequest request, CancellationToken ct)

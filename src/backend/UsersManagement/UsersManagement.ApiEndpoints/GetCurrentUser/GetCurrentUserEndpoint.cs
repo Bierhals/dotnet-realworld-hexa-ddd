@@ -16,11 +16,10 @@ internal sealed class GetCurrentUserEndpoint : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/user", HandleAsync)
+        app.MapGet(string.Empty, HandleAsync)
             .WithSummary("Get current user")
             .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit spec for Get Current User endpoint</a>")
             .Produces(StatusCodes.Status401Unauthorized)
-            .WithTags("User and Authentication")
             .RequireAuthorization();
     }
 
