@@ -4,22 +4,6 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/CommentsManagement/">
-    <Project Path="CommentsManagement/CommentsManagement.Application.UnitTests/CommentsManagement.Application.UnitTests.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.Application/CommentsManagement.Application.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.Domain.UnitTests/CommentsManagement.Domain.UnitTests.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.Domain/CommentsManagement.Domain.csproj" />
-  </Folder>
-  <Folder Name="/CommentsManagement/AdaptersInbound/">
-    <Project Path="CommentsManagement/CommentsManagement.ApiEndpoints.UnitTests/CommentsManagement.ApiEndpoints.UnitTests.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.ApiEndpoints/CommentsManagement.ApiEndpoints.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.InterModuleApi.UnitTests/CommentsManagement.InterModuleApi.UnitTests.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.InterModuleApi/CommentsManagement.InterModuleApi.csproj" />
-  </Folder>
-  <Folder Name="/CommentsManagement/AdaptersOutbound/">
-    <Project Path="CommentsManagement/CommentsManagement.Persistence.UnitTests/CommentsManagement.Persistence.UnitTests.csproj" />
-    <Project Path="CommentsManagement/CommentsManagement.Persistence/CommentsManagement.Persistence.csproj" />
-  </Folder>
   <Folder Name="/ContentManagement/">
     <Project Path="ContentManagement/ContentManagement.Application.UnitTests/ContentManagement.Application.UnitTests.csproj" />
     <Project Path="ContentManagement/ContentManagement.Application/ContentManagement.Application.csproj" />
