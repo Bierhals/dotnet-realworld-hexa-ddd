@@ -1,6 +1,8 @@
 using System;
 using Conduit.ContentManagement.ApiEndpoints.CreateArticle;
+using Conduit.ContentManagement.ApiEndpoints.CreateArticleFavorite;
 using Conduit.ContentManagement.ApiEndpoints.DeleteArticle;
+using Conduit.ContentManagement.ApiEndpoints.DeleteArticleFavorite;
 using Conduit.ContentManagement.ApiEndpoints.GetArticle;
 using Conduit.ContentManagement.ApiEndpoints.GetArticles;
 using Conduit.ContentManagement.ApiEndpoints.GetArticlesFeed;
@@ -20,6 +22,7 @@ public static class ConfigurationExtension
     {
         app.MapArticlesEndpoints();
         app.MapTagsEndpoints();
+        app.MapFavoriteEndpoints();
     }
 
     private static void MapArticlesEndpoints(this IEndpointRouteBuilder app)
@@ -41,6 +44,15 @@ public static class ConfigurationExtension
             .WithTags("Tags");
 
         group.AddEndpoint<GetTagsEndpoint>();
+    }
+
+    private static void MapFavoriteEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/articles/{slug}/favorite")
+            .WithTags("Favorites");
+
+        group.AddEndpoint<CreateArticleFavoriteEndpoint>();
+        group.AddEndpoint<DeleteArticleFavoriteEndpoint>();
     }
 
     public static void ConfigureContentManagementJsonOptions(this IServiceCollection services)
