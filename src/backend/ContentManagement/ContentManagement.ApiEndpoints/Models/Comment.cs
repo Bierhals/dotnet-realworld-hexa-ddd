@@ -1,6 +1,6 @@
-/* using System;
+using System;
 
-namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 public record Comment
 {
@@ -10,4 +10,3 @@ public record Comment
     public required string Body { get; init; }
     public required Profile Author { get; init; }
 }
- */

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
-/// <summary>
-/// Multiple articles
-/// </summary>
+[Description("Multiple articles")]
 public record MultipleArticlesResponse
 {
     public required IEnumerable<Article> Articles { get; init; }

@@ -1,9 +1,12 @@
 using System;
 using Conduit.ContentManagement.ApiEndpoints.CreateArticle;
+using Conduit.ContentManagement.ApiEndpoints.CreateArticleComment;
 using Conduit.ContentManagement.ApiEndpoints.CreateArticleFavorite;
 using Conduit.ContentManagement.ApiEndpoints.DeleteArticle;
+using Conduit.ContentManagement.ApiEndpoints.DeleteArticleComment;
 using Conduit.ContentManagement.ApiEndpoints.DeleteArticleFavorite;
 using Conduit.ContentManagement.ApiEndpoints.GetArticle;
+using Conduit.ContentManagement.ApiEndpoints.GetArticleComments;
 using Conduit.ContentManagement.ApiEndpoints.GetArticles;
 using Conduit.ContentManagement.ApiEndpoints.GetArticlesFeed;
 using Conduit.ContentManagement.ApiEndpoints.GetTags;
@@ -23,6 +26,7 @@ public static class ConfigurationExtension
         app.MapArticlesEndpoints();
         app.MapTagsEndpoints();
         app.MapFavoriteEndpoints();
+        app.MapCommentsEndpoints();
     }
 
     private static void MapArticlesEndpoints(this IEndpointRouteBuilder app)
@@ -53,6 +57,16 @@ public static class ConfigurationExtension
 
         group.AddEndpoint<CreateArticleFavoriteEndpoint>();
         group.AddEndpoint<DeleteArticleFavoriteEndpoint>();
+    }
+
+    private static void MapCommentsEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/articles/{slug}/comments")
+            .WithTags("Comments");
+
+        group.AddEndpoint<CreateArticleCommentEndpoint>();
+        group.AddEndpoint<DeleteArticleCommentEndpoint>();
+        group.AddEndpoint<GetArticleCommentsEndpoint>();
     }
 
     public static void ConfigureContentManagementJsonOptions(this IServiceCollection services)
