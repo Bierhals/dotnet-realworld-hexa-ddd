@@ -1,4 +1,4 @@
-/* namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 public record Profile
 {
@@ -7,4 +7,3 @@ public record Profile
     public required string Image { get; init; }
     public required bool Following { get; init; }
 }
- */

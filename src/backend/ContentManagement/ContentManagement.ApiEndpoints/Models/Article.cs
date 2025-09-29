@@ -1,7 +1,7 @@
-/* using System;
+using System;
 using System.Collections.Generic;
 
-namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 public record Article
 {
@@ -16,4 +16,3 @@ public record Article
     public required int FavoritesCount { get; init; }
     public required Profile Author { get; init; }
 }
- */

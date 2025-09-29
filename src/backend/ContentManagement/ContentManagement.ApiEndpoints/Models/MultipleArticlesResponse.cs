@@ -1,6 +1,6 @@
-/* using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 /// <summary>
 /// Multiple articles
@@ -10,4 +10,3 @@ public record MultipleArticlesResponse
     public required IEnumerable<Article> Articles { get; init; }
     public required int ArticlesCount { get; init; }
 }
- */

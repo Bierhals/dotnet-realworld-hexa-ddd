@@ -1,6 +1,6 @@
-/* using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 public record NewArticle
 {
@@ -9,4 +9,3 @@ public record NewArticle
     public required string Body { get; init; }
     public IEnumerable<string>? TagList { get; init; }
 }
- */

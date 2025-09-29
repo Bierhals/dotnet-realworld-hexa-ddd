@@ -21,6 +21,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppSerializerContext.Default);
 });
 builder.Services.ConfigureUserManagementJsonOptions();
+builder.Services.ConfigureContentManagementJsonOptions();
 
 
 builder.Services

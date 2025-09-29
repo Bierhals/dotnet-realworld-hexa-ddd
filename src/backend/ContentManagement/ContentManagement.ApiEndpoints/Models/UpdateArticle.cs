@@ -1,4 +1,4 @@
-/* namespace Conduit.RestAPI.ViewModels;
+namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
 public record UpdateArticle
 {
@@ -6,4 +6,3 @@ public record UpdateArticle
     public required string Description { get; init; }
     public required string Body { get; init; }
 }
- */
