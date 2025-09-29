@@ -14,5 +14,5 @@ public record Article
     public required DateTime UpdatedAt { get; init; }
     public required bool Favorited { get; init; }
     public required int FavoritesCount { get; init; }
-    public required Profile Author { get; init; }
+    public required Author Author { get; init; }
 }

@@ -3,7 +3,7 @@ using Conduit.ContentManagement.ApiEndpoints.Models;
 
 namespace Conduit.ContentManagement.ApiEndpoints;
 
-[JsonSerializable(typeof(Profile))]
+[JsonSerializable(typeof(Author))]
 [JsonSerializable(typeof(Article))]
 [JsonSerializable(typeof(NewArticle))]
 [JsonSerializable(typeof(NewArticleRequest))]

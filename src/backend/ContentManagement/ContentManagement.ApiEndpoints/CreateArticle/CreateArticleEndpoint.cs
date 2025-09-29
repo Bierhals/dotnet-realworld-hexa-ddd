@@ -40,7 +40,7 @@ internal sealed class CreateArticleEndpoint : IEndpoint
                     UpdatedAt = DateTime.Now,
                     Favorited = true,
                     FavoritesCount = 3,
-                    Author = new Profile
+                    Author = new Author
                     {
                         Username = "username",
                         Bio = "bio",

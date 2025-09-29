@@ -8,5 +8,5 @@ public record Comment
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
     public required string Body { get; init; }
-    public required Profile Author { get; init; }
+    public required Author Author { get; init; }
 }

@@ -34,7 +34,7 @@ internal sealed class CreateArticleCommentEndpoint : IEndpoint
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     Body = "body",
-                    Author = new Profile
+                    Author = new Author
                     {
                         Username = "username",
                         Bio = "bio",

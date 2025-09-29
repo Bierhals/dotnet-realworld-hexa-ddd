@@ -1,6 +1,6 @@
 namespace Conduit.ContentManagement.ApiEndpoints.Models;
 
-public record Profile
+public record Author
 {
     public required string Username { get; init; }
     public required string Bio { get; init; }
