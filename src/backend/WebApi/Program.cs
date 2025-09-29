@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Conduit.ContentManagement.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints;
 using Conduit.UsersManagement.ApiEndpoints.Models;
 using Conduit.WebApi.Configuration;
@@ -61,6 +62,7 @@ if (app.Environment.IsDevelopment())
     .UseConduitCors(); */
 
 app.MapUserManagementEndpoints();
+app.MapContentManagementEndpoints();
 
 app.Run();
 
