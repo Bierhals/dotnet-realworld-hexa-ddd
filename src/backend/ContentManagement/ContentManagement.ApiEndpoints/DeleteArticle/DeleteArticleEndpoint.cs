@@ -17,7 +17,8 @@ internal sealed class DeleteArticleEndpoint : IEndpoint
         app.MapDelete("/{slug}", HandleAsync)
             .WithSummary("Delete an article")
             .WithDescription("Delete an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints/#delete-article\">Conduit spec for Delete Article endpoint</a>")
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization();
     }
 
     private static Task<Results<Ok, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromRoute] string slug, CancellationToken ct)

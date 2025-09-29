@@ -14,6 +14,7 @@ namespace Conduit.ContentManagement.ApiEndpoints;
 [JsonSerializable(typeof(GetArticlesRequest))]
 [JsonSerializable(typeof(Models.UpdateArticle))]
 [JsonSerializable(typeof(UpdateArticleRequest))]
+[JsonSerializable(typeof(TagsResponse))]
 internal partial class ContentManagementSerializerContext : JsonSerializerContext
 {
 

@@ -18,7 +18,8 @@ internal sealed class GetArticlesFeedEndpoint : IEndpoint
         app.MapGet("/feed", HandleAsync)
             .WithSummary("Get recent articles from users you follow")
             .WithDescription("Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/docs/specs/backend/endpoints/#registration\">Conduit Spec for registration endpoint</a>")
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization();
     }
 
     private static Task<Results<Ok<MultipleArticlesResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([AsParameters] GetArticlesFeedRequest filter, CancellationToken ct)

@@ -19,7 +19,7 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
             .WithSummary("Update an article")
             .WithDescription("Update an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#update-article\">Conduit spec for Update Article endpoint</a>")
             .Produces(StatusCodes.Status401Unauthorized)
-            .WithTags("Articles");
+            .RequireAuthorization();
     }
 
     private static Task<Results<Ok<SingleArticleResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromRoute] string slug, [FromBody] UpdateArticleRequest request, CancellationToken ct)

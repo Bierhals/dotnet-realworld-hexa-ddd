@@ -18,13 +18,15 @@ internal sealed class CreateArticleEndpoint : IEndpoint
         app.MapPost(string.Empty, HandleAsync)
             .WithSummary("Create an article")
             .WithDescription("Create an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints/#create-article\">Conduit Spec for create article endpoint</a>")
-            .Produces(StatusCodes.Status401Unauthorized);
+            .Produces(StatusCodes.Status401Unauthorized)
+            .RequireAuthorization();
     }
 
-    private static Task<Results<Ok<SingleArticleResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] NewArticleRequest request, CancellationToken ct)
+    private static Task<Results<Created<SingleArticleResponse>, UnprocessableEntity<ValidationProblemDetails>>> HandleAsync([FromBody] NewArticleRequest request, CancellationToken ct)
     {
-        return Task.FromResult<Results<Ok<SingleArticleResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
-            TypedResults.Ok(
+        return Task.FromResult<Results<Created<SingleArticleResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
+            TypedResults.Created(
+                (string?)null, 
                 new SingleArticleResponse
             {
                 Article = new Article
