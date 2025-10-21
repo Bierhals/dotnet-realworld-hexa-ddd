@@ -6,7 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Shared/Shared/Shared.csproj" />
     <ProjectReference Include="../UsersManagement.Domain/UsersManagement.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ErrorOr" />
   </ItemGroup>
 
 </Project>

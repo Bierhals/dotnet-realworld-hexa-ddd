@@ -1,4 +1,4 @@
-/* namespace Conduit.Users.Application.Users.Dtos;
+namespace Conduit.UsersManagement.Application.Dtos;
 
 public record UserDto
 {
@@ -9,4 +9,3 @@ public record UserDto
     public required string Bio { get; init; }
     public required string Image { get; init; }
 }
- */

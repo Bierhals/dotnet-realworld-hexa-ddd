@@ -1,14 +1,13 @@
-/* using Conduit.Users.Application.Users.Dtos;
-using Conduit.Domain.Common;
-using CSharpFunctionalExtensions;
-using MediatR;
 
-namespace Conduit.Users.Application.Users.Commands.RegisterNewUser;
+using Conduit.Shared.RequestHandling;
+using Conduit.UsersManagement.Application.Dtos;
+using ErrorOr;
 
-public class RegisterNewUserCommand : IRequest<Result<UserDto, Error>>
+namespace Conduit.UsersManagement.Application.Commands.RegisterNewUser;
+
+public class RegisterNewUserCommand : ICommand<ErrorOr<UserDto>>
 {
     public required string Email { get; init; }
     public required string Username { get; init; }
     public required string Password { get; init; }
 }
- */

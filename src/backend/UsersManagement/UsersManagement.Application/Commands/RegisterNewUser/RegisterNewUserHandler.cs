@@ -1,35 +1,31 @@
-/* using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Users.Application.Services;
-using Conduit.Users.Application.Users.Dtos;
-using Conduit.Domain.Common;
-using Conduit.Domain.User;
-using CSharpFunctionalExtensions;
-using CSharpFunctionalExtensions.ValueTasks;
-using MediatR;
+using Conduit.Shared.RequestHandling;
+using Conduit.UsersManagement.Application.Dtos;
+using ErrorOr;
 
-namespace Conduit.Users.Application.Users.Commands.RegisterNewUser;
+namespace Conduit.UsersManagement.Application.Commands.RegisterNewUser;
 
-public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Result<UserDto, Error>>
+public class RegisterNewUserHandler : ICommandHandler<RegisterNewUserCommand, ErrorOr<UserDto>>
 {
-    readonly IUnitOfWork _unitOfWork;
+    /*readonly IUnitOfWork _unitOfWork;
     readonly IUsersCounter _usersCounter;
     readonly IUsersRepository _userRepository;
     readonly IPasswordHasher _passwordHasher;
-    readonly IAuthenticationService _authenticationService;
+    readonly IAuthenticationService _authenticationService;*/
 
-    public RegisterNewUserHandler(IUnitOfWork unitOfWork, IUsersCounter usersCounter, IPasswordHasher passwordHasher, IUsersRepository userRepository, IAuthenticationService authenticationService)
+    public RegisterNewUserHandler(/*IUnitOfWork unitOfWork, IUsersCounter usersCounter, IPasswordHasher passwordHasher, IUsersRepository userRepository, IAuthenticationService authenticationService*/)
     {
-        _userRepository = userRepository;
+        /*_userRepository = userRepository;
         _usersCounter = usersCounter;
         _passwordHasher = passwordHasher;
         _unitOfWork = unitOfWork;
-        _authenticationService = authenticationService;
+        _authenticationService = authenticationService;*/
     }
 
-    public Task<Result<UserDto, Error>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
+    public Task<ErrorOr<UserDto>> Handle(RegisterNewUserCommand request, CancellationToken cancellationToken = default)
     {
-        Result<UserEmail, Error> email = UserEmail.Create(request.Email);
+        /*Result<UserEmail, Error> email = UserEmail.Create(request.Email);
         Result<Username, Error> username = Username.Create(request.Username);
 
         return Task.FromResult(Result.Combine<Error>(email, username))
@@ -48,7 +44,15 @@ public class RegisterNewUserHandler : IRequestHandler<RegisterNewUserCommand, Re
                     Image = newUser.Image,
                     Token = _authenticationService.GenerateJwtToken(newUser.Id.Value)
                 };
-            });
+            });*/
+        return Task.FromResult(new UserDto
+        {
+            Id = "Id",
+            Email = "Email",
+            Username = "Username",
+            Bio = "Bio",
+            Image = "Image",
+            Token = "Token"
+        }.ToErrorOr());
     }
 }
- */
