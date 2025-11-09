@@ -1,7 +1,7 @@
-using Conduit.Shared.ApiEndpoints;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Shared.ApiEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

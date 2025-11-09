@@ -1,13 +1,13 @@
-using Conduit.Shared.ApiEndpoints;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.ContentManagement.ApiEndpoints.Models;
+using Conduit.Shared.ApiEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Conduit.ContentManagement.ApiEndpoints.Models;
 
 namespace Conduit.ContentManagement.ApiEndpoints.GetArticleComments;
 
@@ -25,8 +25,8 @@ internal sealed class GetArticleCommentsEndpoint : IEndpoint
         return Task.FromResult<Results<Ok<MultipleCommentsResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
             TypedResults.Ok(
                 new MultipleCommentsResponse
-            {
-                Comments = new[]
+                {
+                    Comments = new[]
                 {
                     new Comment
                     {
@@ -43,6 +43,6 @@ internal sealed class GetArticleCommentsEndpoint : IEndpoint
                         }
                     }
                 }
-            }));
+                }));
     }
 }

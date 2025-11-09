@@ -1,13 +1,13 @@
-using Conduit.Shared.ApiEndpoints;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.ContentManagement.ApiEndpoints.Models;
+using Conduit.Shared.ApiEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Conduit.ContentManagement.ApiEndpoints.Models;
 
 namespace Conduit.ContentManagement.ApiEndpoints.CreateArticleComment;
 
@@ -27,21 +27,21 @@ internal sealed class CreateArticleCommentEndpoint : IEndpoint
         return Task.FromResult<Results<Ok<SingleCommentResponse>, UnprocessableEntity<ValidationProblemDetails>>>(
             TypedResults.Ok(
                 new SingleCommentResponse
-            {
-                Comment = new Comment
                 {
-                    Id = 0,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Body = "body",
-                    Author = new Author
+                    Comment = new Comment
                     {
-                        Username = "username",
-                        Bio = "bio",
-                        Image = "image",
-                        Following = false
+                        Id = 0,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Body = "body",
+                        Author = new Author
+                        {
+                            Username = "username",
+                            Bio = "bio",
+                            Image = "image",
+                            Following = false
+                        }
                     }
-                }
-            }));
+                }));
     }
 }
