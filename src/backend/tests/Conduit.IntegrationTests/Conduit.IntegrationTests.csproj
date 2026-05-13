@@ -5,6 +5,6 @@
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Conduit\Conduit.csproj" />
+    <ProjectReference Include="..\..\Conduit\Conduit.csproj" />
   </ItemGroup>
 </Project>
