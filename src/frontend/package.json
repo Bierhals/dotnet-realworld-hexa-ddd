@@ -5,18 +5,16 @@
   "engines": {
     "node": ">= 20"
   },
-  "packageManager": "pnpm@10.33.0",
   "type": "module",
   "scripts": {
-    "prepare": "simple-git-hooks",
     "dev": "vite --port 4173",
     "build": "vite build",
     "build:analyze": "cross-env ANALYZE=1 vite build && size-limit",
     "serve": "vite preview --port 4173",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint --fix .",
-    "test": "pnpm test:unit && pnpm test:e2e && tsx scripts/merge-coverage.ts",
-    "test:e2e": "pnpm build && cross-env CI=true playwright test",
+    "test": "test:unit && test:e2e && tsx scripts/merge-coverage.ts",
+    "test:e2e": "build && cross-env CI=true playwright test",
     "test:e2e:prod": "cross-env E2E_BASE_URL='https://vue3-realworld-example-app-mutoe.vercel.app' playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:ui:debug": "playwright test --ui --headed --debug",
@@ -58,13 +56,6 @@
     "vitest": "^4.1.4",
     "vitest-monocart-coverage": "^4.0.2",
     "vue-tsc": "^3.2.6"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npm exec lint-staged",
-    "pre-push": "pnpm type-check && pnpm build"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
   },
   "size-limit": [
     {

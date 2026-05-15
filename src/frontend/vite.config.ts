@@ -23,6 +23,15 @@ export default defineConfig({
     vue(),
     allowAnalysis && analyzer({ summaryOnly: true }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        'target': 'https://localhost:5001',
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '') 
+      },
+    },
+  },
   test: {
     include: [
       'src/**/*.spec.ts',
