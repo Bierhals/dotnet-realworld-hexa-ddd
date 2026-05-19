@@ -8,8 +8,23 @@
             "name": "C#: Conduit-API Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/src/backend/Conduit/Conduit.csproj"
+            "projectPath": "${workspaceFolder}/backend/Conduit/Conduit.csproj"
         }
-
+        {
+            "name": "Attach: Conduit API",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": true
+        },
+        {
+            "name": "Node: Frontend Vite Dev",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev", "--", "--open"],
+            "console": "integratedTerminal"
+        }
     ]
 }
