@@ -1,0 +1,14 @@
+﻿<Solution>
+  <Folder Name="/config/">
+    <File Path="Directory.Packages.props" />
+    <File Path="Directory.Build.props" />
+    <File Path=".editorconfig" />
+    <File Path="../.gitignore" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Conduit\Conduit.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\Conduit.IntegrationTests\Conduit.IntegrationTests.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
