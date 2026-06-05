@@ -108,6 +108,7 @@ builder.Services.AddConduit();
 builder.Services.AddJwt();
 
 var app = builder.Build();
+app.UsePathBase("/api");
 
 app.Services.GetRequiredService<ILoggerFactory>().AddSerilogLogging();
 
@@ -122,7 +123,7 @@ app.UseMvc();
 app.UseSwagger(c => c.RouteTemplate = "swagger/{documentName}/swagger.json");
 
 // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
-app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1"));
+app.UseSwaggerUI(x => x.SwaggerEndpoint("/api/swagger/v1/swagger.json", "RealWorld API V1"));
 
 using (var scope = app.Services.CreateScope())
 {
