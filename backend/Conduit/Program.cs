@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Conduit;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 
 // read database configuration (database provider + database connection) from environment variables
 //Environment.GetEnvironmentVariable(DEFAULT_DATABASE_PROVIDER)
@@ -46,51 +50,59 @@ builder.Services.AddDbContext<ConduitContext>(options =>
 
 builder.Services.AddLocalization(x => x.ResourcesPath = "Resources");
 
-// Inject an implementation of ISwaggerProvider with defaulted settings applied
-builder.Services.AddSwaggerGen(x =>
+builder.Services.AddOpenApi(options =>
 {
-    x.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info = new()
         {
-            In = ParameterLocation.Header,
-            Description = "Please insert JWT with Bearer into field",
-            Name = "Authorization",
-            Type = SecuritySchemeType.ApiKey,
-            BearerFormat = "JWT",
-        }
-    );
-
-    x.SupportNonNullableReferenceTypes();
-
-    x.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
+            Title = "RealWorld API",
+            Version = "v1"
+        };
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
         {
+            ["Bearer"] = new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    },
-                },
-                Array.Empty<string>()
-            },
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer", // "bearer" refers to the header name here
+                In = ParameterLocation.Header,
+                BearerFormat = "JWT",
+                Description = "Please insert JWT with Bearer into field",
+                Name = "Authorization"
+            }
+        };
+
+        // Apply it as a requirement for all operations
+        foreach (var operation in document.Paths.Values.SelectMany(path => path.Operations!))
+        {
+            operation.Value.Security ??= [];
+            operation.Value.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            });
         }
-    );
-    x.SwaggerDoc("v1", new OpenApiInfo { Title = "RealWorld API", Version = "v1" });
-    x.CustomSchemaIds(y => y.FullName);
-    x.DocInclusionPredicate((_, _) => true);
-    x.TagActionsBy(y => new List<string> { y.GroupName ?? throw new InvalidOperationException() });
-    x.CustomSchemaIds(s => s.FullName?.Replace("+", "."));
+        return Task.CompletedTask;
+    });
+    // schema names that include the full namespace of the model
+    options.CreateSchemaReferenceId = (type) =>
+    {
+        var schemaRefId = OpenApiOptions.CreateDefaultSchemaReferenceId(type);
+        // Ignore primitive types
+        if (schemaRefId is null)
+        {
+            return null;
+        }
+ 
+        // Replace '+' with '.' to handle nested types
+        return type.Type.FullName!.Replace("+", ".", StringComparison.Ordinal);
+    };
 });
 
 builder.Services.AddCors();
 builder
     .Services.AddMvc(opt =>
     {
-        opt.Conventions.Add(new GroupByApiRootConvention());
         opt.Filters.Add<ValidatorActionFilter>();
         opt.EnableEndpointRouting = false;
     })
@@ -119,11 +131,11 @@ app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseAuthentication();
 app.UseMvc();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint
-app.UseSwagger(c => c.RouteTemplate = "swagger/{documentName}/swagger.json");
+// Enable middleware to serve generated OpenAPI as a JSON endpoint
+app.MapOpenApi("openapi/{documentName}.json");
 
-// Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
-app.UseSwaggerUI(x => x.SwaggerEndpoint("/api/swagger/v1/swagger.json", "RealWorld API V1"));
+// Enable middleware to serve openapi-ui assets(HTML, JS, CSS etc.)
+app.MapScalarApiReference("/api/api-docs");
 
 using (var scope = app.Services.CreateScope())
 {

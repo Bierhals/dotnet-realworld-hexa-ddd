@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Followers;
 
+[ApiController]
 [Route("profiles")]
 public class FollowersController(IMediator mediator) : Controller
 {

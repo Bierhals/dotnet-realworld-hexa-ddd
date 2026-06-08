@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Favorites;
 
+[ApiController]
 [Route("articles")]
 public class FavoritesController(IMediator mediator) : Controller
 {

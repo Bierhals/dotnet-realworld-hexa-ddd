@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Tags;
 
+[ApiController]
 [Route("tags")]
 public class TagsController(IMediator mediator) : Controller
 {
