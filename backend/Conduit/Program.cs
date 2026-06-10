@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit;
+using Conduit.Features.Articles;
+using Conduit.Features.Comments;
+using Conduit.Features.Favorites;
+using Conduit.Features.Followers;
+using Conduit.Features.Profiles;
+using Conduit.Features.Tags;
+using Conduit.Features.Users;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +57,16 @@ builder.Services.AddDbContext<ConduitContext>(options =>
 });
 
 builder.Services.AddLocalization(x => x.ResourcesPath = "Resources");
+builder.Services.AddAuthorization();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.ConfigureHttpJsonOptions(opt =>
+    opt.SerializerOptions.DefaultIgnoreCondition = System
+        .Text
+        .Json
+        .Serialization
+        .JsonIgnoreCondition
+        .WhenWritingNull
+);
 
 builder.Services.AddOpenApi(options =>
 {
@@ -93,27 +111,13 @@ builder.Services.AddOpenApi(options =>
         {
             return null;
         }
- 
+
         // Replace '+' with '.' to handle nested types
         return type.Type.FullName!.Replace("+", ".", StringComparison.Ordinal);
     };
 });
 
 builder.Services.AddCors();
-builder
-    .Services.AddMvc(opt =>
-    {
-        opt.Filters.Add<ValidatorActionFilter>();
-        opt.EnableEndpointRouting = false;
-    })
-    .AddJsonOptions(opt =>
-        opt.JsonSerializerOptions.DefaultIgnoreCondition = System
-            .Text
-            .Json
-            .Serialization
-            .JsonIgnoreCondition
-            .WhenWritingNull
-    );
 
 builder.Services.AddConduit();
 
@@ -129,7 +133,15 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
-app.UseMvc();
+app.UseAuthorization();
+
+app.MapArticlesEndpoints();
+app.MapCommentsEndpoints();
+app.MapFavoritesEndpoints();
+app.MapFollowersEndpoints();
+app.MapProfilesEndpoints();
+app.MapTagsEndpoints();
+app.MapUsersEndpoints();
 
 // Enable middleware to serve generated OpenAPI as a JSON endpoint
 app.MapOpenApi("openapi/{documentName}.json");
