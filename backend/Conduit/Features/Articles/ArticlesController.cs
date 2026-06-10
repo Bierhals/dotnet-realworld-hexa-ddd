@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Articles;
 
+[ApiController]
 [Route("articles")]
 public class ArticlesController(IMediator mediator) : Controller
 {

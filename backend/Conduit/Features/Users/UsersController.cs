@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Users;
 
+[ApiController]
 [Route("users")]
 public class UsersController(IMediator mediator)
 {

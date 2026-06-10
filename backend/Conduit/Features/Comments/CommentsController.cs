@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Conduit.Features.Comments;
 
+[ApiController]
 [Route("articles")]
 public class CommentsController(IMediator mediator) : Controller
 {
