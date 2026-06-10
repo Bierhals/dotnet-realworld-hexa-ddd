@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -43,6 +45,25 @@ public class ErrorHandlingMiddleware(
         string? result;
         switch (exception)
         {
+            case ValidationException validationException:
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.UnprocessableEntity;
+                var errors = new Dictionary<string, string[]>();
+
+                foreach (var failure in validationException.Errors)
+                {
+                    if (!errors.TryGetValue(failure.PropertyName, out var existingErrors))
+                    {
+                        errors[failure.PropertyName] = [failure.ErrorMessage];
+                        continue;
+                    }
+
+                    errors[failure.PropertyName] = [.. existingErrors, failure.ErrorMessage];
+                }
+
+                result = JsonSerializer.Serialize(new { errors });
+                break;
+            }
             case RestException re:
                 context.Response.StatusCode = (int)re.Code;
                 result = JsonSerializer.Serialize(new { errors = re.Errors });
