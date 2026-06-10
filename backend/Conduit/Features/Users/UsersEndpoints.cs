@@ -7,10 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Create = Conduit.Features.Users.Create;
-using Details = Conduit.Features.Users.Details;
-using Edit = Conduit.Features.Users.Edit;
-using Login = Conduit.Features.Users.Login;
 
 namespace Conduit.Features.Users;
 

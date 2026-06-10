@@ -12,8 +12,8 @@ using Conduit.Features.Tags;
 using Conduit.Features.Users;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,6 +70,27 @@ builder.Services.ConfigureHttpJsonOptions(opt =>
 
 builder.Services.AddOpenApi(options =>
 {
+    options.AddOperationTransformer((operation, context, cancellationToken) =>
+    {
+        var endpointMetadata = context.Description.ActionDescriptor.EndpointMetadata;
+
+        if (endpointMetadata.OfType<IAllowAnonymous>().Any())
+        {
+            return Task.CompletedTask;
+        }
+
+        if (endpointMetadata.OfType<IAuthorizeData>().Any())
+        {
+            operation.Security ??= [];
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", context.Document)] = []
+            });
+        }
+
+        return Task.CompletedTask;
+    });
+
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
         document.Info = new()
@@ -91,15 +112,6 @@ builder.Services.AddOpenApi(options =>
             }
         };
 
-        // Apply it as a requirement for all operations
-        foreach (var operation in document.Paths.Values.SelectMany(path => path.Operations!))
-        {
-            operation.Value.Security ??= [];
-            operation.Value.Security.Add(new OpenApiSecurityRequirement
-            {
-                [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-            });
-        }
         return Task.CompletedTask;
     });
     // schema names that include the full namespace of the model
