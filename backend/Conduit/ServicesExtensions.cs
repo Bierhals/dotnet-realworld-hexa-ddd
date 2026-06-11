@@ -9,10 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 using Details = Conduit.Features.Users.Details;
 
 namespace Conduit;
@@ -95,22 +92,5 @@ public static class ServicesExtensions
                     },
                 };
             });
-    }
-
-    public static void AddSerilogLogging(this ILoggerFactory loggerFactory)
-    {
-        // Attach the sink to the logger configuration
-        var log = new LoggerConfiguration()
-            .MinimumLevel.Verbose()
-            .Enrich.FromLogContext()
-            //just for local debug
-            .WriteTo.Console(
-                outputTemplate: "{Timestamp:HH:mm:ss} [{Level}] {SourceContext} {Message}{NewLine}{Exception}",
-                theme: AnsiConsoleTheme.Code
-            )
-            .CreateLogger();
-
-        loggerFactory.AddSerilog(log);
-        Log.Logger = log;
     }
 }

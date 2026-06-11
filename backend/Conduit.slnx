@@ -7,6 +7,8 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="Conduit\Conduit.csproj" Type="Classic C#" />
+    <Project Path="Conduit.AppHost\Conduit.AppHost.csproj" Type="Classic C#" />
+    <Project Path="Conduit.ServiceDefaults\Conduit.ServiceDefaults.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests\Conduit.IntegrationTests\Conduit.IntegrationTests.csproj" Type="Classic C#" />
