@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
@@ -28,6 +28,9 @@ var defaultDatabaseConnectionString = "Filename=realworld.db";
 var defaultDatabaseProvider = "sqlite";
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
+builder.AddServiceDefaults();
 
 // take the connection string from the environment variable or use hard-coded database name
 var connectionString = defaultDatabaseConnectionString;
@@ -137,8 +140,6 @@ builder.Services.AddJwt();
 
 var app = builder.Build();
 app.UsePathBase("/api");
-
-app.Services.GetRequiredService<ILoggerFactory>().AddSerilogLogging();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
