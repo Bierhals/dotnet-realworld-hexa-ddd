@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
@@ -26,20 +27,20 @@ public static class CommentsEndpoints
 
     private static Task<CommentEnvelope> CreateCommentAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         Create.Model model,
         CancellationToken cancellationToken
     ) => mediator.Send(new Create.Command(model, slug), cancellationToken);
 
     private static Task<CommentsEnvelope> ListCommentsAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         CancellationToken cancellationToken
     ) => mediator.Send(new List.Query(slug), cancellationToken);
 
     private static Task DeleteCommentAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         int id,
         CancellationToken cancellationToken
     ) => mediator.Send(new Delete.Command(slug, id), cancellationToken);

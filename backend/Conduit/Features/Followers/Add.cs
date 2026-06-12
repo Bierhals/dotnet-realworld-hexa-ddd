@@ -1,11 +1,11 @@
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +13,7 @@ namespace Conduit.Features.Followers;
 
 public class Add
 {
-    public record Command(string Username) : IRequest<ProfileEnvelope>;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.Username).NotNull().NotEmpty();
-    }
+    public record Command([Required] string Username) : IRequest<ProfileEnvelope>;
 
     public class QueryHandler(
         ConduitContext context,

@@ -4,13 +4,11 @@ using System.Threading.Tasks;
 using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Details = Conduit.Features.Users.Details;
 
 namespace Conduit;
 
@@ -18,16 +16,14 @@ public static class ServicesExtensions
 {
     public static void AddConduit(this IServiceCollection services)
     {
+        services.AddValidation();
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly())
         );
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
         services.AddScoped(
             typeof(IPipelineBehavior<,>),
             typeof(DBContextTransactionPipelineBehavior<,>)
         );
-
-        services.AddValidatorsFromAssemblyContaining<Details.QueryValidator>();
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

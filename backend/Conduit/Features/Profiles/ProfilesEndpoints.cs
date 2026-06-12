@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -20,7 +21,7 @@ public static class ProfilesEndpoints
 
     private static Task<ProfileEnvelope> GetProfileAsync(
         IMediator mediator,
-        string username,
+        [Required] string username,
         CancellationToken cancellationToken
     ) => mediator.Send(new Details.Query(username), cancellationToken);
 }

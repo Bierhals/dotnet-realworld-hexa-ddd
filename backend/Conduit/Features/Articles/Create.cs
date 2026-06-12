@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,32 +15,16 @@ public class Create
 {
     public class ArticleData
     {
-        public string? Title { get; init; }
+        public required string Title { get; init; }
 
-        public string? Description { get; init; }
+        public required string Description { get; init; }
 
-        public string? Body { get; init; }
+        public required string Body { get; init; }
 
         public string[]? TagList { get; init; }
     }
 
-    public class ArticleDataValidator : AbstractValidator<ArticleData>
-    {
-        public ArticleDataValidator()
-        {
-            RuleFor(x => x.Title).NotNull().NotEmpty();
-            RuleFor(x => x.Description).NotNull().NotEmpty();
-            RuleFor(x => x.Body).NotNull().NotEmpty();
-        }
-    }
-
-    public record Command(ArticleData Article) : IRequest<ArticleEnvelope>;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() =>
-            RuleFor(x => x.Article).NotNull().SetValidator(new ArticleDataValidator());
-    }
+    public record Command([Required] ArticleData Article) : IRequest<ArticleEnvelope>;
 
     public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
         : IRequestHandler<Command, ArticleEnvelope>

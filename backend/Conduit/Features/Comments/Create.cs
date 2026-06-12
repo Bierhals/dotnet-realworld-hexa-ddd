@@ -1,11 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +13,11 @@ namespace Conduit.Features.Comments;
 
 public class Create
 {
-    public record CommentData(string? Body);
+    public record CommentData([Required] string Body);
 
-    public record Command(Model Model, string Slug) : IRequest<CommentEnvelope>;
+    public record Command([Required] Model Model, string Slug) : IRequest<CommentEnvelope>;
 
-    public record Model(CommentData Comment) : IRequest<CommentEnvelope>;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.Model.Comment.Body).NotEmpty();
-    }
+    public record Model([property: Required] CommentData Comment) : IRequest<CommentEnvelope>;
 
     public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
         : IRequestHandler<Command, CommentEnvelope>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
@@ -72,7 +73,7 @@ public static class ArticlesEndpoints
         );
     }
 
-    private static Task<ArticleEnvelope> GetArticleAsync(IMediator mediator, string slug, CancellationToken cancellationToken)
+    private static Task<ArticleEnvelope> GetArticleAsync(IMediator mediator, [Required] string slug, CancellationToken cancellationToken)
     {
         return mediator.Send(new Details.Query(slug), cancellationToken);
     }
@@ -84,14 +85,14 @@ public static class ArticlesEndpoints
 
     private static Task<ArticleEnvelope> PutArticleAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         Edit.Model model,
         CancellationToken cancellationToken)
     {
         return mediator.Send(new Edit.Command(model, slug), cancellationToken);
     }
 
-    private static Task DeleteArticleAsync(IMediator mediator, string slug, CancellationToken cancellationToken)
+    private static Task DeleteArticleAsync(IMediator mediator, [Required] string slug, CancellationToken cancellationToken)
     {
         return mediator.Send(new Delete.Command(slug), cancellationToken);
     }
