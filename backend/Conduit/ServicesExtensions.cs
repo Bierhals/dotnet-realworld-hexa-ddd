@@ -29,8 +29,6 @@ public static class ServicesExtensions
 
         services.AddValidatorsFromAssemblyContaining<Details.QueryValidator>();
 
-        services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program)));
-
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
