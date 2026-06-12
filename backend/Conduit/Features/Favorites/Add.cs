@@ -1,11 +1,11 @@
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Features.Articles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +13,7 @@ namespace Conduit.Features.Favorites;
 
 public class Add
 {
-    public record Command(string Slug) : IRequest<ArticleEnvelope>;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.Slug).NotNull().NotEmpty();
-    }
+    public record Command([Required] string Slug) : IRequest<ArticleEnvelope>;
 
     public class QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
         : IRequestHandler<Command, ArticleEnvelope>

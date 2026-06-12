@@ -1,18 +1,13 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation;
 using MediatR;
 
 namespace Conduit.Features.Profiles;
 
 public class Details
 {
-    public record Query(string Username) : IRequest<ProfileEnvelope>;
-
-    public class QueryValidator : AbstractValidator<Query>
-    {
-        public QueryValidator() => RuleFor(x => x.Username).NotEmpty();
-    }
+    public record Query([Required] string Username) : IRequest<ProfileEnvelope>;
 
     public class QueryHandler(IProfileReader profileReader)
         : IRequestHandler<Query, ProfileEnvelope>

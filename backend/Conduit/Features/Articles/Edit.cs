@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -7,7 +8,6 @@ using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,14 +17,9 @@ public class Edit
 {
     public record ArticleData(string? Title, string? Description, string? Body, string[]? TagList);
 
-    public record Command(Model Model, string Slug) : IRequest<ArticleEnvelope>;
-
-    public record Model(ArticleData Article);
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.Model.Article).NotNull();
-    }
+    public record Command([Required] Model Model, string Slug) : IRequest<ArticleEnvelope>;
+    
+    public record Model([property: Required] ArticleData Article);
 
     public class Handler(ConduitContext context) : IRequestHandler<Command, ArticleEnvelope>
     {

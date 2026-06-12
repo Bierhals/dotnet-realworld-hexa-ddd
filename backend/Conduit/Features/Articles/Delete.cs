@@ -1,9 +1,9 @@
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +11,7 @@ namespace Conduit.Features.Articles;
 
 public class Delete
 {
-    public record Command(string Slug) : IRequest;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.Slug).NotNull().NotEmpty();
-    }
+    public record Command([Required] string Slug) : IRequest;
 
     public class QueryHandler(ConduitContext context) : IRequestHandler<Command>
     {

@@ -1,11 +1,11 @@
 using System;
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +13,7 @@ namespace Conduit.Features.Users;
 
 public class Details
 {
-    public record Query(string Username) : IRequest<UserEnvelope>;
-
-    public class QueryValidator : AbstractValidator<Query>
-    {
-        public QueryValidator() => RuleFor(x => x.Username).NotNull().NotEmpty();
-    }
+    public record Query([Required] string Username) : IRequest<UserEnvelope>;
 
     public class QueryHandler(
         ConduitContext context,

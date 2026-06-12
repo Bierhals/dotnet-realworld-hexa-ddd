@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,12 +27,7 @@ public class Edit
         public string? Image { get; set; }
     }
 
-    public record Command(UserData User) : IRequest<UserEnvelope>;
-
-    public class CommandValidator : AbstractValidator<Command>
-    {
-        public CommandValidator() => RuleFor(x => x.User).NotNull();
-    }
+    public record Command([Required] UserData User) : IRequest<UserEnvelope>;
 
     public class Handler(
         ConduitContext context,

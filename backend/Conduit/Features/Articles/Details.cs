@@ -1,9 +1,9 @@
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +11,7 @@ namespace Conduit.Features.Articles;
 
 public class Details
 {
-    public record Query(string Slug) : IRequest<ArticleEnvelope>;
-
-    public class QueryValidator : AbstractValidator<Query>
-    {
-        public QueryValidator() => RuleFor(x => x.Slug).NotNull().NotEmpty();
-    }
+    public record Query([Required] string Slug) : IRequest<ArticleEnvelope>;
 
     public class QueryHandler(ConduitContext context) : IRequestHandler<Query, ArticleEnvelope>
     {

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
@@ -25,13 +26,13 @@ public static class FavoritesEndpoints
 
     private static Task<Articles.ArticleEnvelope> AddFavoriteAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         CancellationToken cancellationToken
     ) => mediator.Send(new Add.Command(slug), cancellationToken);
 
     private static Task<Articles.ArticleEnvelope> DeleteFavoriteAsync(
         IMediator mediator,
-        string slug,
+        [Required] string slug,
         CancellationToken cancellationToken
     ) => mediator.Send(new Delete.Command(slug), cancellationToken);
 }

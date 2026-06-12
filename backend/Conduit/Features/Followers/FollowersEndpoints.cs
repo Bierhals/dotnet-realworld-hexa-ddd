@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
@@ -25,13 +26,13 @@ public static class FollowersEndpoints
 
     private static Task<Profiles.ProfileEnvelope> FollowUserAsync(
         IMediator mediator,
-        string username,
+        [Required] string username,
         CancellationToken cancellationToken
     ) => mediator.Send(new Add.Command(username), cancellationToken);
 
     private static Task<Profiles.ProfileEnvelope> UnfollowUserAsync(
         IMediator mediator,
-        string username,
+        [Required] string username,
         CancellationToken cancellationToken
     ) => mediator.Send(new Delete.Command(username), cancellationToken);
 }
