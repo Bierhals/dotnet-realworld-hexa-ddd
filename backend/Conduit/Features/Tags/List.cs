@@ -3,16 +3,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Tags;
 
 public class List
 {
-    public record Query : IRequest<TagsEnvelope>;
+    public record Query : IQuery<TagsEnvelope>;
 
-    public class QueryHandler(ConduitContext context) : IRequestHandler<Query, TagsEnvelope>
+    public class QueryHandler(ConduitContext context) : IQueryHandler<Query, TagsEnvelope>
     {
         public async Task<TagsEnvelope> Handle(Query message, CancellationToken cancellationToken)
         {

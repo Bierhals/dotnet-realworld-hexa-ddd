@@ -30,3 +30,25 @@ public class DBContextTransacionCommandDecorator<TComand, TResponse>(ConduitCont
         return result;
     }
 }
+
+public class DBContextTransacionCommandDecorator<TComand>(ConduitContext context, ICommandHandler<TComand> next)
+    : ICommandHandler<TComand>
+    where TComand : ICommand
+{
+    public async Task Handle(TComand request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            context.BeginTransaction();
+
+            await next.Handle(request, cancellationToken);
+
+            context.CommitTransaction();
+        }
+        catch (Exception)
+        {
+            context.RollbackTransaction();
+            throw;
+        }
+    }
+}

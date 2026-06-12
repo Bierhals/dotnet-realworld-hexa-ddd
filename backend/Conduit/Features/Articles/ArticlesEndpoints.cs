@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +29,7 @@ public static class ArticlesEndpoints
     }
 
     private static Task<ArticlesEnvelope> GetArticlesAsync(
-        IMediator mediator,
+        IQueryHandler<List.Query, ArticlesEnvelope> queryHandler,
         string? tag,
         string? author,
         string? favorited,
@@ -37,7 +37,7 @@ public static class ArticlesEndpoints
         int? offset,
         CancellationToken cancellationToken)
     {
-        return mediator.Send(
+        return queryHandler.Handle(
             new List.Query(
                 tag ?? string.Empty,
                 author ?? string.Empty,
@@ -50,7 +50,7 @@ public static class ArticlesEndpoints
     }
 
     private static Task<ArticlesEnvelope> GetFeedArticlesAsync(
-        IMediator mediator,
+        IQueryHandler<List.Query, ArticlesEnvelope> queryHandler,
         string? tag,
         string? author,
         string? favorited,
@@ -58,7 +58,7 @@ public static class ArticlesEndpoints
         int? offset,
         CancellationToken cancellationToken)
     {
-        return mediator.Send(
+        return queryHandler.Handle(
             new List.Query(
                 tag ?? string.Empty,
                 author ?? string.Empty,
@@ -73,27 +73,27 @@ public static class ArticlesEndpoints
         );
     }
 
-    private static Task<ArticleEnvelope> GetArticleAsync(IMediator mediator, [Required] string slug, CancellationToken cancellationToken)
+    private static Task<ArticleEnvelope> GetArticleAsync(IQueryHandler<Details.Query, ArticleEnvelope> queryHandler, [Required] string slug, CancellationToken cancellationToken)
     {
-        return mediator.Send(new Details.Query(slug), cancellationToken);
+        return queryHandler.Handle(new Details.Query(slug), cancellationToken);
     }
 
-    private static Task<ArticleEnvelope> PostArticleAsync(IMediator mediator, Create.Command command, CancellationToken cancellationToken)
+    private static Task<ArticleEnvelope> PostArticleAsync(ICommandHandler<Create.Command, ArticleEnvelope> commandHandler, Create.Command command, CancellationToken cancellationToken)
     {
-        return mediator.Send(command, cancellationToken);
+        return commandHandler.Handle(command, cancellationToken);
     }
 
     private static Task<ArticleEnvelope> PutArticleAsync(
-        IMediator mediator,
+        ICommandHandler<Edit.Command, ArticleEnvelope> commandHandler,
         [Required] string slug,
         Edit.Model model,
         CancellationToken cancellationToken)
     {
-        return mediator.Send(new Edit.Command(model, slug), cancellationToken);
+        return commandHandler.Handle(new Edit.Command(model, slug), cancellationToken);
     }
 
-    private static Task DeleteArticleAsync(IMediator mediator, [Required] string slug, CancellationToken cancellationToken)
+    private static Task DeleteArticleAsync(ICommandHandler<Delete.Command> commandHandler, [Required] string slug, CancellationToken cancellationToken)
     {
-        return mediator.Send(new Delete.Command(slug), cancellationToken);
+        return commandHandler.Handle(new Delete.Command(slug), cancellationToken);
     }
 }

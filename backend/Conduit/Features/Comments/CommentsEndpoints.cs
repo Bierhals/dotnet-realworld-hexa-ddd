@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -26,22 +26,22 @@ public static class CommentsEndpoints
     }
 
     private static Task<CommentEnvelope> CreateCommentAsync(
-        IMediator mediator,
+        ICommandHandler<Create.Command, CommentEnvelope> commandHandler,
         [Required] string slug,
         Create.Model model,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Create.Command(model, slug), cancellationToken);
+    ) => commandHandler.Handle(new Create.Command(model, slug), cancellationToken);
 
     private static Task<CommentsEnvelope> ListCommentsAsync(
-        IMediator mediator,
+        IQueryHandler<List.Query, CommentsEnvelope> queryHandler,
         [Required] string slug,
         CancellationToken cancellationToken
-    ) => mediator.Send(new List.Query(slug), cancellationToken);
+    ) => queryHandler.Handle(new List.Query(slug), cancellationToken);
 
     private static Task DeleteCommentAsync(
-        IMediator mediator,
+        ICommandHandler<Delete.Command> commandHandler,
         [Required] string slug,
         int id,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Delete.Command(slug, id), cancellationToken);
+    ) => commandHandler.Handle(new Delete.Command(slug, id), cancellationToken);
 }

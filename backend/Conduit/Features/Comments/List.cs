@@ -3,16 +3,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Comments;
 
 public class List
 {
-    public record Query(string Slug) : IRequest<CommentsEnvelope>;
+    public record Query(string Slug) : IQuery<CommentsEnvelope>;
 
-    public class QueryHandler(ConduitContext context) : IRequestHandler<Query, CommentsEnvelope>
+    public class Handler(ConduitContext context) : IQueryHandler<Query, CommentsEnvelope>
     {
         public async Task<CommentsEnvelope> Handle(
             Query message,

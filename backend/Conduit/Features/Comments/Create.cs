@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Comments;
@@ -15,12 +15,12 @@ public class Create
 {
     public record CommentData([Required] string Body);
 
-    public record Command([Required] Model Model, string Slug) : IRequest<CommentEnvelope>;
+    public record Command([Required] Model Model, string Slug) : ICommand<CommentEnvelope>;
 
-    public record Model([property: Required] CommentData Comment) : IRequest<CommentEnvelope>;
+    public record Model([Required] CommentData Comment);
 
     public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : IRequestHandler<Command, CommentEnvelope>
+        : ICommandHandler<Command, CommentEnvelope>
     {
         public async Task<CommentEnvelope> Handle(
             Command message,

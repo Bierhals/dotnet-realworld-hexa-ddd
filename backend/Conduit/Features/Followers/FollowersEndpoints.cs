@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,14 +25,14 @@ public static class FollowersEndpoints
     }
 
     private static Task<Profiles.ProfileEnvelope> FollowUserAsync(
-        IMediator mediator,
+        ICommandHandler<Add.Command, Profiles.ProfileEnvelope> commandHandler,
         [Required] string username,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Add.Command(username), cancellationToken);
+    ) => commandHandler.Handle(new Add.Command(username), cancellationToken);
 
     private static Task<Profiles.ProfileEnvelope> UnfollowUserAsync(
-        IMediator mediator,
+        ICommandHandler<Delete.Command, Profiles.ProfileEnvelope> commandHandler,
         [Required] string username,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Delete.Command(username), cancellationToken);
+    ) => commandHandler.Handle(new Delete.Command(username), cancellationToken);
 }
