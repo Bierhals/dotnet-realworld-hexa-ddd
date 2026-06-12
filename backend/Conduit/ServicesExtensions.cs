@@ -2,8 +2,10 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Conduit.Features.Profiles;
+using Conduit.Features.Users;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
+using Conduit.Shared.RequestHandling;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +26,29 @@ public static class ServicesExtensions
             typeof(IPipelineBehavior<,>),
             typeof(DBContextTransactionPipelineBehavior<,>)
         );
+
+        services.AddTransient<Create.Handler>();
+        services.AddTransient<ICommandHandler<Create.Command, UserEnvelope>>(provider =>
+        {
+            var handler = provider.GetRequiredService<Create.Handler>();
+            var dbContext = provider.GetRequiredService<ConduitContext>();
+            return new DBContextTransacionCommandDecorator<Create.Command, UserEnvelope>(dbContext, handler);
+        });
+        services.AddTransient<Login.Handler>();
+        services.AddTransient<ICommandHandler<Login.Command, UserEnvelope>>(provider =>
+        {
+            var handler = provider.GetRequiredService<Login.Handler>();
+            var dbContext = provider.GetRequiredService<ConduitContext>();
+            return new DBContextTransacionCommandDecorator<Login.Command, UserEnvelope>(dbContext, handler);
+        });
+        services.AddTransient<IQueryHandler<Features.Users.Details.Query, UserEnvelope>, Features.Users.Details.Handler>();
+        services.AddTransient<Edit.Handler>();
+        services.AddTransient<ICommandHandler<Edit.Command, UserEnvelope>>(provider =>
+        {
+            var handler = provider.GetRequiredService<Edit.Handler>();
+            var dbContext = provider.GetRequiredService<ConduitContext>();
+            return new DBContextTransacionCommandDecorator<Edit.Command, UserEnvelope>(dbContext, handler);
+        });
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

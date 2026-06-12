@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Users;
@@ -21,13 +21,13 @@ public class Login
         public required string Password { get; init; }
     }
 
-    public record Command([Required] UserData User) : IRequest<UserEnvelope>;
+    public record Command([Required] UserData User) : ICommand<UserEnvelope>;
 
     public class Handler(
         ConduitContext context,
         IPasswordHasher passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator
-    ) : IRequestHandler<Command, UserEnvelope>
+    ) : ICommandHandler<Command, UserEnvelope>
     {
         public async Task<UserEnvelope> Handle(Command message, CancellationToken cancellationToken)
         {
