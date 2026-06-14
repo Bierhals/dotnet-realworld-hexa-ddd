@@ -16,11 +16,19 @@ public class DBContextTransacionCommandDecorator<TComand, TResponse>(ConduitCont
 
         return await strategy.ExecuteAsync(async () =>
         {
-            using var transaction = await context.Database.BeginTransactionAsync();
-            var result = await next.Handle(request, cancellationToken);
-            await transaction.CommitAsync();
+            try
+            {
+                context.BeginTransaction();
+                var result = await next.Handle(request, cancellationToken);
+                context.CommitTransaction();
 
-            return result;
+                return result;
+            }
+            catch (Exception)
+            {
+                context.RollbackTransaction();
+                throw;
+            }
         });
     }
 }
@@ -35,9 +43,17 @@ public class DBContextTransacionCommandDecorator<TComand>(ConduitContext context
 
         await strategy.ExecuteAsync(async () =>
         {
-            using var transaction = await context.Database.BeginTransactionAsync();
-            await next.Handle(request, cancellationToken);
-            await transaction.CommitAsync();
+            try
+            {
+                context.BeginTransaction();
+                await next.Handle(request, cancellationToken);
+                context.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                context.RollbackTransaction();
+                throw;
+            }
         });
     }
 }
