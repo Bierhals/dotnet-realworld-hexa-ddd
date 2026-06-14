@@ -1,8 +1,9 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,7 @@ public class SliceFixture : IDisposable
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddConduit();
+        services.AddJwt();
 
         var builder = new DbContextOptionsBuilder();
         builder.UseInMemoryDatabase(_dbName);
@@ -46,27 +48,25 @@ public class SliceFixture : IDisposable
         return await action(scope.ServiceProvider);
     }
 
-    public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request) =>
-        ExecuteScopeAsync(sp =>
-        {
-            var mediator = sp.GetRequiredService<IMediator>();
-
-            return mediator.Send(request);
-        });
-
-    public Task SendAsync(IRequest request) =>
-        ExecuteScopeAsync(sp =>
-        {
-            var mediator = sp.GetRequiredService<IMediator>();
-
-            return mediator.Send(request);
-        });
-
     public Task ExecuteDbContextAsync(Func<ConduitContext, Task> action) =>
         ExecuteScopeAsync(sp => action(sp.GetRequiredService<ConduitContext>()));
 
     public Task<T> ExecuteDbContextAsync<T>(Func<ConduitContext, Task<T>> action) =>
         ExecuteScopeAsync(sp => action(sp.GetRequiredService<ConduitContext>()));
+
+    public Task<TResponse> ExecuteCommandHandlerAsync<TResponse>(ICommand<TResponse> request) =>
+        ExecuteScopeAsync(sp =>
+        {
+            var handlerType = typeof(ICommandHandler<,>).MakeGenericType(
+                request.GetType(),
+                typeof(TResponse)
+            );
+            var handler = sp.GetRequiredService(handlerType);
+            var handle = handlerType.GetMethod(nameof(ICommandHandler<ICommand<TResponse>, TResponse>.Handle));
+
+            return (Task<TResponse>)
+                handle!.Invoke(handler, [request, CancellationToken.None])!;
+        });
 
     public Task InsertAsync(params object[] entities) =>
         ExecuteDbContextAsync(db =>

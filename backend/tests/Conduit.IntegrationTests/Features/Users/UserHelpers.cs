@@ -16,7 +16,7 @@ public static class UserHelpers
     {
         var command = new Create.Command(new Create.UserData(DefaultUserName, "email", "password"));
 
-        var commandResult = await fixture.SendAsync(command);
+        var commandResult = await fixture.ExecuteCommandHandlerAsync(command);
         return commandResult.User;
     }
 }

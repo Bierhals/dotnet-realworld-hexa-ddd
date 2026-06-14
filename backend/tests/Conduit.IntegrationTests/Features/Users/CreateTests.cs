@@ -14,7 +14,7 @@ public class CreateTests : SliceFixture
     {
         var command = new Create.Command(new Create.UserData("username", "email", "password"));
 
-        await SendAsync(command);
+        _ = await ExecuteCommandHandlerAsync(command);
 
         var created = await ExecuteDbContextAsync(db =>
             db.Persons.Where(d => d.Email == command.User.Email).SingleOrDefaultAsync()
