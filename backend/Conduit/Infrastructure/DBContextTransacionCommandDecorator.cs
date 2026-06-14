@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Shared.RequestHandling;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Infrastructure;
 
@@ -11,23 +12,16 @@ public class DBContextTransacionCommandDecorator<TComand, TResponse>(ConduitCont
 {
     public async Task<TResponse> Handle(TComand request, CancellationToken cancellationToken)
     {
-        TResponse? result;
+        var strategy = context.Database.CreateExecutionStrategy();
 
-        try
+        return await strategy.ExecuteAsync(async () =>
         {
-            context.BeginTransaction();
+            using var transaction = await context.Database.BeginTransactionAsync();
+            var result = await next.Handle(request, cancellationToken);
+            await transaction.CommitAsync();
 
-            result = await next.Handle(request, cancellationToken);
-
-            context.CommitTransaction();
-        }
-        catch (Exception)
-        {
-            context.RollbackTransaction();
-            throw;
-        }
-
-        return result;
+            return result;
+        });
     }
 }
 
@@ -37,18 +31,13 @@ public class DBContextTransacionCommandDecorator<TComand>(ConduitContext context
 {
     public async Task Handle(TComand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            context.BeginTransaction();
+        var strategy = context.Database.CreateExecutionStrategy();
 
+        await strategy.ExecuteAsync(async () =>
+        {
+            using var transaction = await context.Database.BeginTransactionAsync();
             await next.Handle(request, cancellationToken);
-
-            context.CommitTransaction();
-        }
-        catch (Exception)
-        {
-            context.RollbackTransaction();
-            throw;
-        }
+            await transaction.CommitAsync();
+        });
     }
 }
