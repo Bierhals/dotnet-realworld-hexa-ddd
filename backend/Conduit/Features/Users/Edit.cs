@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Users;
@@ -27,13 +27,13 @@ public class Edit
         public string? Image { get; set; }
     }
 
-    public record Command([Required] UserData User) : IRequest<UserEnvelope>;
+    public record Command([Required] UserData User) : ICommand<UserEnvelope>;
 
     public class Handler(
         ConduitContext context,
         IPasswordHasher passwordHasher,
         ICurrentUserAccessor currentUserAccessor
-    ) : IRequestHandler<Command, UserEnvelope>
+    ) : ICommandHandler<Command, UserEnvelope>
     {
         public async Task<UserEnvelope> Handle(Command message, CancellationToken cancellationToken)
         {

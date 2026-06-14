@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.RequestHandling;
 
 namespace Conduit.Features.Users;
 
 public class Details
 {
-    public record Query([Required] string Username) : IRequest<UserEnvelope>;
+    public record Query([Required] string Username) : IQuery<UserEnvelope>;
 
-    public class QueryHandler(
+    public class Handler(
         ConduitContext context,
         IJwtTokenGenerator jwtTokenGenerator
-    ) : IRequestHandler<Query, UserEnvelope>
+    ) : IQueryHandler<Query, UserEnvelope>
     {
         public async Task<UserEnvelope> Handle(Query message, CancellationToken cancellationToken)
         {

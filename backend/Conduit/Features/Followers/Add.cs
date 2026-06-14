@@ -6,20 +6,20 @@ using Conduit.Domain;
 using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.RequestHandling;
 
 namespace Conduit.Features.Followers;
 
 public class Add
 {
-    public record Command([Required] string Username) : IRequest<ProfileEnvelope>;
+    public record Command([Required] string Username) : ICommand<ProfileEnvelope>;
 
-    public class QueryHandler(
+    public class Handler(
         ConduitContext context,
         ICurrentUserAccessor currentUserAccessor,
         IProfileReader profileReader
-    ) : IRequestHandler<Command, ProfileEnvelope>
+    ) : ICommandHandler<Command, ProfileEnvelope>
     {
         public async Task<ProfileEnvelope> Handle(
             Command message,

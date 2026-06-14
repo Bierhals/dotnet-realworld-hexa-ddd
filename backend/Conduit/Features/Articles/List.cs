@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Articles;
@@ -18,10 +18,10 @@ public class List
         int? Limit,
         int? Offset,
         bool IsFeed = false
-    ) : IRequest<ArticlesEnvelope>;
+    ) : IQuery<ArticlesEnvelope>;
 
-    public class QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : IRequestHandler<Query, ArticlesEnvelope>
+    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
+        : IQueryHandler<Query, ArticlesEnvelope>
     {
         public async Task<ArticlesEnvelope> Handle(
             Query message,

@@ -4,16 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.RequestHandling;
 
 namespace Conduit.Features.Articles;
 
 public class Details
 {
-    public record Query([Required] string Slug) : IRequest<ArticleEnvelope>;
+    public record Query([Required] string Slug) : IQuery<ArticleEnvelope>;
 
-    public class QueryHandler(ConduitContext context) : IRequestHandler<Query, ArticleEnvelope>
+    public class Handler(ConduitContext context) : IQueryHandler<Query, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Query message,

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Articles;
@@ -17,11 +17,11 @@ public class Edit
 {
     public record ArticleData(string? Title, string? Description, string? Body, string[]? TagList);
 
-    public record Command([Required] Model Model, string Slug) : IRequest<ArticleEnvelope>;
+    public record Command([Required] Model Model, string Slug) : ICommand<ArticleEnvelope>;
     
     public record Model([property: Required] ArticleData Article);
 
-    public class Handler(ConduitContext context) : IRequestHandler<Command, ArticleEnvelope>
+    public class Handler(ConduitContext context) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,

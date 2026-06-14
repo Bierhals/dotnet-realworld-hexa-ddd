@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -31,29 +31,29 @@ public static class UsersEndpoints
     }
 
     private static Task<UserEnvelope> CreateUserAsync(
-        IMediator mediator,
+        ICommandHandler<Create.Command, UserEnvelope> commandHandler,
         Create.Command command,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => commandHandler.Handle(command, cancellationToken);
 
     private static Task<UserEnvelope> LoginUserAsync(
-        IMediator mediator,
+        ICommandHandler<Login.Command, UserEnvelope> commandHandler,
         Login.Command command,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => commandHandler.Handle(command, cancellationToken);
 
     private static Task<UserEnvelope> GetCurrentUserAsync(
-        IMediator mediator,
+        IQueryHandler<Details.Query, UserEnvelope> queryHandler,
         ICurrentUserAccessor currentUserAccessor,
         CancellationToken cancellationToken
-    ) => mediator.Send(
+    ) => queryHandler.Handle(
         new Details.Query(currentUserAccessor.GetCurrentUsername() ?? "<unknown>"),
         cancellationToken
     );
 
     private static Task<UserEnvelope> EditCurrentUserAsync(
-        IMediator mediator,
+        ICommandHandler<Edit.Command, UserEnvelope> commandHandler,
         Edit.Command command,
         CancellationToken cancellationToken
-    ) => mediator.Send(command, cancellationToken);
+    ) => commandHandler.Handle(command, cancellationToken);
 }

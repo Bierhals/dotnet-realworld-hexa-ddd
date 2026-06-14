@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Conduit.Features.Articles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.RequestHandling;
 
 namespace Conduit.Features.Favorites;
 
 public class Delete
 {
-    public record Command([Required] string Slug) : IRequest<ArticleEnvelope>;
+    public record Command([Required] string Slug) : ICommand<ArticleEnvelope>;
 
-    public class QueryHandler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : IRequestHandler<Command, ArticleEnvelope>
+    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
+        : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,

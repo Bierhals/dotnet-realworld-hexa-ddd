@@ -4,16 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Conduit.Shared.RequestHandling;
 
 namespace Conduit.Features.Articles;
 
 public class Delete
 {
-    public record Command([Required] string Slug) : IRequest;
+    public record Command([Required] string Slug) : ICommand;
 
-    public class QueryHandler(ConduitContext context) : IRequestHandler<Command>
+    public class Handler(ConduitContext context) : ICommandHandler<Command>
     {
         public async Task Handle(Command message, CancellationToken cancellationToken)
         {
@@ -29,7 +29,6 @@ public class Delete
 
             context.Articles.Remove(article);
             await context.SaveChangesAsync(cancellationToken);
-            await Task.FromResult(Unit.Value);
         }
     }
 }

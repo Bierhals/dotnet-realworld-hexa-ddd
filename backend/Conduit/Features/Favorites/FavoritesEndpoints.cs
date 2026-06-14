@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure.Security;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,14 +25,14 @@ public static class FavoritesEndpoints
     }
 
     private static Task<Articles.ArticleEnvelope> AddFavoriteAsync(
-        IMediator mediator,
+        ICommandHandler<Add.Command, Articles.ArticleEnvelope> commandHandler,
         [Required] string slug,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Add.Command(slug), cancellationToken);
+    ) => commandHandler.Handle(new Add.Command(slug), cancellationToken);
 
     private static Task<Articles.ArticleEnvelope> DeleteFavoriteAsync(
-        IMediator mediator,
+        ICommandHandler<Delete.Command, Articles.ArticleEnvelope> commandHandler,
         [Required] string slug,
         CancellationToken cancellationToken
-    ) => mediator.Send(new Delete.Command(slug), cancellationToken);
+    ) => commandHandler.Handle(new Delete.Command(slug), cancellationToken);
 }

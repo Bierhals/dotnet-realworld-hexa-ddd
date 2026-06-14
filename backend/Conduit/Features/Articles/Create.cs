@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Domain;
 using Conduit.Infrastructure;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Articles;
@@ -24,10 +24,10 @@ public class Create
         public string[]? TagList { get; init; }
     }
 
-    public record Command([Required] ArticleData Article) : IRequest<ArticleEnvelope>;
+    public record Command([Required] ArticleData Article) : ICommand<ArticleEnvelope>;
 
     public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : IRequestHandler<Command, ArticleEnvelope>
+        : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,

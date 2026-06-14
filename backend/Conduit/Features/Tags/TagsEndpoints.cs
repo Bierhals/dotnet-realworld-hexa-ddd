@@ -1,10 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using List = Conduit.Features.Tags.List;
 
 namespace Conduit.Features.Tags;
 
@@ -19,6 +18,6 @@ public static class TagsEndpoints
         return endpoints;
     }
 
-    private static Task<TagsEnvelope> ListTagsAsync(IMediator mediator, CancellationToken cancellationToken) =>
-        mediator.Send(new List.Query(), cancellationToken);
+    private static Task<TagsEnvelope> ListTagsAsync(IQueryHandler<List.Query, TagsEnvelope> queryHandler, CancellationToken cancellationToken) =>
+        queryHandler.Handle(new List.Query(), cancellationToken);
 }
