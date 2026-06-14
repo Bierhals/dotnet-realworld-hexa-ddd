@@ -21,9 +21,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
-// read database configuration (database provider + database connection) from environment variables
-//Environment.GetEnvironmentVariable(DEFAULT_DATABASE_PROVIDER)
-//Environment.GetEnvironmentVariable(DEFAULT_DATABASE_CONNECTION_STRING)
 var defaultDatabaseConnectionString = "Filename=realworld.db";
 var defaultDatabaseProvider = "sqlite";
 
@@ -36,28 +33,25 @@ builder.AddServiceDefaults();
 var connectionString = defaultDatabaseConnectionString;
 
 // take the database provider from the environment variable or use hard-coded database provider
-var databaseProvider = defaultDatabaseProvider;
+var databaseProvider = Environment.GetEnvironmentVariable("DATABASE_PROVIDER") ?? defaultDatabaseProvider;
 
-builder.Services.AddDbContext<ConduitContext>(options =>
+if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison.Ordinal))
 {
-    if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison.Ordinal))
+    builder.Services.AddDbContext<ConduitContext>(options =>
     {
         options.UseSqlite(connectionString);
-    }
-    else if (
-        databaseProvider.ToLowerInvariant().Trim().Equals("sqlserver", StringComparison.Ordinal)
-    )
-    {
-        // only works in windows container
-        options.UseSqlServer(connectionString);
-    }
-    else
-    {
-        throw new InvalidOperationException(
-            "Database provider unknown. Please check configuration"
-        );
-    }
-});
+    });
+}
+else if (databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal))
+{
+    builder.AddNpgsqlDbContext<ConduitContext>(connectionName: "conduit-db");
+}
+else
+{
+    throw new InvalidOperationException(
+        "Database provider unknown. Please check configuration"
+    );
+}
 
 builder.Services.AddLocalization(x => x.ResourcesPath = "Resources");
 builder.Services.AddAuthorization();

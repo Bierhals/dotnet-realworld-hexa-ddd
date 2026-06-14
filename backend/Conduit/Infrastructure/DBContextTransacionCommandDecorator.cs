@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Shared.RequestHandling;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Infrastructure;
 
@@ -11,23 +12,24 @@ public class DBContextTransacionCommandDecorator<TComand, TResponse>(ConduitCont
 {
     public async Task<TResponse> Handle(TComand request, CancellationToken cancellationToken)
     {
-        TResponse? result;
+        var strategy = context.Database.CreateExecutionStrategy();
 
-        try
+        return await strategy.ExecuteAsync(async () =>
         {
-            context.BeginTransaction();
+            try
+            {
+                context.BeginTransaction();
+                var result = await next.Handle(request, cancellationToken);
+                context.CommitTransaction();
 
-            result = await next.Handle(request, cancellationToken);
-
-            context.CommitTransaction();
-        }
-        catch (Exception)
-        {
-            context.RollbackTransaction();
-            throw;
-        }
-
-        return result;
+                return result;
+            }
+            catch (Exception)
+            {
+                context.RollbackTransaction();
+                throw;
+            }
+        });
     }
 }
 
@@ -37,18 +39,21 @@ public class DBContextTransacionCommandDecorator<TComand>(ConduitContext context
 {
     public async Task Handle(TComand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            context.BeginTransaction();
+        var strategy = context.Database.CreateExecutionStrategy();
 
-            await next.Handle(request, cancellationToken);
-
-            context.CommitTransaction();
-        }
-        catch (Exception)
+        await strategy.ExecuteAsync(async () =>
         {
-            context.RollbackTransaction();
-            throw;
-        }
+            try
+            {
+                context.BeginTransaction();
+                await next.Handle(request, cancellationToken);
+                context.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                context.RollbackTransaction();
+                throw;
+            }
+        });
     }
 }
