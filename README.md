@@ -4,55 +4,77 @@ ASP.NET Core codebase containing real world examples (CRUD, auth, advanced patte
 
 ## [RealWorld](https://github.com/gothinkster/realworld)
 
-This codebase was created to demonstrate a fully fledged fullstack application built with ASP.NET Core (with Feature orientation) including CRUD operations, authentication, routing, pagination, and more.
+This repository contains a fullstack RealWorld implementation with a .NET backend and a Vue frontend. The backend provides the RealWorld API with CRUD operations, authentication, routing, pagination, and more.
 
-We've gone to great lengths to adhere to the ASP.NET Core community styleguides & best practices.
+The code follows the standard style guidelines of .NET and Vue 3 and is guided by established best practices for both ecosystems.
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+For more information about the RealWorld specification and compatible implementations, see the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
-## How it works
+## Goals
 
-This is using ASP.NET Core with:
+- Provide a backend-focused implementation of the RealWorld API for articles, comments, tags, users, profiles, favorites, and followers.
+- Follow ideas from Hexagonal Architecture, Domain Driven Design, and vertical feature slices.
+- Prefer .NET and Microsoft packages wherever possible. External packages should only be added when they provide clear value.
+- Avoid framework abstractions for their own sake. Commands, queries, and handlers are intentionally small and project-specific.
+- Keep local development comfortable with .NET Aspire, PostgreSQL, a YARP gateway, and the existing Vue frontend.
 
-- CQRS and [MediatR](https://github.com/jbogard/MediatR)
-  - [Simplifying Development and Separating Concerns with MediatR](https://blogs.msdn.microsoft.com/cdndevs/2016/01/26/simplifying-development-and-separating-concerns-with-mediatr/)
-  - [CQRS with MediatR and AutoMapper](https://lostechies.com/jimmybogard/2015/05/05/cqrs-with-mediatr-and-automapper/)
-  - [Thin Controllers with CQRS and MediatR](https://codeopinion.com/thin-controllers-cqrs-mediatr/)
-- [AutoMapper](http://automapper.org)
-- [Fluent Validation](https://github.com/JeremySkinner/FluentValidation)
-- Feature folders and vertical slices
-- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/) on SQLite for demo purposes. Can easily be anything else EF Core supports. Open to porting to other ORMs/DBs.
-- Built-in Swagger via [Swashbuckle.AspNetCore](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
-- [Bullseye](https://github.com/adamralph/bullseye) for building!
-- JWT authentication using [ASP.NET Core JWT Bearer Authentication](https://github.com/aspnet/Security/tree/master/src/Microsoft.AspNetCore.Authentication.JwtBearer).
-- Use [dotnet-format](https://github.com/dotnet/format) for style checking
-- `.editorconfig` to enforce some usage patterns
+## Technologies
 
-This basic architecture is based on this reference architecture: [https://github.com/jbogard/ContosoUniversityCore](https://github.com/jbogard/ContosoUniversityCore)
+Backend:
 
-## Getting started
+- .NET 10
+- ASP.NET Core Minimal APIs
+- Entity Framework Core
+- SQLite for simple local API runs
+- PostgreSQL through .NET Aspire
+- Microsoft OpenAPI with Scalar as the API UI
+- JWT Bearer Authentication
+- xUnit for unit and integration tests
 
-Install the .NET Core SDK and lots of documentation: [https://www.microsoft.com/net/download/core](https://www.microsoft.com/net/download/core)
+Frontend:
 
-Documentation for ASP.NET Core: [https://docs.microsoft.com/en-us/aspnet/core/](https://docs.microsoft.com/en-us/aspnet/core/)
+- Vue
+- Vite
+- Pinia
+- Playwright/Vitest for frontend tests
 
-## Docker Build
+## Running
 
-There is a 'Makefile' for OS X and Linux:
+### Full Stack With Aspire
 
-- `make build` executes `docker-compose build`
-- `make run` executes `docker-compose up`
+The preferred local startup path is the Aspire AppHost:
 
-The above might work for Docker on Windows
+```bash
+dotnet run --project backend/Conduit.AppHost/Conduit.AppHost.csproj
+```
 
-## Local building
+The AppHost starts and wires together:
 
-- It's just another C# file!   `dotnet run -p build/build.csproj`
+- PostgreSQL
+- the Conduit API
+- the Vue/Vite frontend
+- a YARP gateway
 
-## Swagger URL
+### API Only
 
-- `http://localhost:5000/swagger`
+The API can also be started directly without Aspire. By default, it uses SQLite with `realworld.db`.
 
-## GitHub Actions build
+```bash
+dotnet run --project backend/Conduit/Conduit.csproj
+```
 
-![Build and Test](https://github.com/gothinkster/aspnetcore-realworld-example-app/workflows/Build%20and%20Test/badge.svg)
+The API uses `/api` as its path base. The API documentation is available at:
+
+```text
+/api/api-docs
+```
+
+## Tests
+
+Backend tests:
+
+```bash
+dotnet test backend/Conduit.slnx
+```
+
+Frontend tests live under `frontend/` and are run through the npm scripts defined there.
