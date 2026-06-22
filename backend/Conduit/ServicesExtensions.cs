@@ -1,13 +1,6 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Tags = Conduit.Features.Tags;
-using Users = Conduit.Features.Users;
-using Profiles = Conduit.Features.Profiles;
-using Followers = Conduit.Features.Followers;
-using Favorites = Conduit.Features.Favorites;
-using Comments = Conduit.Features.Comments;
-using Articles = Conduit.Features.Articles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
 using Conduit.Shared.RequestHandling;
@@ -15,6 +8,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Articles = Conduit.Features.Articles;
+using Comments = Conduit.Features.Comments;
+using Favorites = Conduit.Features.Favorites;
+using Followers = Conduit.Features.Followers;
+using Profiles = Conduit.Features.Profiles;
+using Tags = Conduit.Features.Tags;
+using Users = Conduit.Features.Users;
 
 namespace Conduit;
 

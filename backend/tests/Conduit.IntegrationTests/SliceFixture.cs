@@ -62,7 +62,7 @@ public class SliceFixture : IDisposable
                 typeof(TResponse)
             );
             var handler = sp.GetRequiredService(handlerType);
-            var handle = handlerType.GetMethod(nameof(ICommandHandler<ICommand<TResponse>, TResponse>.Handle));
+            var handle = handlerType.GetMethod(nameof(ICommandHandler<,>.Handle));
 
             return (Task<TResponse>)
                 handle!.Invoke(handler, [request, CancellationToken.None])!;
