@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+
+jobs:
+  backend:
+    name: Backend – Format / Build / Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore backend/Conduit.slnx --locked-mode
+
+      - name: Format check
+        run: dotnet format backend/Conduit.slnx --verify-no-changes
+
+      - name: Build
+        run: dotnet build backend/Conduit.slnx --no-restore --configuration Release -warnaserror
+
+      - name: Test
+        run: >
+          dotnet test backend/Conduit.slnx
+          --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults/
+
+      - name: Generate coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+        with:
+          reports: 'TestResults/**/coverage.cobertura.xml'
+          targetdir: 'CoverageReport'
+          reporttypes: 'MarkdownSummaryGithub'
+
+      - name: Post coverage comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: backend-coverage
+          recreate: true
+          path: CoverageReport/SummaryGithub.md
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: CoverageReport/
+
+  frontend:
+    name: Frontend – Type-check / Lint / Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npx eslint . --max-warnings 0
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Generate coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+        with:
+          reports: 'frontend/coverage/unit/lcov.info'
+          targetdir: 'FrontendCoverageReport'
+          reporttypes: 'MarkdownSummaryGithub'
+
+      - name: Post coverage comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: frontend-coverage
+          recreate: true
+          path: FrontendCoverageReport/SummaryGithub.md
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: FrontendCoverageReport/
