@@ -637,7 +637,7 @@
       "conduit": {
         "type": "Project",
         "dependencies": {
-          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.4.3, )",
+          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.4.6, )",
           "Conduit.ServiceDefaults": "[1.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.9, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.9, )",
@@ -660,9 +660,9 @@
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.4.3, )",
-        "resolved": "13.4.3",
-        "contentHash": "ZVxVY5RDIdjHFnCbFqCKtUZ7cpahxUZwG5cbUJRCZkCGIUlECzUW/DhjtpGgLfPK6ggw5jqwmooUT4B1PlJ/zg==",
+        "requested": "[13.4.6, )",
+        "resolved": "13.4.6",
+        "contentHash": "Lt92FuyX4JkKwrAgrOsVARpmk3U9vBGBq784ZEO3hR2vC74o8VS/VWBJHYrRBYTXapuj+mwwPzvcUICmbB43Zg==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "10.0.8",
           "Microsoft.Extensions.Configuration.Abstractions": "10.0.8",

@@ -4,9 +4,9 @@
     "net10.0": {
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "Direct",
-        "requested": "[13.4.3, )",
-        "resolved": "13.4.3",
-        "contentHash": "ZVxVY5RDIdjHFnCbFqCKtUZ7cpahxUZwG5cbUJRCZkCGIUlECzUW/DhjtpGgLfPK6ggw5jqwmooUT4B1PlJ/zg==",
+        "requested": "[13.4.6, )",
+        "resolved": "13.4.6",
+        "contentHash": "Lt92FuyX4JkKwrAgrOsVARpmk3U9vBGBq784ZEO3hR2vC74o8VS/VWBJHYrRBYTXapuj+mwwPzvcUICmbB43Zg==",
         "dependencies": {
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "10.0.8",
           "Npgsql.DependencyInjection": "10.0.2",
