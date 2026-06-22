@@ -1,13 +1,13 @@
 using System;
-using System.Net;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Conduit.Infrastructure.Security;
-using Microsoft.EntityFrameworkCore;
 using Conduit.Shared.RequestHandling;
+using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Features.Users;
 

@@ -18,7 +18,7 @@ public class Edit
     public record ArticleData(string? Title, string? Description, string? Body, string[]? TagList);
 
     public record Command([Required] Model Model, string Slug) : ICommand<ArticleEnvelope>;
-    
+
     public record Model([property: Required] ArticleData Article);
 
     public class Handler(ConduitContext context) : ICommandHandler<Command, ArticleEnvelope>
