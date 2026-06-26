@@ -15,13 +15,17 @@ public static class UsersEndpoints
     public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var users = endpoints.MapGroup("/users")
-            .WithTags("Users");
+            .WithTags("User and Authentication");
 
         users.MapPost("", CreateUserAsync);
-        users.MapPost("login", LoginUserAsync);
+        users.MapPost("login", LoginUserAsync)
+            .WithSummary("Existing user login")
+            .WithDescription("Login for existing user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#authentication\">Conduit Spec for login endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
 
         var currentUser = endpoints.MapGroup("/user")
-            .WithTags("User")
+            .WithTags("User and Authentication")
             .RequireAuthorization(new AuthorizeAttribute { AuthenticationSchemes = JwtIssuerOptions.Schemes });
 
         currentUser.MapGet("", GetCurrentUserAsync);
