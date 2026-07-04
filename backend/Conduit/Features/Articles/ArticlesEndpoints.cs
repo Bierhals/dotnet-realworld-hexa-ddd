@@ -27,7 +27,7 @@ public static class ArticlesEndpoints
         articles.MapGet("feed", GetFeedArticlesAsync)
             .AllowAnonymous()
             .WithSummary("Get recent articles from users you follow")
-            .WithDescription("Get most recent articles from users you follow. Use query parameters to limit. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#feed-articles\">Conduit Spec for feed articles endpoint</a>")
+            .WithDescription("Get most recent articles from users you follow. Use query parameters to limit. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#feed-articles\">Conduit Spec for feed articles endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         articles.MapGet("{slug}", GetArticleAsync)
