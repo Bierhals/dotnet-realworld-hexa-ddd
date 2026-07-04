@@ -18,9 +18,26 @@ public static class CommentsEndpoints
             .WithTags("Comments")
             .RequireAuthorization(new AuthorizeAttribute { AuthenticationSchemes = JwtIssuerOptions.Schemes });
 
-        comments.MapPost("", CreateCommentAsync);
-        comments.MapGet("", ListCommentsAsync).AllowAnonymous();
-        comments.MapDelete("{id:int}", DeleteCommentAsync);
+        comments.MapPost("", CreateCommentAsync)
+            .WithSummary("Create a comment for an article")
+            .WithDescription("Create a comment for an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#add-comments-to-an-article\">Conduit Spec for add comment endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        comments.MapGet("", ListCommentsAsync)
+            .AllowAnonymous()
+            .WithSummary("Get comments for an article")
+            .WithDescription("Get the comments for an article. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-comments-from-an-article\">Conduit Spec for get comments endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        comments.MapDelete("{id:int}", DeleteCommentAsync)
+            .WithSummary("Delete a comment for an article")
+            .WithDescription("Delete a comment for an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#delete-comment\">Conduit Spec for delete comment endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status403Forbidden)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
 
         return endpoints;
     }

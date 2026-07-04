@@ -17,7 +17,11 @@ public static class UsersEndpoints
         var users = endpoints.MapGroup("/users")
             .WithTags("User and Authentication");
 
-        users.MapPost("", CreateUserAsync);
+        users.MapPost("", CreateUserAsync)
+            .WithSummary("Register a new user")
+            .WithDescription("Register a new user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#registration\">Conduit Spec for registration endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status409Conflict)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         users.MapPost("login", LoginUserAsync)
             .WithSummary("Existing user login")
             .WithDescription("Login for existing user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#authentication\">Conduit Spec for login endpoint</a>")
@@ -28,8 +32,16 @@ public static class UsersEndpoints
             .WithTags("User and Authentication")
             .RequireAuthorization(new AuthorizeAttribute { AuthenticationSchemes = JwtIssuerOptions.Schemes });
 
-        currentUser.MapGet("", GetCurrentUserAsync);
-        currentUser.MapPut("", EditCurrentUserAsync);
+        currentUser.MapGet("", GetCurrentUserAsync)
+            .WithSummary("Get current user")
+            .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit Spec for get current user endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        currentUser.MapPut("", EditCurrentUserAsync)
+            .WithSummary("Update current user")
+            .WithDescription("Updated user information for current user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#update-user\">Conduit Spec for update user endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
 
         return endpoints;
     }
