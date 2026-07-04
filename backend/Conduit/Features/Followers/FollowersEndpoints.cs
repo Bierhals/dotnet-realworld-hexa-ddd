@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,14 +36,18 @@ public static class FollowersEndpoints
     }
 
     private static Task<Profiles.ProfileEnvelope> FollowUserAsync(
+        [Required]
+        [Description("Username of the profile you want to follow")]
+        string username,
         ICommandHandler<Add.Command, Profiles.ProfileEnvelope> commandHandler,
-        [Required] string username,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(new Add.Command(username), cancellationToken);
 
     private static Task<Profiles.ProfileEnvelope> UnfollowUserAsync(
+        [Required]
+        [Description("Username of the profile you want to unfollow")]
+        string username,
         ICommandHandler<Delete.Command, Profiles.ProfileEnvelope> commandHandler,
-        [Required] string username,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(new Delete.Command(username), cancellationToken);
 }

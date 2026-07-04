@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Infrastructure;
@@ -6,6 +7,7 @@ using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
 namespace Conduit.Features.Users;
@@ -46,15 +48,17 @@ public static class UsersEndpoints
         return endpoints;
     }
 
-    private static Task<UserEnvelope> CreateUserAsync(
-        ICommandHandler<Create.Command, UserEnvelope> commandHandler,
+    private static async Task<Created<UserEnvelope>> CreateUserAsync(
+        [Description("Details of the new user to register")]
         Create.Command command,
+        ICommandHandler<Create.Command, UserEnvelope> commandHandler,
         CancellationToken cancellationToken
-    ) => commandHandler.Handle(command, cancellationToken);
+    ) => TypedResults.Created((string?)null, await commandHandler.Handle(command, cancellationToken));
 
     private static Task<UserEnvelope> LoginUserAsync(
-        ICommandHandler<Login.Command, UserEnvelope> commandHandler,
+        [Description("Credentials to use")]
         Login.Command command,
+        ICommandHandler<Login.Command, UserEnvelope> commandHandler,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(command, cancellationToken);
 
@@ -68,8 +72,9 @@ public static class UsersEndpoints
     );
 
     private static Task<UserEnvelope> EditCurrentUserAsync(
-        ICommandHandler<Edit.Command, UserEnvelope> commandHandler,
+        [Description("User details to update. At least one field is required.")]
         Edit.Command command,
+        ICommandHandler<Edit.Command, UserEnvelope> commandHandler,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(command, cancellationToken);
 }
