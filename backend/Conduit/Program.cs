@@ -154,7 +154,10 @@ app.MapUsersEndpoints();
 app.MapOpenApi("openapi/{documentName}.json");
 
 // Enable middleware to serve openapi-ui assets(HTML, JS, CSS etc.)
-app.MapScalarApiReference("/api/api-docs");
+app.MapScalarApiReference(
+    "/api/api-docs",
+    options => options.WithOperationTitleSource(OperationTitleSource.Path)
+);
 
 using (var scope = app.Services.CreateScope())
 {
