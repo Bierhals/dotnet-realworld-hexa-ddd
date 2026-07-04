@@ -18,12 +18,44 @@ public static class ArticlesEndpoints
             .WithTags("Articles")
             .RequireAuthorization(new AuthorizeAttribute { AuthenticationSchemes = JwtIssuerOptions.Schemes });
 
-        articles.MapGet("", GetArticlesAsync).AllowAnonymous();
-        articles.MapGet("feed", GetFeedArticlesAsync).AllowAnonymous();
-        articles.MapGet("{slug}", GetArticleAsync).AllowAnonymous();
-        articles.MapPost("", PostArticleAsync);
-        articles.MapPut("{slug}", PutArticleAsync);
-        articles.MapDelete("{slug}", DeleteArticleAsync);
+        articles.MapGet("", GetArticlesAsync)
+            .AllowAnonymous()
+            .WithSummary("Get recent articles globally")
+            .WithDescription("Get most recent articles globally. Use query parameters to filter results. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#list-articles\">Conduit Spec for list articles endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        articles.MapGet("feed", GetFeedArticlesAsync)
+            .AllowAnonymous()
+            .WithSummary("Get recent articles from users you follow")
+            .WithDescription("Get most recent articles from users you follow. Use query parameters to limit. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#feed-articles\">Conduit Spec for feed articles endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        articles.MapGet("{slug}", GetArticleAsync)
+            .AllowAnonymous()
+            .WithSummary("Get an article")
+            .WithDescription("Get an article. Auth not required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-article\">Conduit Spec for get article endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        articles.MapPost("", PostArticleAsync)
+            .WithSummary("Create an article")
+            .WithDescription("Create an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#create-article\">Conduit Spec for create article endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status409Conflict)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        articles.MapPut("{slug}", PutArticleAsync)
+            .WithSummary("Update an article")
+            .WithDescription("Update an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#update-article\">Conduit Spec for update article endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status403Forbidden)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+        articles.MapDelete("{slug}", DeleteArticleAsync)
+            .WithSummary("Delete an article")
+            .WithDescription("Delete an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#delete-article\">Conduit Spec for delete article endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status403Forbidden)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
 
         return endpoints;
     }

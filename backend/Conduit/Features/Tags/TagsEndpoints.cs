@@ -13,7 +13,10 @@ public static class TagsEndpoints
     {
         var tags = endpoints.MapGroup("/tags").WithTags("Tags");
 
-        tags.MapGet("", ListTagsAsync);
+        tags.MapGet("", ListTagsAsync)
+            .WithSummary("Get tags")
+            .WithDescription("Get tags. Auth not required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#tags\">Conduit Spec for tags endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
 
         return endpoints;
     }
