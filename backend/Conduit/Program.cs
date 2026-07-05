@@ -92,8 +92,19 @@ builder.Services.AddOpenApi(options =>
     {
         document.Info = new()
         {
-            Title = "RealWorld API",
-            Version = "v1"
+            Title = "RealWorld Conduit API",
+            Version = "2.0.0",
+            Description = "Conduit API documentation",
+            Contact = new()
+            {
+                Name = "RealWorld",
+                Url = new Uri("https://realworld-docs.netlify.app/")
+            },
+            License = new()
+            {
+                Name = "MIT",
+                Url = new Uri("https://opensource.org/licenses/MIT")
+            },
         };
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
@@ -154,7 +165,10 @@ app.MapUsersEndpoints();
 app.MapOpenApi("openapi/{documentName}.json");
 
 // Enable middleware to serve openapi-ui assets(HTML, JS, CSS etc.)
-app.MapScalarApiReference("/api/api-docs");
+app.MapScalarApiReference(
+    "/api/api-docs",
+    options => options.WithOperationTitleSource(OperationTitleSource.Path)
+);
 
 using (var scope = app.Services.CreateScope())
 {
