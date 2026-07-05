@@ -92,8 +92,19 @@ builder.Services.AddOpenApi(options =>
     {
         document.Info = new()
         {
-            Title = "RealWorld API",
-            Version = "v1"
+            Title = "RealWorld Conduit API",
+            Version = "2.0.0",
+            Description = "Conduit API documentation",
+            Contact = new()
+            {
+                Name = "RealWorld",
+                Url = new Uri("https://realworld-docs.netlify.app/")
+            },
+            License = new()
+            {
+                Name = "MIT",
+                Url = new Uri("https://opensource.org/licenses/MIT")
+            },
         };
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
