@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,8 +26,10 @@ public static class ProfilesEndpoints
     }
 
     private static Task<ProfileEnvelope> GetProfileAsync(
+        [Required]
+        [Description("Username of the profile to get")]
+        string username,
         IQueryHandler<Details.Query, ProfileEnvelope> queryHandler,
-        [Required] string username,
         CancellationToken cancellationToken
     ) => queryHandler.Handle(new Details.Query(username), cancellationToken);
 }

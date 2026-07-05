@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,14 +36,18 @@ public static class FavoritesEndpoints
     }
 
     private static Task<Articles.ArticleEnvelope> AddFavoriteAsync(
+        [Required]
+        [Description("Slug of the article that you want to favorite")]
+        string slug,
         ICommandHandler<Add.Command, Articles.ArticleEnvelope> commandHandler,
-        [Required] string slug,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(new Add.Command(slug), cancellationToken);
 
     private static Task<Articles.ArticleEnvelope> DeleteFavoriteAsync(
+        [Required]
+        [Description("Slug of the article that you want to unfavorite")]
+        string slug,
         ICommandHandler<Delete.Command, Articles.ArticleEnvelope> commandHandler,
-        [Required] string slug,
         CancellationToken cancellationToken
     ) => commandHandler.Handle(new Delete.Command(slug), cancellationToken);
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Conduit.Shared.RequestHandling;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 
 namespace Conduit.Features.Comments;
@@ -42,23 +44,34 @@ public static class CommentsEndpoints
         return endpoints;
     }
 
-    private static Task<CommentEnvelope> CreateCommentAsync(
-        ICommandHandler<Create.Command, CommentEnvelope> commandHandler,
-        [Required] string slug,
+    private static async Task<Created<CommentEnvelope>> CreateCommentAsync(
+        [Required]
+        [Description("Slug of the article that you want to create a comment for")]
+        string slug,
+        [Description("Comment you want to create")]
         Create.Model model,
+        ICommandHandler<Create.Command, CommentEnvelope> commandHandler,
         CancellationToken cancellationToken
-    ) => commandHandler.Handle(new Create.Command(model, slug), cancellationToken);
+    ) => TypedResults.Created((string?)null, await commandHandler.Handle(new Create.Command(model, slug), cancellationToken));
 
     private static Task<CommentsEnvelope> ListCommentsAsync(
+        [Required]
+        [Description("Slug of the article that you want to get comments for")]
+        string slug,
         IQueryHandler<List.Query, CommentsEnvelope> queryHandler,
-        [Required] string slug,
         CancellationToken cancellationToken
     ) => queryHandler.Handle(new List.Query(slug), cancellationToken);
 
-    private static Task DeleteCommentAsync(
-        ICommandHandler<Delete.Command> commandHandler,
-        [Required] string slug,
+    private static async Task<NoContent> DeleteCommentAsync(
+        [Required]
+        [Description("Slug of the article that you want to delete a comment for")]
+        string slug,
+        [Description("ID of the comment you want to delete")]
         int id,
-        CancellationToken cancellationToken
-    ) => commandHandler.Handle(new Delete.Command(slug, id), cancellationToken);
+        ICommandHandler<Delete.Command> commandHandler,
+        CancellationToken cancellationToken)
+    {
+        await commandHandler.Handle(new Delete.Command(slug, id), cancellationToken);
+        return TypedResults.NoContent();
+    }
 }
