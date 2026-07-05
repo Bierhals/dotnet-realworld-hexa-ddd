@@ -14,6 +14,7 @@ using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -143,7 +144,27 @@ builder.Services.AddConduit();
 
 builder.Services.AddJwt();
 
+// The API runs behind a YARP gateway (see Conduit.AppHost) that forwards the
+// public-facing scheme, host and path base via X-Forwarded-* headers. Trust
+// those headers so that generated URLs (OpenAPI servers, Location headers,
+// LinkGenerator, etc.) reflect the gateway's public address instead of the
+// API's internal address.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor
+        | ForwardedHeaders.XForwardedProto
+        | ForwardedHeaders.XForwardedHost;
+    // The gateway is not a fixed, known proxy address in the containerized
+    // Aspire environment, so clear the default restrictions and trust all
+    // proxies forwarding to this service.
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 app.UsePathBase("/api");
 
 app.UseMiddleware<ErrorHandlingMiddleware>();

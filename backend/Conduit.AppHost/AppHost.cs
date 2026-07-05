@@ -1,3 +1,5 @@
+using Aspire.Hosting.Yarp.Transforms;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
@@ -19,7 +21,7 @@ var gateway = builder.AddYarp("gateway")
     .WithHttpsDeveloperCertificate()
     .WithConfiguration(yarp =>
     {
-        yarp.AddRoute("/api/{**catch-all}", api);
+        yarp.AddRoute("/api/{**catch-all}", api).WithTransformXForwarded();
         if (builder.ExecutionContext.IsRunMode)
         {
             var viteAppCluster = yarp.AddCluster(viteApp);
