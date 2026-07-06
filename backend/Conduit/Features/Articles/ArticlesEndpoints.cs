@@ -14,8 +14,6 @@ namespace Conduit.Features.Articles;
 
 public static class ArticlesEndpoints
 {
-    private const string GetArticleRouteName = "GetArticle";
-
     public static IEndpointRouteBuilder MapArticlesEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var articles = endpoints.MapGroup("/articles")
@@ -35,7 +33,7 @@ public static class ArticlesEndpoints
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         articles.MapGet("{slug}", GetArticleAsync)
             .AllowAnonymous()
-            .WithName(GetArticleRouteName)
+            .WithName(nameof(GetArticleAsync))
             .WithSummary("Get an article")
             .WithDescription("Get an article. Auth not required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-article\">Conduit Spec for get article endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
@@ -134,7 +132,7 @@ public static class ArticlesEndpoints
         CancellationToken cancellationToken)
     {
         var envelope = await commandHandler.Handle(command, cancellationToken);
-        var location = linkGenerator.GetUriByName(httpContext, GetArticleRouteName, new { slug = envelope.Article.Slug });
+        var location = linkGenerator.GetPathByName(httpContext, nameof(GetArticleAsync), new { slug = envelope.Article.Slug });
         return TypedResults.Created(location, envelope);
     }
 

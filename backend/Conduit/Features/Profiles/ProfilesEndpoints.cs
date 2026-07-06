@@ -11,7 +11,7 @@ namespace Conduit.Features.Profiles;
 
 public static class ProfilesEndpoints
 {
-    public const string GetProfileRouteName = "GetProfile";
+    public const string GetProfileRouteName = nameof(GetProfileAsync);
 
     public static IEndpointRouteBuilder MapProfilesEndpoints(this IEndpointRouteBuilder endpoints)
     {

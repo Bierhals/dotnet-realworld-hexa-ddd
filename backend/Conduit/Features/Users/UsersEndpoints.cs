@@ -58,7 +58,7 @@ public static class UsersEndpoints
         CancellationToken cancellationToken)
     {
         var envelope = await commandHandler.Handle(command, cancellationToken);
-        var location = linkGenerator.GetUriByName(
+        var location = linkGenerator.GetPathByName(
             httpContext,
             ProfilesEndpoints.GetProfileRouteName,
             new { username = envelope.User.Username }

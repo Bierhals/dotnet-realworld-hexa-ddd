@@ -14,8 +14,6 @@ namespace Conduit.Features.Comments;
 
 public static class CommentsEndpoints
 {
-    private const string CommentRouteName = "Comment";
-
     // No GET endpoint exists for a single comment (only DELETE), but the
     // route name is still used to build the Location header for newly
     // created comments, since it uniquely identifies the resource's address.
@@ -39,7 +37,7 @@ public static class CommentsEndpoints
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         comments.MapDelete("{id:int}", DeleteCommentAsync)
-            .WithName(CommentRouteName)
+            .WithName(nameof(DeleteCommentAsync))
             .WithSummary("Delete a comment for an article")
             .WithDescription("Delete a comment for an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#delete-comment\">Conduit Spec for delete comment endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
@@ -62,9 +60,9 @@ public static class CommentsEndpoints
         CancellationToken cancellationToken)
     {
         var envelope = await commandHandler.Handle(new Create.Command(model, slug), cancellationToken);
-        var location = linkGenerator.GetUriByName(
+        var location = linkGenerator.GetPathByName(
             httpContext,
-            CommentRouteName,
+            nameof(DeleteCommentAsync),
             new { slug, id = envelope.Comment.CommentId }
         );
         return TypedResults.Created(location, envelope);
