@@ -14,6 +14,7 @@ using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -143,11 +144,18 @@ builder.Services.AddConduit();
 
 builder.Services.AddJwt();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
-app.UsePathBase("/api");
 
+app.UseForwardedHeaders();
+app.UseRouting();
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
@@ -166,7 +174,7 @@ app.MapOpenApi("openapi/{documentName}.json");
 
 // Enable middleware to serve openapi-ui assets(HTML, JS, CSS etc.)
 app.MapScalarApiReference(
-    "/api/api-docs",
+    "api-docs",
     options => options.WithOperationTitleSource(OperationTitleSource.Path)
 );
 

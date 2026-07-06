@@ -33,6 +33,7 @@ public static class ArticlesEndpoints
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         articles.MapGet("{slug}", GetArticleAsync)
             .AllowAnonymous()
+            .WithName(nameof(GetArticleAsync))
             .WithSummary("Get an article")
             .WithDescription("Get an article. Auth not required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-article\">Conduit Spec for get article endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
@@ -126,9 +127,13 @@ public static class ArticlesEndpoints
         [Description("The article to create")]
         Create.Command command,
         ICommandHandler<Create.Command, ArticleEnvelope> commandHandler,
+        LinkGenerator linkGenerator,
+        HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        return TypedResults.Created((string?)null, await commandHandler.Handle(command, cancellationToken));
+        var envelope = await commandHandler.Handle(command, cancellationToken);
+        var location = linkGenerator.GetPathByName(httpContext, nameof(GetArticleAsync), new { slug = envelope.Article.Slug });
+        return TypedResults.Created(location, envelope);
     }
 
     private static Task<ArticleEnvelope> PutArticleAsync(

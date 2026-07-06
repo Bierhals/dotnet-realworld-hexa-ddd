@@ -36,6 +36,7 @@ public static class UsersEndpoints
 
         currentUser.MapGet("", GetCurrentUserAsync)
             .WithSummary("Get current user")
+            .WithName(nameof(GetCurrentUserAsync))
             .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit Spec for get current user endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
@@ -52,8 +53,18 @@ public static class UsersEndpoints
         [Description("Details of the new user to register")]
         Create.Command command,
         ICommandHandler<Create.Command, UserEnvelope> commandHandler,
-        CancellationToken cancellationToken
-    ) => TypedResults.Created((string?)null, await commandHandler.Handle(command, cancellationToken));
+        LinkGenerator linkGenerator,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
+    {
+        var envelope = await commandHandler.Handle(command, cancellationToken);
+        var location = linkGenerator.GetPathByName(
+            httpContext,
+            nameof(GetCurrentUserAsync),
+            null
+        );
+        return TypedResults.Created(location, envelope);
+    }
 
     private static Task<UserEnvelope> LoginUserAsync(
         [Description("Credentials to use")]

@@ -1,3 +1,11 @@
+using Aspire.Hosting.Yarp.Transforms;
+using Yarp.ReverseProxy.Transforms;
+
+// The public path prefix under which the API is exposed by the gateway. Kept
+// as a single constant so the route pattern and the X-Forwarded-Prefix header
+// sent to the API (see Conduit/Program.cs) always stay in sync.
+const string apiPathPrefix = "/api";
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
@@ -19,7 +27,10 @@ var gateway = builder.AddYarp("gateway")
     .WithHttpsDeveloperCertificate()
     .WithConfiguration(yarp =>
     {
-        yarp.AddRoute("/api/{**catch-all}", api);
+        yarp.AddRoute($"{apiPathPrefix}/{{**catch-all}}", api)
+            .WithTransformPathRemovePrefix(apiPathPrefix)
+            .WithTransformXForwarded()
+            .WithTransformRequestHeader("X-Forwarded-Prefix", apiPathPrefix, append: false);
         if (builder.ExecutionContext.IsRunMode)
         {
             var viteAppCluster = yarp.AddCluster(viteApp);

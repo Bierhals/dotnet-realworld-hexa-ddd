@@ -27,6 +27,7 @@ public static class CommentsEndpoints
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         comments.MapGet("", ListCommentsAsync)
+            .WithName(nameof(ListCommentsAsync))
             .AllowAnonymous()
             .WithSummary("Get comments for an article")
             .WithDescription("Get the comments for an article. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-comments-from-an-article\">Conduit Spec for get comments endpoint</a>")
@@ -51,8 +52,18 @@ public static class CommentsEndpoints
         [Description("Comment you want to create")]
         Create.Model model,
         ICommandHandler<Create.Command, CommentEnvelope> commandHandler,
-        CancellationToken cancellationToken
-    ) => TypedResults.Created((string?)null, await commandHandler.Handle(new Create.Command(model, slug), cancellationToken));
+        LinkGenerator linkGenerator,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
+    {
+        var envelope = await commandHandler.Handle(new Create.Command(model, slug), cancellationToken);
+        var location = linkGenerator.GetPathByName(
+            httpContext,
+            nameof(ListCommentsAsync),
+            new { slug }
+        );
+        return TypedResults.Created(location, envelope);
+    }
 
     private static Task<CommentsEnvelope> ListCommentsAsync(
         [Required]
