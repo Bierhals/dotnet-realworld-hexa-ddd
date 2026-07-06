@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
 using Conduit.Shared.RequestHandling;
@@ -52,8 +53,18 @@ public static class UsersEndpoints
         [Description("Details of the new user to register")]
         Create.Command command,
         ICommandHandler<Create.Command, UserEnvelope> commandHandler,
-        CancellationToken cancellationToken
-    ) => TypedResults.Created((string?)null, await commandHandler.Handle(command, cancellationToken));
+        LinkGenerator linkGenerator,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
+    {
+        var envelope = await commandHandler.Handle(command, cancellationToken);
+        var location = linkGenerator.GetUriByName(
+            httpContext,
+            ProfilesEndpoints.GetProfileRouteName,
+            new { username = envelope.User.Username }
+        );
+        return TypedResults.Created(location, envelope);
+    }
 
     private static Task<UserEnvelope> LoginUserAsync(
         [Description("Credentials to use")]

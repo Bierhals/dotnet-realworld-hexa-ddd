@@ -11,11 +11,14 @@ namespace Conduit.Features.Profiles;
 
 public static class ProfilesEndpoints
 {
+    public const string GetProfileRouteName = "GetProfile";
+
     public static IEndpointRouteBuilder MapProfilesEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var profiles = endpoints.MapGroup("/profiles").WithTags("Profile");
 
         profiles.MapGet("{username}", GetProfileAsync)
+            .WithName(GetProfileRouteName)
             .WithSummary("Get a profile")
             .WithDescription("Get a profile of a user of the system. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-profile\">Conduit Spec for get profile endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)

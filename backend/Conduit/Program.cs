@@ -14,6 +14,7 @@ using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
@@ -165,7 +166,31 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-app.UsePathBase("/api");
+
+// The gateway's route prefix ("/api" by default, see Conduit.AppHost) is sent
+// on the X-Forwarded-Prefix header so the API can derive its path base
+// dynamically instead of hard-coding it here too. This keeps the two in sync
+// if the gateway route is ever reconfigured, and lets the API be reached
+// without any path base at all (e.g. direct/local access) when the header is
+// absent.
+var defaultPathBase = new PathString("/api");
+app.Use((context, next) =>
+{
+    var forwardedPrefix = context.Request.Headers["X-Forwarded-Prefix"].ToString();
+    var pathBase = string.IsNullOrEmpty(forwardedPrefix)
+        ? defaultPathBase
+        : new PathString(forwardedPrefix);
+
+    if (pathBase.HasValue && context.Request.Path.StartsWithSegments(pathBase, out var remainingPath))
+    {
+        context.Request.PathBase = context.Request.PathBase.Add(pathBase);
+        context.Request.Path = remainingPath;
+    }
+
+    return next(context);
+});
+
+app.UseRouting();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
