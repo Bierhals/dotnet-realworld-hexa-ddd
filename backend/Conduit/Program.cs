@@ -14,7 +14,6 @@ using Conduit.Infrastructure;
 using Conduit.Infrastructure.Errors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
@@ -145,20 +144,9 @@ builder.Services.AddConduit();
 
 builder.Services.AddJwt();
 
-// The API runs behind a YARP gateway (see Conduit.AppHost) that forwards the
-// public-facing scheme, host and path base via X-Forwarded-* headers. Trust
-// those headers so that generated URLs (OpenAPI servers, Location headers,
-// LinkGenerator, etc.) reflect the gateway's public address instead of the
-// API's internal address.
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders =
-        ForwardedHeaders.XForwardedFor
-        | ForwardedHeaders.XForwardedProto
-        | ForwardedHeaders.XForwardedHost;
-    // The gateway is not a fixed, known proxy address in the containerized
-    // Aspire environment, so clear the default restrictions and trust all
-    // proxies forwarding to this service.
+    options.ForwardedHeaders = ForwardedHeaders.All;
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -166,34 +154,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-
-// The gateway's route prefix ("/api" by default, see Conduit.AppHost) is sent
-// on the X-Forwarded-Prefix header so the API can derive its path base
-// dynamically instead of hard-coding it here too. This keeps the two in sync
-// if the gateway route is ever reconfigured, and lets the API be reached
-// without any path base at all (e.g. direct/local access) when the header is
-// absent.
-var defaultPathBase = new PathString("/api");
-app.Use((context, next) =>
-{
-    var forwardedPrefix = context.Request.Headers["X-Forwarded-Prefix"].ToString();
-    var pathBase = string.IsNullOrEmpty(forwardedPrefix)
-        ? defaultPathBase
-        : new PathString(forwardedPrefix);
-
-    if (pathBase.HasValue && context.Request.Path.StartsWithSegments(pathBase, out var remainingPath))
-    {
-        context.Request.PathBase = context.Request.PathBase.Add(pathBase);
-        context.Request.Path = remainingPath;
-    }
-
-    return next(context);
-});
-
 app.UseRouting();
-
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
@@ -212,7 +174,7 @@ app.MapOpenApi("openapi/{documentName}.json");
 
 // Enable middleware to serve openapi-ui assets(HTML, JS, CSS etc.)
 app.MapScalarApiReference(
-    "/api/api-docs",
+    "api-docs",
     options => options.WithOperationTitleSource(OperationTitleSource.Path)
 );
 

@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Features.Profiles;
 using Conduit.Infrastructure;
 using Conduit.Infrastructure.Security;
 using Conduit.Shared.RequestHandling;
@@ -37,6 +36,7 @@ public static class UsersEndpoints
 
         currentUser.MapGet("", GetCurrentUserAsync)
             .WithSummary("Get current user")
+            .WithName(nameof(GetCurrentUserAsync))
             .WithDescription("Gets the currently logged-in user<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-current-user\">Conduit Spec for get current user endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
@@ -60,8 +60,8 @@ public static class UsersEndpoints
         var envelope = await commandHandler.Handle(command, cancellationToken);
         var location = linkGenerator.GetPathByName(
             httpContext,
-            ProfilesEndpoints.GetProfileRouteName,
-            new { username = envelope.User.Username }
+            nameof(GetCurrentUserAsync),
+            null
         );
         return TypedResults.Created(location, envelope);
     }

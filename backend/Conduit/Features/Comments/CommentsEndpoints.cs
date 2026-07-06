@@ -14,9 +14,6 @@ namespace Conduit.Features.Comments;
 
 public static class CommentsEndpoints
 {
-    // No GET endpoint exists for a single comment (only DELETE), but the
-    // route name is still used to build the Location header for newly
-    // created comments, since it uniquely identifies the resource's address.
     public static IEndpointRouteBuilder MapCommentsEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var comments = endpoints.MapGroup("/articles/{slug}/comments")
@@ -30,6 +27,7 @@ public static class CommentsEndpoints
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         comments.MapGet("", ListCommentsAsync)
+            .WithName(nameof(ListCommentsAsync))
             .AllowAnonymous()
             .WithSummary("Get comments for an article")
             .WithDescription("Get the comments for an article. Auth is optional<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#get-comments-from-an-article\">Conduit Spec for get comments endpoint</a>")
@@ -37,7 +35,6 @@ public static class CommentsEndpoints
             .ProducesValidationProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
         comments.MapDelete("{id:int}", DeleteCommentAsync)
-            .WithName(nameof(DeleteCommentAsync))
             .WithSummary("Delete a comment for an article")
             .WithDescription("Delete a comment for an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#delete-comment\">Conduit Spec for delete comment endpoint</a>")
             .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
@@ -62,8 +59,8 @@ public static class CommentsEndpoints
         var envelope = await commandHandler.Handle(new Create.Command(model, slug), cancellationToken);
         var location = linkGenerator.GetPathByName(
             httpContext,
-            nameof(DeleteCommentAsync),
-            new { slug, id = envelope.Comment.CommentId }
+            nameof(ListCommentsAsync),
+            new { slug }
         );
         return TypedResults.Created(location, envelope);
     }

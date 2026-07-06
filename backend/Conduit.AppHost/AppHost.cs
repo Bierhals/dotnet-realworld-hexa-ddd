@@ -1,4 +1,5 @@
 using Aspire.Hosting.Yarp.Transforms;
+using Yarp.ReverseProxy.Transforms;
 
 // The public path prefix under which the API is exposed by the gateway. Kept
 // as a single constant so the route pattern and the X-Forwarded-Prefix header
@@ -27,6 +28,7 @@ var gateway = builder.AddYarp("gateway")
     .WithConfiguration(yarp =>
     {
         yarp.AddRoute($"{apiPathPrefix}/{{**catch-all}}", api)
+            .WithTransformPathRemovePrefix(apiPathPrefix)
             .WithTransformXForwarded()
             .WithTransformRequestHeader("X-Forwarded-Prefix", apiPathPrefix, append: false);
         if (builder.ExecutionContext.IsRunMode)
