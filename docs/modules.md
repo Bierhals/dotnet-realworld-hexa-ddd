@@ -27,10 +27,10 @@ Based on the RealWorld domain, the following modules are identified:
 |---|---|---|---|
 | **Identity** | Registration, authentication, user profile data (the user's own account) | `Person` (account-facing fields: `Username`, `Email`, `Bio`, `Image`, `Hash`, `Salt`) | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit` |
 | **Profiles** | Public-facing profile view, follow/unfollow relationships between users | `FollowedPeople` (reads `Person` via a published contract, does not own it) | `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
-| **Articles** | Authoring and browsing articles | `Article` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details` |
+| **Articles** | Authoring and browsing articles, and tagging of articles | `Article`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details` |
 | **Comments** | Commenting on articles | `Comment` | `Comments/Create`, `Comments/Delete`, `Comments/List` |
 | **Favorites** | Favoriting/unfavoriting articles | `ArticleFavorite` | `Favorites/Add`, `Favorites/Delete` |
-| **Tags** | Tag catalog and tagging of articles | `Tag`, `ArticleTag` | `Tags/List` |
+| **Tags** | Tag catalog (the set of known tag names) | `Tag` | `Tags/List` |
 
 These map almost 1:1 onto the existing `Features/*` folders, which keeps the
 migration low-risk: today's vertical slices already approximate the module
@@ -70,9 +70,17 @@ Mapping current implicit couplings to the target module-cut:
   read-only **Articles** and **Identity** contracts.
 - **Favorites** references `Article` and `Person` → **Favorites** depends on
   read-only **Articles** and **Identity** contracts.
-- **Tags**/`ArticleTag` references `Article` → **Tags** depends on a
-  read-only **Articles** contract, or (preferably) **Articles** owns tagging
-  as part of its own aggregate and **Tags** only owns the tag catalog.
+- **Tags**/`ArticleTag` references `Article` → **`ArticleTag` is owned by the
+  Articles module**, not by Tags. `ArticleTag` is the join between an article
+  and a tag, and tagging an article is part of the Articles aggregate's own
+  lifecycle (set on create/edit, deleted when the article is deleted). The
+  **Tags** module owns only the `Tag` catalog itself (the set of known tag
+  names) and exposes a read-only contract (e.g. `ITagReader`) that
+  **Articles** depends on when validating/attaching tags to an article.
+  **Articles** exposes the article's current tag list to other
+  modules/consumers via its own `IArticleReader` contract (as it already does
+  today through `Article.TagList`); no other module queries `ArticleTag`
+  directly.
 - **Profiles**/`FollowedPeople` references `Person` → **Profiles** depends on
   a read-only **Identity** contract.
 
@@ -160,15 +168,17 @@ module.
         │                        │                         │
 ┌───────┴────────┐      ┌────────┴────────┐        ┌───────┴────────┐
 │    Profiles     │      │    Articles     │        │    Comments     │
-│ (FollowedPeople) │      │   (Article)     │◄───────┤   (Comment)     │
-└─────────────────┘      └───────▲─────────┘  IArticleReader
-                                  │ IArticleReader (contract)
-                     ┌────────────┼────────────┐
-                     │                         │
-             ┌───────┴────────┐       ┌────────┴────────┐
-             │   Favorites     │       │      Tags        │
-             │ (ArticleFavorite)│      │ (Tag, ArticleTag) │
-             └─────────────────┘       └──────────────────┘
+│ (FollowedPeople) │      │(Article,        │◄───────┤   (Comment)     │
+└─────────────────┘      │ ArticleTag)     │  IArticleReader
+                          └───▲────────▲───┘
+                              │        │ ITagReader (contract)
+              IArticleReader  │        │
+                     ┌────────┘        └────────┐
+                     │                          │
+             ┌───────┴────────┐        ┌────────┴────────┐
+             │   Favorites     │        │      Tags        │
+             │ (ArticleFavorite)│       │      (Tag)        │
+             └─────────────────┘        └──────────────────┘
 
 Legend:
   ──►  allowed dependency, via the target module's public Contracts only
