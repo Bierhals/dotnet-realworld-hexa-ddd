@@ -27,14 +27,30 @@ Based on the RealWorld domain, the following modules are identified:
 |---|---|---|---|
 | **Identity** | Registration, authentication, user profile data (the user's own account) | `Person` (account-facing fields: `Username`, `Email`, `Bio`, `Image`, `Hash`, `Salt`) | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit` |
 | **Profiles** | Public-facing profile view, follow/unfollow relationships between users | `FollowedPeople` (reads `Person` via a published contract, does not own it) | `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
-| **Articles** | Authoring and browsing articles, and tagging of articles | `Article`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details` |
-| **Comments** | Commenting on articles | `Comment` | `Comments/Create`, `Comments/Delete`, `Comments/List` |
-| **Favorites** | Favoriting/unfavoriting articles | `ArticleFavorite` | `Favorites/Add`, `Favorites/Delete` |
+| **Articles** | Authoring and browsing articles, commenting, favoriting, and tagging of articles | `Article`, `Comment`, `ArticleFavorite`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details`, `Comments/Create`, `Comments/Delete`, `Comments/List`, `Favorites/Add`, `Favorites/Delete` |
 | **Tags** | Tag catalog (the set of known tag names) | `Tag` | `Tags/List` |
 
-These map almost 1:1 onto the existing `Features/*` folders, which keeps the
-migration low-risk: today's vertical slices already approximate the module
-boundaries, they simply are not yet enforced by tooling/project structure.
+`Articles`, `Comments`, and `Favorites` are treated as a **single module**
+rather than three separate ones. All three center on the `Article` aggregate,
+share its lifecycle (a comment or favorite cannot outlive its article, and
+both are always looked up/listed together with the article they belong to),
+and have no independent meaning outside of an article. Splitting them into
+separate modules would force constant chatty cross-module contract calls for
+what is really one cohesive context, without providing any real isolation
+benefit. `Comment` and `ArticleFavorite` therefore remain internal
+implementation details of the `Articles` module — accessible from within the
+module without going through a `Contracts` interface — while still following
+the "own your commands/queries" rule *within* that module (e.g. comment
+creation logic doesn't leak into article-editing code).
+
+`Tags` remains a separate module because the tag catalog (the set of known
+tag names) is a distinct concern from any single article and is intended to
+be reusable/queryable independently of articles (see `Tags/List`).
+
+These map closely onto the existing `Features/*` folders (with `Comments` and
+`Favorites` folded into `Articles`), which keeps the migration low-risk:
+today's vertical slices already approximate the module boundaries, they
+simply are not yet enforced by tooling/project structure.
 
 ## Module Boundaries
 
@@ -42,11 +58,13 @@ Each module:
 
 - **Owns its data.** Only the owning module may read/write its entities
   directly through EF Core (`DbContext` access, migrations for that entity's
-  table). For example, only **Favorites** creates/removes `ArticleFavorite`
-  rows; only **Comments** creates/removes `Comment` rows.
+  table). For example, only **Articles** creates/removes `Comment` and
+  `ArticleFavorite` rows (these are internal to the `Articles` module); only
+  **Identity** creates/removes `Person` rows.
 - **Owns its use cases.** Application/command-query logic for a capability
-  lives in the owning module (e.g. all logic to add/remove a favorite lives in
-  **Favorites**, not duplicated in **Articles**).
+  lives in the owning module (e.g. all logic to add/remove a favorite or
+  comment lives in **Articles**, since it is part of the same context, not
+  scattered across separate modules).
 - **Exposes a public contract**, not its internal entities. Other modules must
   not reference another module's EF Core entity types, `DbContext`, or
   internal handlers. Instead each module exposes:
@@ -56,20 +74,20 @@ Each module:
     read data they don't own.
   - **Command contracts** — a narrow public API (interface + DTO) for actions
     other modules need to trigger (e.g. "does this article exist and who is
-    its author" for **Comments**/**Favorites** to use, without touching
-    `Article` directly).
+    its author" for **Profiles** to use, without touching `Article` directly).
 
 ### Cross-module data needs today
 
 Mapping current implicit couplings to the target module-cut:
 
-- **Articles** references `Person` (`Author`) → **Articles** depends on a
-  read-only **Identity** contract (`IPersonReader`-style), not the `Person`
-  entity.
-- **Comments** references `Article` and `Person` → **Comments** depends on
-  read-only **Articles** and **Identity** contracts.
-- **Favorites** references `Article` and `Person` → **Favorites** depends on
-  read-only **Articles** and **Identity** contracts.
+- **Articles** (including its internal `Comment`/`ArticleFavorite` concerns)
+  references `Person` (`Author`) → **Articles** depends on a read-only
+  **Identity** contract (`IPersonReader`-style), not the `Person` entity.
+- **Comments** and **Favorites** are internal to the `Articles` module and
+  reference `Article`/`Person` directly in-process; no cross-module contract
+  is needed between them and `Article` since they share the same module
+  boundary. They still depend on the read-only **Identity** contract for
+  author information.
 - **Tags**/`ArticleTag` references `Article` → **`ArticleTag` is owned by the
   Articles module**, not by Tags. `ArticleTag` is the join between an article
   and a tag, and tagging an article is part of the Articles aggregate's own
@@ -92,12 +110,16 @@ Mapping current implicit couplings to the target module-cut:
    This mirrors the existing `IProfileReader` pattern already used by
    **Profiles**.
 2. **Prefer in-process domain/integration events for side effects.** When an
-   action in one module must trigger behavior in another (e.g. "an article
-   was deleted, so its comments and favorites must be removed"), the owning
+   action in one module must trigger behavior in another (e.g. "a person was
+   deleted, so their comments/favorites/articles must be handled"), the owning
    module publishes an in-process event (e.g. via `MediatR`-style
    `INotification` or a lightweight in-process event bus) instead of the
    consuming module reaching into the other module's tables. Handlers for
-   these events live in the *consuming* module.
+   these events live in the *consuming* module. Side effects that stay within
+   the same module (e.g. deleting an article's comments/favorites when the
+   article itself is deleted) do not need events — they are handled directly
+   in-process since `Article`, `Comment`, and `ArticleFavorite` share the same
+   module boundary.
 3. **No direct cross-module entity/DbContext access.** A module must never
    `Include()`/query another module's EF Core entity types directly, and must
    never share a `DbSet` across module boundaries in application code (shared
@@ -122,14 +144,21 @@ Modules/
       ArticleSummary.cs
     Domain/                # entities owned by this module (internal)
       Article.cs
+      Comment.cs
+      ArticleFavorite.cs
+      ArticleTag.cs
     Create.cs, Edit.cs, ...# use cases (internal)
+    Comments/               # Comments sub-folder — internal to this module
+      Create.cs, Delete.cs, List.cs
+    Favorites/              # Favorites sub-folder — internal to this module
+      Add.cs, Delete.cs
     ArticlesEndpoints.cs    # HTTP endpoints for this module
-  Comments/
+    CommentsEndpoints.cs
+    FavoritesEndpoints.cs
+  Tags/
     Contracts/
     Domain/
     ...
-  Favorites/
-  Tags/
   Identity/
   Profiles/
 ```
@@ -164,30 +193,30 @@ module.
                      │  (Person: account data)   │
                      └───────────▲───────────────┘
                                  │ IPersonReader (contract)
-        ┌────────────────────────┼─────────────────────────┐
-        │                        │                         │
-┌───────┴────────┐      ┌────────┴────────┐        ┌───────┴────────┐
-│    Profiles     │      │    Articles     │        │    Comments     │
-│ (FollowedPeople) │      │(Article,        │◄───────┤   (Comment)     │
-└─────────────────┘      │ ArticleTag)     │  IArticleReader
-                          └───▲────────▲───┘
-                              │        │ ITagReader (contract)
-              IArticleReader  │        │
-                     ┌────────┘        └────────┐
-                     │                          │
-             ┌───────┴────────┐        ┌────────┴────────┐
-             │   Favorites     │        │      Tags        │
-             │ (ArticleFavorite)│       │      (Tag)        │
-             └─────────────────┘        └──────────────────┘
+              ┌──────────────────┴──────────────────┐
+              │                                      │
+     ┌────────┴────────┐                    ┌────────┴─────────────────┐
+     │    Profiles      │                    │        Articles          │
+     │ (FollowedPeople)  │                    │ (Article, Comment,        │
+     └───────────────────┘                    │  ArticleFavorite,        │
+                                               │  ArticleTag)             │
+                                               └────────────▲─────────────┘
+                                                             │ ITagReader (contract)
+                                                    ┌────────┴────────┐
+                                                    │      Tags        │
+                                                    │      (Tag)        │
+                                                    └───────────────────┘
 
 Legend:
   ──►  allowed dependency, via the target module's public Contracts only
   All other module-to-module access is forbidden.
+  Comment/ArticleFavorite/ArticleTag are internal to the Articles module —
+  no contract boundary exists between Article, Comment, and ArticleFavorite.
 ```
 
 Only **Contracts** are consumed across module boundaries; the arrows above
 represent dependencies on read interfaces/DTOs (e.g. `IPersonReader`,
-`IArticleReader`), never on another module's domain entities or persistence
+`ITagReader`), never on another module's domain entities or persistence
 layer.
 
 ## Consequences
@@ -198,8 +227,13 @@ layer.
 - **Positive:** New contributors have a clear, documented rule set for where
   code belongs and what it may depend on.
 - **Trade-off:** Some duplication of small read DTOs across modules (e.g. an
-  `ArticleSummary` used by both **Comments** and **Favorites**) is expected
-  and preferred over sharing entities.
+  `ArticleSummary` exposed by **Articles** for **Profiles**/**Tags** to
+  consume) is expected and preferred over sharing entities.
+- **Trade-off:** Grouping `Articles`, `Comments`, and `Favorites` into one
+  module means that module carries more responsibility than the others. This
+  is accepted because the alternative (three separate modules) would add
+  contract overhead without real isolation, since none of the three can be
+  meaningfully used or deployed independently of `Article`.
 - **Follow-up work (not part of this ADR):** Physically moving
   `Features/*`/`Domain/*` into the `Modules/*` layout described above, and
   introducing the read-contract interfaces/in-process events for the
