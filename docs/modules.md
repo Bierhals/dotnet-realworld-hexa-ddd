@@ -1,8 +1,8 @@
-# ADR: Module-Cut for a Modulith Architecture
+# Modulith Architecture Concept: Module-Cut and Boundary Rules
 
-- Status: Accepted
-- Date: 2026-07-07
-- Related issue: [#45](https://github.com/Bierhals/dotnet-realworld-hexa-ddd/issues/45)
+- Version: 1.1
+- Last updated: 2026-07-07
+- Owner: Backend maintainers
 
 ## Context
 
@@ -25,8 +25,8 @@ Based on the RealWorld domain, the following modules are identified:
 
 | Module | Responsibility | Owned entities | Owned use cases (current `Features/*`) |
 |---|---|---|---|
-| **Identity** | Registration, authentication, user profile data (the user's own account) | `Person` (account-facing fields: `Username`, `Email`, `Bio`, `Image`, `Hash`, `Salt`) | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit` |
-| **Profiles** | Public-facing profile view, follow/unfollow relationships between users | `FollowedPeople` (reads `Person` via a published contract, does not own it) | `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
+| **Identity** | Authentication only: verifying credentials at login and issuing sessions/JWTs, orchestrating account creation during registration | *(none — delegates account data to **Profiles**)* | `Users/Create` (orchestrates registration via a **Profiles** contract), `Users/Login` |
+| **Profiles** | Owns user account/profile data (creation and updates), public-facing profile view, follow/unfollow relationships between users | `Person` (account-facing fields: `Username`, `Email`, `Bio`, `Image`, `Hash`, `Salt`), `FollowedPeople` | `Users/Details`, `Users/Edit`, `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
 | **Articles** | Authoring and browsing articles, commenting, favoriting, and tagging of articles | `Article`, `Comment`, `ArticleFavorite`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details`, `Comments/Create`, `Comments/Delete`, `Comments/List`, `Favorites/Add`, `Favorites/Delete` |
 | **Tags** | Tag catalog (the set of known tag names) | `Tag` | `Tags/List` |
 
@@ -60,7 +60,7 @@ Each module:
   directly through EF Core (`DbContext` access, migrations for that entity's
   table). For example, only **Articles** creates/removes `Comment` and
   `ArticleFavorite` rows (these are internal to the `Articles` module); only
-  **Identity** creates/removes `Person` rows.
+  **Profiles** creates/removes `Person` rows.
 - **Owns its use cases.** Application/command-query logic for a capability
   lives in the owning module (e.g. all logic to add/remove a favorite or
   comment lives in **Articles**, since it is part of the same context, not
@@ -82,11 +82,11 @@ Mapping current implicit couplings to the target module-cut:
 
 - **Articles** (including its internal `Comment`/`ArticleFavorite` concerns)
   references `Person` (`Author`) → **Articles** depends on a read-only
-  **Identity** contract (`IPersonReader`-style), not the `Person` entity.
+  **Profiles** contract (`IPersonReader`-style), not the `Person` entity.
 - **Comments** and **Favorites** are internal to the `Articles` module and
   reference `Article`/`Person` directly in-process; no cross-module contract
   is needed between them and `Article` since they share the same module
-  boundary. They still depend on the read-only **Identity** contract for
+  boundary. They still depend on the read-only **Profiles** contract for
   author information.
 - **Tags**/`ArticleTag` references `Article` → **`ArticleTag` is owned by the
   Articles module**, not by Tags. `ArticleTag` is the join between an article
@@ -99,8 +99,15 @@ Mapping current implicit couplings to the target module-cut:
   modules/consumers via its own `IArticleReader` contract (as it already does
   today through `Article.TagList`); no other module queries `ArticleTag`
   directly.
-- **Profiles**/`FollowedPeople` references `Person` → **Profiles** depends on
-  a read-only **Identity** contract.
+- **Identity**/`Users/Create` (registration) needs a `Person` row created →
+  **Identity** depends on a **Profiles** write contract (e.g.
+  `IPersonWriter.CreateAsync(...)`), since `Person` is owned by **Profiles**.
+  **Identity**/`Users/Login` needs to verify credentials (`Hash`/`Salt`) →
+  **Identity** depends on the same read-only **Profiles** contract
+  (`IPersonReader`-style) used by other modules, rather than owning or
+  querying `Person` directly.
+- **Profiles** owns `Person` and `FollowedPeople` directly (same module), so
+  no cross-module contract is needed between them.
 
 ## Cross-Module Communication
 
@@ -188,24 +195,23 @@ module.
 ## Module Boundary Diagram
 
 ```text
-                     ┌─────────────────────────┐
-                     │        Identity          │
-                     │  (Person: account data)   │
-                     └───────────▲───────────────┘
-                                 │ IPersonReader (contract)
-              ┌──────────────────┴──────────────────┐
-              │                                      │
-     ┌────────┴────────┐                    ┌────────┴─────────────────┐
-     │    Profiles      │                    │        Articles          │
-     │ (FollowedPeople)  │                    │ (Article, Comment,        │
-     └───────────────────┘                    │  ArticleFavorite,        │
-                                               │  ArticleTag)             │
-                                               └────────────▲─────────────┘
-                                                             │ ITagReader (contract)
-                                                    ┌────────┴────────┐
-                                                    │      Tags        │
-                                                    │      (Tag)        │
-                                                    └───────────────────┘
+                     ┌───────────────────────────┐
+                     │         Profiles           │
+                     │ (Person, FollowedPeople)   │
+                     └───────▲──────────▲─────────┘
+       IPersonWriter/        │          │ IPersonReader (contract)
+       IPersonReader         │          │
+                    ┌────────┴───┐  ┌────┴──────────────────────┐
+                    │  Identity   │  │        Articles           │
+                    │ (auth only) │  │ (Article, Comment,        │
+                    └─────────────┘  │  ArticleFavorite,         │
+                                     │  ArticleTag)               │
+                                     └────────────▲────────────────┘
+                                                   │ ITagReader (contract)
+                                          ┌────────┴────────┐
+                                          │      Tags        │
+                                          │      (Tag)        │
+                                          └───────────────────┘
 
 Legend:
   ──►  allowed dependency, via the target module's public Contracts only
@@ -219,7 +225,7 @@ represent dependencies on read interfaces/DTOs (e.g. `IPersonReader`,
 `ITagReader`), never on another module's domain entities or persistence
 layer.
 
-## Consequences
+## Trade-offs and Follow-up
 
 - **Positive:** Modules can evolve, be tested, and (eventually) be extracted
   into separate deployables with minimal churn, since coupling is limited to
@@ -234,8 +240,9 @@ layer.
   is accepted because the alternative (three separate modules) would add
   contract overhead without real isolation, since none of the three can be
   meaningfully used or deployed independently of `Article`.
-- **Follow-up work (not part of this ADR):** Physically moving
+- **Follow-up work (not part of this document):** Physically moving
   `Features/*`/`Domain/*` into the `Modules/*` layout described above, and
-  introducing the read-contract interfaces/in-process events for the
-  cross-module data needs listed above. This ADR intentionally documents the
-  target design first so future feature work can migrate incrementally.
+  introducing the read/write-contract interfaces/in-process events for the
+  cross-module data needs listed above. This document intentionally
+  describes the target design first so future feature work can migrate
+  incrementally.
