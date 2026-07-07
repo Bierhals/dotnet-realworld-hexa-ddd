@@ -1,6 +1,6 @@
 # Modulith Architecture Concept: Module-Cut and Boundary Rules
 
-- Version: 1.1
+- Version: 1.2
 - Last updated: 2026-07-07
 - Owner: Backend maintainers
 
@@ -25,69 +25,53 @@ Based on the RealWorld domain, the following modules are identified:
 
 | Module | Responsibility | Owned entities | Owned use cases (current `Features/*`) |
 |---|---|---|---|
-| **Identity** | Authentication and account credentials: enforcing username/email uniqueness, verifying credentials at login, issuing sessions/JWTs | `Credentials` (`Username`, `Email`, `Hash`, `Salt`) | `Users/Create` (registration — also triggers `Profile` creation via a **Profiles** contract), `Users/Login`; hosts `Users/Details` and `Users/Edit` but coordinates with **Profiles** for those (see below) |
-| **Profiles** | Public-facing profile data (bio/image), follow/unfollow relationships between users | `Profile` (`Bio`, `Image`, plus a read-only cached copy of `Username` used as the public lookup key), `FollowedPeople` | `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
+| **Identity** | Authentication, account credentials, and public profile data, including the follow/unfollow relationship between users | `Person` (`Username`, `Email`, `Hash`, `Salt`, `Bio`, `Image`), `FollowedPeople` | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit`, `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
 | **Articles** | Authoring and browsing articles, commenting, favoriting, and tagging of articles | `Article`, `Comment`, `ArticleFavorite`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details`, `Comments/Create`, `Comments/Delete`, `Comments/List`, `Favorites/Add`, `Favorites/Delete` |
 | **Tags** | Tag catalog (the set of known tag names) | `Tag` | `Tags/List` |
 
-`Person` is split into two entities along an auth-vs-public-profile line:
-`Username`, `Email`, `Hash`, and `Salt` are authentication data — they are
-required to log in, to enforce account uniqueness, and to identify the
-subject of a JWT — so they are owned by **Identity** as a `Credentials`
-entity. `Bio` and `Image` are public-facing profile data with no bearing on
-authentication, so they remain owned by **Profiles** as a `Profile` entity.
-Because profiles are looked up and displayed by `Username` (see
-`Profiles/Details`), **Profiles** keeps a read-only cached copy of `Username`
-alongside its own `Profile` row, kept in sync with **Identity** via an
-in-process event (e.g. `UsernameChanged`) whenever **Identity** changes it;
-**Profiles** never treats this cached copy as authoritative or writes it back.
+`Identity` and `Profiles` are treated as a **single module** rather than two
+separate ones. An earlier draft of this document split `Person` along an
+auth-vs-public-profile line (`Credentials` in `Identity` owning
+`Username`/`Email`/`Hash`/`Salt`, `Profile` in `Profiles` owning
+`Bio`/`Image`). That split was reverted: the RealWorld API itself models
+`Users/Details` and `Users/Edit` as single REST endpoints that
+read/write `username`, `email`, `bio`, and `image` together — an external
+contract this project doesn't control. Honoring a clean auth/profile
+boundary underneath that endpoint shape required a two-part write for
+`Users/Create`, coordinated cross-module reads/writes for `Users/Details`
+and `Users/Edit`, and a `Profiles`-side cached copy of `Username` kept in
+sync via an in-process `UsernameChanged` event — a meaningful amount of
+coordination overhead to preserve a boundary the public API doesn't actually
+respect. Keeping `Person` (and `FollowedPeople`, since follow relationships
+are likewise keyed off account identity) as a single **Identity** module
+removes all of that: `Users/Create`, `Users/Details`, and `Users/Edit` go
+back to being simple, single-module operations, at the cost of a slightly
+larger module that spans authentication, public profile, and the social
+graph.
 
-This split has consequences for three use cases that previously fit cleanly
-inside a single module:
-
-- **`Users/Create` (registration)** becomes a two-part write: **Identity**
-  creates the `Credentials` row first (after checking username/email
-  uniqueness), then synchronously calls a **Profiles** command contract
-  (e.g. `IProfileWriter.CreateAsync(personId, username)`) to create the
-  matching `Profile` row (with empty `Bio`/`Image`) before returning the
-  registration response. A synchronous call — not an event — is used here
-  because the API response must reflect the fully created account
-  immediately.
-- **`Users/Details`** (the authenticated user's own account view) and
-  **`Users/Edit`** are no longer owned by a single module: both read/write
-  `Username`/`Email` (**Identity**) and `Bio`/`Image` (**Profiles**).
-  **Identity** hosts the endpoint and handler (as the entry point for "the
-  current authenticated user"), reads/writes its own `Credentials`, and
-  composes the result with a call to **Profiles**'s `IProfileReader` (for
-  `Users/Details`) or a **Profiles** command contract (for `Users/Edit`) to
-  read/update `Bio`/`Image`.
-
-These three use cases are the explicit exception to "each use case lives
-entirely inside one module" — they are coordinated, contract-mediated
-operations spanning **Identity** and **Profiles**, not violations of module
-isolation, since neither module ever touches the other's entities directly.
-
-`Articles`, `Comments`, and `Favorites` are treated as a **single module**
-rather than three separate ones. All three center on the `Article` aggregate,
-share its lifecycle (a comment or favorite cannot outlive its article, and
-both are always looked up/listed together with the article they belong to),
-and have no independent meaning outside of an article. Splitting them into
-separate modules would force constant chatty cross-module contract calls for
-what is really one cohesive context, without providing any real isolation
-benefit. `Comment` and `ArticleFavorite` therefore remain internal
-implementation details of the `Articles` module — accessible from within the
-module without going through a `Contracts` interface — while still following
-the "own your commands/queries" rule *within* that module (e.g. comment
-creation logic doesn't leak into article-editing code).
+`Articles`, `Comments`, and `Favorites` are likewise treated as a **single
+module** rather than three separate ones. All three center on the `Article`
+aggregate, share its lifecycle (a comment or favorite cannot outlive its
+article, and both are always looked up/listed together with the article
+they belong to), and have no independent meaning outside of an article.
+Splitting them into separate modules would force constant chatty
+cross-module contract calls for what is really one cohesive context, without
+providing any real isolation benefit. `Comment` and `ArticleFavorite`
+therefore remain internal implementation details of the `Articles` module —
+accessible from within the module without going through a `Contracts`
+interface — while still following the "own your commands/queries" rule
+*within* that module (e.g. comment creation logic doesn't leak into
+article-editing code).
 
 `Tags` remains a separate module because the tag catalog (the set of known
 tag names) is a distinct concern from any single article and is intended to
 be reusable/queryable independently of articles (see `Tags/List`).
 
-These map closely onto the existing `Features/*` folders (with `Comments` and
-`Favorites` folded into `Articles`), which keeps the migration low-risk:
-today's vertical slices already approximate the module boundaries, they
-simply are not yet enforced by tooling/project structure.
+These map closely onto the existing `Features/*` folders (with `Profiles`
+and `Followers` folded into `Identity`, and `Comments`/`Favorites` folded
+into `Articles`), which keeps the migration low-risk: today's vertical
+slices already approximate the module boundaries, they simply are not yet
+enforced by tooling/project structure.
 
 ## Module Boundaries
 
@@ -97,10 +81,7 @@ Each module:
   directly through EF Core (`DbContext` access, migrations for that entity's
   table). For example, only **Articles** creates/removes `Comment` and
   `ArticleFavorite` rows (these are internal to the `Articles` module); only
-  **Identity** creates/removes `Credentials` rows; only **Profiles**
-  creates/removes `Profile` rows (except for its cached `Username` copy,
-  which is only ever updated in reaction to an **Identity** event, never
-  written from another module directly).
+  **Identity** creates/removes `Person` and `FollowedPeople` rows.
 - **Owns its use cases.** Application/command-query logic for a capability
   lives in the owning module (e.g. all logic to add/remove a favorite or
   comment lives in **Articles**, since it is part of the same context, not
@@ -113,8 +94,9 @@ Each module:
     `Features/Profiles/IProfileReader.cs`) that other modules can depend on to
     read data they don't own.
   - **Command contracts** — a narrow public API (interface + DTO) for actions
-    other modules need to trigger (e.g. "does this article exist and who is
-    its author" for **Profiles** to use, without touching `Article` directly).
+    other modules need to trigger (e.g. `ITagWriter.GetOrCreateAsync` for
+    **Articles** to use when it needs to attach a tag name that may not yet
+    exist in the **Tags** catalog).
 
 ### Cross-module data needs today
 
@@ -122,46 +104,38 @@ Mapping current implicit couplings to the target module-cut:
 
 - **Articles** (including its internal `Comment`/`ArticleFavorite` concerns)
   references author display data (`Username`, `Bio`, `Image`) → **Articles**
-  depends on a read-only **Profiles** contract (`IProfileReader`-style,
-  the same one already used by other consumers of profile data), not
-  **Identity**'s `Credentials`, since article/comment authoring only needs
-  the public profile fields, never `Email`/`Hash`/`Salt`.
+  depends on a read-only **Identity** contract (`IProfileReader`-style, the
+  same one already used by other consumers of profile data), never
+  **Identity**'s `Email`/`Hash`/`Salt`, since article/comment authoring only
+  needs the public profile fields.
 - **Comments** and **Favorites** are internal to the `Articles` module and
   reference `Article` directly in-process; no cross-module contract is
   needed between them and `Article` since they share the same module
-  boundary. They still depend on the read-only **Profiles** contract for
+  boundary. They still depend on the read-only **Identity** contract for
   author information.
 - **Tags**/`ArticleTag` references `Article` → **`ArticleTag` is owned by the
   Articles module**, not by Tags. `ArticleTag` is the join between an article
   and a tag, and tagging an article is part of the Articles aggregate's own
   lifecycle (set on create/edit, deleted when the article is deleted). The
   **Tags** module owns only the `Tag` catalog itself (the set of known tag
-  names) and exposes a read-only contract (e.g. `ITagReader`) that
-  **Articles** depends on when validating/attaching tags to an article.
+  names) and exposes both:
+  - a read-only contract (e.g. `ITagReader`) that **Articles** depends on
+    when listing/validating existing tags, and
+  - a write contract (`ITagWriter.GetOrCreateAsync(tagName)`) that
+    **Articles** depends on when creating/editing an article, since the
+    RealWorld API allows an article to introduce brand-new tag names that
+    don't yet exist in the catalog. **Articles** never inserts `Tag` rows
+    itself — it always goes through `ITagWriter` so **Tags** remains the
+    sole owner of the catalog, mirroring how **Identity** exposes a read
+    contract for other modules that need data it owns.
   **Articles** exposes the article's current tag list to other
   modules/consumers via its own `IArticleReader` contract (as it already does
   today through `Article.TagList`); no other module queries `ArticleTag`
   directly.
-- **Identity**/`Users/Create` (registration) needs a matching `Profile` row
-  created → **Identity** depends on a **Profiles** write contract (e.g.
-  `IProfileWriter.CreateAsync(personId, username)`), since `Profile` is owned
-  by **Profiles**. This is a synchronous contract call, not an event,
-  because the registration response must include the fully created account.
-- **Identity**/`Users/Login` only needs its own `Credentials`
-  (`Email`/`Hash`/`Salt`) → no cross-module dependency.
-- **Identity**/`Users/Details` and `Users/Edit` need `Bio`/`Image` in
-  addition to their own `Username`/`Email` → **Identity** depends on
-  **Profiles**'s `IProfileReader` (for `Users/Details`) and a **Profiles**
-  write contract (for `Users/Edit`), composing the response/update from both
-  modules (see "Candidate Modules" above).
-- **Profiles**'s cached `Username` copy needs to stay current whenever
-  **Identity** changes it (there is no `Users`-style rename feature today,
-  but the contract should be resilient to future username changes) →
-  **Profiles** subscribes to an **Identity**-published in-process event
-  (e.g. `UsernameChanged`) rather than querying **Identity**'s `Credentials`
-  on every read.
-- **Profiles** owns `Profile` and `FollowedPeople` directly (same module), so
-  no cross-module contract is needed between them.
+- **Identity** owns `Person` and `FollowedPeople` directly (same module), so
+  `Users/Create`, `Users/Details`, `Users/Edit`, `Profiles/Details`, and
+  `Followers/*` are all single-module operations with no cross-module
+  contract calls needed.
 
 ## Cross-Module Communication
 
@@ -169,8 +143,13 @@ Mapping current implicit couplings to the target module-cut:
    another module depends on a small interface (e.g. `IArticleReader`,
    `IProfileReader`) implemented by the owning module and registered in DI.
    This mirrors the existing `IProfileReader` pattern already used by
-   **Profiles**.
-2. **Prefer in-process domain/integration events for side effects.** When an
+   **Identity**.
+2. **Prefer write contracts for cross-module commands.** When a module needs
+   to trigger a create/update on data owned by another module (e.g.
+   **Articles** needing a new tag name added to the **Tags** catalog), it
+   depends on a narrow write interface (e.g. `ITagWriter`) exposed by the
+   owning module, instead of writing to that module's entities directly.
+3. **Prefer in-process domain/integration events for side effects.** When an
    action in one module must trigger behavior in another (e.g. "a person was
    deleted, so their comments/favorites/articles must be handled"), the owning
    module publishes an in-process event (e.g. via `MediatR`-style
@@ -181,13 +160,13 @@ Mapping current implicit couplings to the target module-cut:
    article itself is deleted) do not need events — they are handled directly
    in-process since `Article`, `Comment`, and `ArticleFavorite` share the same
    module boundary.
-3. **No direct cross-module entity/DbContext access.** A module must never
+4. **No direct cross-module entity/DbContext access.** A module must never
    `Include()`/query another module's EF Core entity types directly, and must
    never share a `DbSet` across module boundaries in application code (shared
    `DbContext`/database is acceptable at the infrastructure level during the
    Modulith stage, but access is mediated through the owning module's
    contracts).
-4. **No direct references to another module's internal types.** Only types
+5. **No direct references to another module's internal types.** Only types
    under a module's `Contracts` (or equivalent public) namespace may be
    referenced by other modules. Everything else (handlers, entities,
    repositories) is internal to the module.
@@ -218,10 +197,17 @@ Modules/
     FavoritesEndpoints.cs
   Tags/
     Contracts/
+      ITagReader.cs
+      ITagWriter.cs
     Domain/
     ...
   Identity/
-  Profiles/
+    Contracts/
+      IProfileReader.cs
+    Domain/
+      Person.cs
+      FollowedPeople.cs
+    ...
 ```
 
 Namespace convention: `Conduit.Modules.<ModuleName>` for internals and
@@ -249,42 +235,33 @@ module.
 ## Module Boundary Diagram
 
 ```text
-                     ┌───────────────────────────────┐
-                     │            Profiles            │
-                     │ (Profile: Username(cached),    │
-                     │  Bio, Image; FollowedPeople)    │
-                     └───▲──────────────────▲──────────┘
-      IProfileWriter/    │                  │ IProfileReader (contract)
-      IProfileReader     │                  │
-      UsernameChanged    │                  │
-      (event, Identity ──┘                  │
-       → Profiles)                          │
-              ┌──────────┴──────┐   ┌────────┴──────────────────┐
-              │     Identity     │   │        Articles           │
-              │ (Credentials:    │   │ (Article, Comment,        │
-              │  Username, Email,│   │  ArticleFavorite,         │
-              │  Hash, Salt)     │   │  ArticleTag)               │
-              └──────────────────┘   └────────────▲────────────────┘
-                                                    │ ITagReader (contract)
-                                           ┌────────┴────────┐
-                                           │      Tags        │
-                                           │      (Tag)        │
-                                           └───────────────────┘
+              ┌──────────────────┐         IProfileReader          ┌───────────────────────────┐
+              │     Identity      │◄────────(contract)─────────────│         Articles           │
+              │ (Person: Username,│                                 │ (Article, Comment,        │
+              │  Email, Hash,     │                                 │  ArticleFavorite,         │
+              │  Salt, Bio, Image;│                                 │  ArticleTag)               │
+              │  FollowedPeople)  │                                 └────────────▲────────────────┘
+              └───────────────────┘                                              │ ITagReader (contract)
+                                                                                  │ ITagWriter (contract)
+                                                                         ┌────────┴────────┐
+                                                                         │      Tags        │
+                                                                         │      (Tag)        │
+                                                                         └───────────────────┘
 
 Legend:
   ──►  allowed dependency, via the target module's public Contracts only
   All other module-to-module access is forbidden.
   Comment/ArticleFavorite/ArticleTag are internal to the Articles module —
   no contract boundary exists between Article, Comment, and ArticleFavorite.
-  Identity → Profiles also includes a one-way `UsernameChanged` event so
-  Profiles can keep its cached `Username` copy current.
+  Articles → Tags uses both a read contract (ITagReader, for listing/
+  validating existing tags) and a write contract (ITagWriter, for
+  getting-or-creating a tag name that doesn't yet exist in the catalog).
 ```
 
-Only **Contracts** (and the narrow `UsernameChanged` event) are consumed
-across module boundaries; the arrows above represent dependencies on read
-interfaces/DTOs (e.g. `IProfileReader`, `ITagReader`) or command
-contracts/events, never on another module's domain entities or persistence
-layer.
+Only **Contracts** are consumed across module boundaries; the arrows above
+represent dependencies on read interfaces/DTOs (e.g. `IProfileReader`,
+`ITagReader`) or command contracts (e.g. `ITagWriter`), never on another
+module's domain entities or persistence layer.
 
 ## Trade-offs and Follow-up
 
@@ -294,26 +271,25 @@ layer.
 - **Positive:** New contributors have a clear, documented rule set for where
   code belongs and what it may depend on.
 - **Trade-off:** Some duplication of small read DTOs across modules (e.g. an
-  `ArticleSummary` exposed by **Articles** for **Profiles**/**Tags** to
+  `ArticleSummary` exposed by **Articles** for **Identity**/**Tags** to
   consume) is expected and preferred over sharing entities.
 - **Trade-off:** Grouping `Articles`, `Comments`, and `Favorites` into one
   module means that module carries more responsibility than the others. This
   is accepted because the alternative (three separate modules) would add
   contract overhead without real isolation, since none of the three can be
   meaningfully used or deployed independently of `Article`.
-- **Trade-off:** Splitting `Person` into **Identity**'s `Credentials` and
-  **Profiles**'s `Profile` makes `Users/Create`, `Users/Details`, and
-  `Users/Edit` coordinated, multi-module operations instead of a single
-  local write/read, and requires **Profiles** to maintain a cached copy of
-  `Username` that is updated in-process (synchronously, via the
-  `UsernameChanged` event handler) whenever **Identity** changes it, rather
-  than being authoritative itself. This is accepted because it keeps
-  authentication secrets (`Hash`/`Salt`) and public profile data cleanly
-  separated, which matters more as the app grows (e.g. only **Identity**
-  ever needs to touch password hashes).
+- **Trade-off:** Keeping authentication, public profile, and the follow graph
+  together in a single **Identity** module means that module also carries
+  more responsibility than **Tags**. This is accepted because the RealWorld
+  API models `Users/Details`/`Users/Edit` as single endpoints spanning
+  auth and profile fields; splitting `Person` into separate
+  `Identity`/`Profiles` entities was tried and reverted (see "Candidate
+  Modules") because it turned those into coordinated, multi-module
+  operations and required a cached, event-synced copy of `Username` for no
+  isolation benefit the public API would ever let us realize.
 - **Follow-up work (not part of this document):** Physically moving
   `Features/*`/`Domain/*` into the `Modules/*` layout described above, and
-  introducing the read/write-contract interfaces/in-process events for the
-  cross-module data needs listed above. This document intentionally
-  describes the target design first so future feature work can migrate
-  incrementally.
+  introducing the read/write-contract interfaces for the cross-module data
+  needs listed above (`IProfileReader`, `ITagReader`, `ITagWriter`). This
+  document intentionally describes the target design first so future
+  feature work can migrate incrementally.
