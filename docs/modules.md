@@ -1,8 +1,8 @@
 # Modulith Architecture Concept: Module-Cut and Boundary Rules
 
-- Version: 1.2
+- Version: 1.0
 - Last updated: 2026-07-07
-- Owner: Backend maintainers
+- Owner: Sven-Uwe Bierhals
 
 ## Context
 
