@@ -10,6 +10,8 @@ The code follows the standard style guidelines of .NET and Vue 3 and is guided b
 
 For more information about the RealWorld specification and compatible implementations, see the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
+See [docs/modules.md](docs/modules.md) for the documented module-cut and target Modulith architecture.
+
 ## Goals
 
 - Provide a backend-focused implementation of the RealWorld API for articles, comments, tags, users, profiles, favorites, and followers.
