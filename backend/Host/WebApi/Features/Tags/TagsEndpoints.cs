@@ -1,0 +1,26 @@
+using System.Threading;
+using System.Threading.Tasks;
+using Conduit.Host.WebApi.Shared.RequestHandling;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+
+namespace Conduit.Host.WebApi.Features.Tags;
+
+public static class TagsEndpoints
+{
+    public static IEndpointRouteBuilder MapTagsEndpoints(this IEndpointRouteBuilder endpoints)
+    {
+        var tags = endpoints.MapGroup("/tags").WithTags("Tags");
+
+        tags.MapGet("", ListTagsAsync)
+            .WithSummary("Get tags")
+            .WithDescription("Get tags. Auth not required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#tags\">Conduit Spec for tags endpoint</a>")
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+
+        return endpoints;
+    }
+
+    private static Task<TagsEnvelope> ListTagsAsync(IQueryHandler<List.Query, TagsEnvelope> queryHandler, CancellationToken cancellationToken) =>
+        queryHandler.Handle(new List.Query(), cancellationToken);
+}
