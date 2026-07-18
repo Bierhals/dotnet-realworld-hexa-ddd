@@ -10,7 +10,7 @@ The code follows the standard style guidelines of .NET and Vue 3 and is guided b
 
 For more information about the RealWorld specification and compatible implementations, see the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
-See [docs/modules.md](docs/modules.md) for the documented module-cut and target Modulith architecture.
+See [docs/README.md](docs/README.md) for the documented Modulith architecture, module cut, and DDD patterns/rules used in this codebase.
 
 ## Goals
 
