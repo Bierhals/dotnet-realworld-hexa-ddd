@@ -105,15 +105,16 @@ layer).
 - Simple cases: manual mapping inline in the handler, or as an extension
   method. More complex aggregates: a dedicated mapper class.
 
-This is what keeps [Contracts](modulith-architecture.md) DTOs and Application
-DTOs consistent: neither ever wraps a raw Domain type, so a Domain refactor
-inside one module can't silently break another module or an API consumer.
+This is what keeps [Contracts](modulith-architecture.md#3-contracts-how-modules-talk-to-each-other)
+DTOs and Application DTOs consistent: neither ever wraps a raw Domain type,
+so a Domain refactor inside one module can't silently break another module
+or an API consumer.
 
 ## 3. Further Patterns
 
-- **Mediator** — the CQRS dispatcher in §1 is a Mediator: callers depend only
-  on `ISender`, not on concrete handlers, decoupling the caller from handler
-  resolution/wiring.
+- **Mediator** — the CQRS dispatcher in [§1](#1-cqrs--mediator-commands--queries)
+  is a Mediator: callers depend only on `ISender`, not on concrete handlers,
+  decoupling the caller from handler resolution/wiring.
 - **Decorator** — cross-cutting behavior (e.g. wrapping a command handler in
   a database transaction) is added by wrapping the handler in another class
   implementing the same interface, rather than baking the concern into every
@@ -142,9 +143,9 @@ inside one module can't silently break another module or an API consumer.
 
 - **Interceptor** — EF Core's `SaveChangesInterceptor` is used to collect
   Domain Events from the `ChangeTracker` before `SaveChanges()` and turn them
-  into Outbox rows (see [DDD Patterns §4](ddd-patterns.md)) — a cross-cutting
-  concern hooked into the persistence pipeline rather than scattered across
-  every repository/handler.
+  into Outbox rows (see [DDD Patterns §4](ddd-patterns.md#4-domain-event)) — a
+  cross-cutting concern hooked into the persistence pipeline rather than
+  scattered across every repository/handler.
 - **Strategy** — used wherever a behavior needs to be swappable at runtime or
   per-configuration without an `if/switch` inside Domain/Application code
   (e.g. a pluggable password-hashing or token-generation strategy behind an
@@ -166,15 +167,15 @@ inside one module can't silently break another module or an API consumer.
 - **Domain stays persistence- and transaction-free** — `IUnitOfWork` is only
   ever used from the Application layer.
 - **Domain objects never leave the Application layer** — always map to a DTO
-  at the boundary (see §2).
+  at the boundary (see [§2](#2-response-mapping-commandquery--dto)).
 - **Project/root namespace naming stays consistent**: `RootNamespace` =
-  `AssemblyName` = project name (see [Module Structure §1](module-structure.md)).
+  `AssemblyName` = project name (see [Module Structure §1](module-structure.md#1-namespace-per-layer)).
 - **The layer name is always present in the namespace**, so a layer
   violation is visible in a `using` statement before any tooling flags it.
 
 ## Further Reading
 
-- Martin Fowler, [*Mediator*](https://martinfowler.com/eaaDev/EventMediator.html) and [*Decorator*](https://en.wikipedia.org/wiki/Decorator_pattern) — the generic pattern descriptions behind §3.
+- Martin Fowler, [*Mediator*](https://martinfowler.com/eaaDev/EventMediator.html) and [*Decorator*](https://en.wikipedia.org/wiki/Decorator_pattern) — the generic pattern descriptions behind [§3](#3-further-patterns).
 - Microsoft Learn, [*EF Core: SaveChanges interceptors*](https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/interceptors) — the interception mechanism used for the Outbox flow.
 - Refactoring Guru, [*Design Patterns catalogue*](https://refactoring.guru/design-patterns) — reference catalogue for Mediator, Decorator, and Strategy.
 - [ErrorOr](https://github.com/amantinband/error-or) — the library used throughout for `ErrorOr<T>` return values.

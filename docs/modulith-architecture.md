@@ -94,8 +94,7 @@ src/
 `Shared` is intentionally named **`Shared`**, not `SharedKernel`: it is kept
 distinct from the strategic DDD "Shared Kernel" pattern (shared *domain*
 knowledge between teams). This project's `Shared` contains only **technical**
-building blocks without any business meaning — see
-[DDD Patterns §14](ddd-patterns.md) for the full rationale.
+building blocks without any business meaning.
 
 ## 3. Contracts: How Modules Talk to Each Other
 
@@ -154,12 +153,14 @@ its own ports, and `Shared` — never another module's `Contracts`. A dependency
 on another module is, from the consuming module's point of view, exactly the
 same kind of external dependency as a database or a third-party HTTP API: it
 must sit behind a port that `Application` owns, with the actual call adapted
-away in `Infrastructure` (see [Module Structure §2](module-structure.md)).
+away in `Infrastructure` (see [Module Structure §2](module-structure.md#2-ports--adapters-hexagonal-architecture-per-module)).
 
 Concretely, `Articles` consuming `Identity`'s profile data looks like this:
 
 ```csharp
-// Articles.Application.Ports — a port Articles.Application owns and knows nothing about Identity
+// Articles.Application.Articles — a port interface Articles.Application owns and knows
+// nothing about Identity; it lives directly next to the use case(s) that consume it,
+// no dedicated Ports namespace or Port suffix
 public interface IProfileReader
 {
     Task<AuthorProfile?> GetAuthorProfileAsync(Guid personId, CancellationToken ct);
@@ -201,7 +202,7 @@ applied consistently to cross-module dependencies as well.
 | `ModuleA.Infrastructure` → `ModuleB.Contracts` | ✅ (adapter implementing one of `ModuleA.Application`'s own ports) |
 | `ModuleA.Application` → `ModuleB.Contracts` | ❌ (Application only knows its own ports plus `Shared`) |
 | `ModuleA.Application`/`Domain` → `ModuleB.Application`/`Domain` | ❌ |
-| any module → another module's `DbContext`/EF Core entities/tables | ❌ (even with a shared physical database, see §7) |
+| any module → another module's `DbContext`/EF Core entities/tables | ❌ (even with a shared physical database, see [§7](#7-database-ownership)) |
 
 ### Asynchronous communication: integration events
 
@@ -225,7 +226,7 @@ event type directly.
 
 Events are processed **in-process** today (e.g. via a lightweight in-process
 event bus or `MediatR`-style notifications), optionally combined with the
-Outbox pattern described in [DDD Patterns §4](ddd-patterns.md) for delivery
+Outbox pattern described in [DDD Patterns §4](ddd-patterns.md#4-domain-event) for delivery
 guarantees.
 
 ### Naming conventions
@@ -285,7 +286,7 @@ builder.Build().Run();
 ## 5. Tests
 
 Test projects are co-located next to the production project they test (see
-§2), not gathered in a separate mirrored `tests/` tree. Given each module
+[§2](#2-solution-structure)), not gathered in a separate mirrored `tests/` tree. Given each module
 already owns its Domain/Application/Infrastructure/Api projects, its test
 projects are just further siblings in the same module folder — moving or
 extracting a module later takes its tests along automatically, and there's no
@@ -323,7 +324,7 @@ over time. Rules worth automating:
 - No type from `*.Infrastructure` may be referenced by another module's `*.Api`.
 - No module's `Application`/`Domain` may reference another module's
   `*.Domain`, `*.Application`, or `*.Contracts` — only that module's own
-  `Infrastructure` adapters may reference `*.Contracts` (see §3).
+  `Infrastructure` adapters may reference `*.Contracts` (see [§3](#3-contracts-how-modules-talk-to-each-other)).
 - Explicitly allowed cross-module dependency directions (e.g. "Articles may
   depend on Identity's contracts, never the reverse") should be listed and
   checked.
@@ -333,7 +334,8 @@ over time. Rules worth automating:
 Recommended: one schema per module (same physical database is fine, but
 logically separated). This makes a later cut to microservices cheaper, since
 each module already has its own data ownership boundary — and it also makes
-the "no module reads another module's tables directly" rule (§3) easy to
+the "no module reads another module's tables directly" rule
+([§3](#3-contracts-how-modules-talk-to-each-other)) easy to
 verify: a module simply has no `DbSet`/migration access to another module's
 schema.
 
@@ -463,13 +465,14 @@ contract boundary exists between `Article`, `Comment`, and `ArticleFavorite`.
 - **Adding a new module?** Copy the five projects (`Contracts`, `Domain`,
   `Application`, `Infrastructure`, `Api`) of an existing module as a template
   — or start with a single assembly per module, see
-  [Module Structure §3](module-structure.md).
+  [Module Structure §3](module-structure.md#3-how-many-assemblies-per-module).
 - **Another module needs data you own?** Add an interface + DTO to your
   `Contracts` project; keep the implementation `internal` in `Application`.
-- **You need data owned by another module?** Define your own port in your
-  `Application.Ports` and implement it in your `Infrastructure` as an adapter
-  that calls the other module's `Contracts` — never reference another
-  module's `Contracts` from your own `Application` (see §3).
+- **You need data owned by another module?** Define your own port interface
+  directly in your `Application` (next to the use case that needs it) and
+  implement it in your `Infrastructure` as an adapter that calls the other
+  module's `Contracts` — never reference another module's `Contracts` from
+  your own `Application` (see [§3](#3-contracts-how-modules-talk-to-each-other)).
 - **You need to react to something another module did?** Handle the
   integration event in your `Infrastructure` (or an `Integration` folder next
   to it) and translate it into a call against your own `Application` — never

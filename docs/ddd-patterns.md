@@ -194,6 +194,38 @@ public sealed class Article : AggregateRoot<ArticleId>
 }
 ```
 
+**External values: pass through, never inject**
+
+An Aggregate stays synchronous and free of I/O — never inject an external
+service into its constructor or methods. When a method needs a value that
+comes from outside (an exchange rate, a stock level, ...), that value is
+fetched **before** the call, in the Application layer, and handed to the
+Aggregate as a plain parameter or Value Object.
+
+| Situation | Approach |
+|---|---|
+| A single Aggregate needs an external value for a calculation | Load the value beforehand in Application, pass it as a parameter |
+| Multiple Aggregates are involved, or the business flow itself needs external data (possibly repeatedly/conditionally) | Domain Service with an injected dependency (see [§6](#6-domain-service)) |
+| The value must be anchored in the Aggregate's state going forward | Value Object/snapshot captured at creation time |
+
+```csharp
+// Domain — pure calculation, no I/O
+public sealed class Article : AggregateRoot<ArticleId>
+{
+    public ErrorOr<Money> CalculatePriceIn(Currency targetCurrency, ExchangeRate rate)
+        => _price.ConvertTo(targetCurrency, rate);
+}
+```
+
+```csharp
+// Application — orchestrates, fetches the value beforehand
+var rate = await _exchangeRateProvider.GetRateAsync(article.Currency, target, ct);
+var converted = article.CalculatePriceIn(target, rate);
+```
+
+Rationale: this keeps the Aggregate rehydratable by the ORM, serializable,
+and testable without mocking I/O.
+
 ## 4. Domain Event
 
 **Purpose:** represents something that **has happened** in the domain. Raised
@@ -303,10 +335,29 @@ transferring money between two accounts).
 - Purely functional services with no dependencies: a plain `static class` is
   enough.
 - Stays completely persistence-free — **no** `IUnitOfWork`, no transaction
-  control inside the Domain.
+  control inside the Domain. (A read-only, Domain-owned port for case 2 below
+  is fine — that is not persistence, just an outward-facing query.)
 - Before reaching for a domain service, check: doesn't this logic actually
   belong on the aggregate root? (The most common modeling mistake here is an
   Anemic Domain Model.)
+
+**When is a Domain Service actually justified?**
+
+Two cases only — anything else stays either on the Aggregate Root or as
+plain Application-layer orchestration:
+
+1. **Multiple Aggregates, with a genuine business rule between them** — pure
+   logic over Aggregates that are already loaded, no I/O.
+2. **Business process/flow logic that itself needs external data**,
+   potentially repeatedly or conditionally — not just "fetch value X, hand it
+   to Y" (that stays Application orchestration, see [§3 Aggregate Root](#3-aggregate-root)
+   "External values").
+
+Needing an external value alone does **not** justify a Domain Service. A
+Domain Service **may** depend on a genuine, Domain-owned port for case 2
+(e.g. an `IWarehouseStockProvider` queried once per order line to check
+availability) — "persistence-free" means no `IUnitOfWork`/transaction
+control, not "no I/O at all".
 
 ```csharp
 public static class FollowPolicy
@@ -330,7 +381,7 @@ public static class FollowPolicy
 - One interface **per aggregate root**, defined in the **Domain** layer
   (Dependency Inversion — Domain defines what it needs, Infrastructure
   supplies the technology). This is the Repository's role as a *port*; see
-  [Module Structure §2](module-structure.md).
+  [Module Structure §2](module-structure.md#2-ports--adapters-hexagonal-architecture-per-module).
 - **No** generic `IRepository<T, TId>` — that invites CRUD thinking instead
   of ubiquitous language, and produces methods nobody actually needs.
 - Only domain-meaningful, clearly named methods (`GetPublishedArticlesAsync`,
@@ -409,6 +460,6 @@ public interface IUnitOfWork
 - Eric Evans, *Domain-Driven Design: Tackling Complexity in the Heart of Software* (2003) — the origin of every pattern in this document.
 - Vaughn Vernon, *Implementing Domain-Driven Design* (2013) — practical, code-heavy companion to Evans' book.
 - Martin Fowler's bliki: [*ValueObject*](https://martinfowler.com/bliki/ValueObject.html), [*Repository*](https://martinfowler.com/eaaCatalog/repository.html), [*DDD_Aggregate*](https://martinfowler.com/bliki/DDD_Aggregate.html).
-- Vlad Khononov, *Learning Domain-Driven Design* (2021) — clear treatment of Core/Supporting/Generic subdomains referenced in §0.
-- [Outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) on microservices.io — the delivery-guarantee mechanism referenced in §4.
+- Vlad Khononov, *Learning Domain-Driven Design* (2021) — clear treatment of Core/Supporting/Generic subdomains referenced in [§0](#0-use-tactical-ddd-only-for-core-subdomains).
+- [Outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html) on microservices.io — the delivery-guarantee mechanism referenced in [§4](#4-domain-event).
 - [ErrorOr](https://github.com/amantinband/error-or) — the library used throughout for `ErrorOr<T>` return values.

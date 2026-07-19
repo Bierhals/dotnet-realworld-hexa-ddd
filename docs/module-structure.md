@@ -13,9 +13,9 @@ Each module follows a `{Module}.{Layer}[.SubNamespace]` schema:
 | Layer | Namespace pattern | Purpose | Example |
 |---|---|---|---|
 | Domain | `{Module}.Domain[.Entities/ValueObjects/Events]` | Entities, value objects, aggregate roots, domain events, business rules — no outward dependencies | `Articles.Domain.Entities` |
-| Application | `{Module}.Application[.UseCases/Ports]` | Use cases (commands/queries) and the ports they depend on | `Articles.Application.Ports` |
+| Application | `{Module}.Application[.Commands/Queries]` | Use cases (commands/queries) and the ports they depend on, placed directly next to the use case that consumes them | `Articles.Application.Articles` |
 | Infrastructure | `{Module}.Infrastructure[.Persistence/Adapters]` | Adapters implementing Application's ports (EF Core, HTTP clients, ...) | `Articles.Infrastructure.Adapters` |
-| Contracts | `{Module}.Contracts[.Events/Queries/Commands]` | The module's public surface for other modules (see [Modulith Architecture §3](modulith-architecture.md)) | `Articles.Contracts.Events` |
+| Contracts | `{Module}.Contracts[.Events/Queries/Commands]` | The module's public surface for other modules (see [Modulith Architecture §3](modulith-architecture.md#3-contracts-how-modules-talk-to-each-other)) | `Articles.Contracts.Events` |
 | Api | `{Module}.Api[.Endpoints]` | HTTP endpoints, request/response mapping | `Articles.Api.Endpoints` |
 | Host | `Host.WebApi[.Extensions/Configuration]` | Composition root wiring modules together | `Host.WebApi.Extensions` |
 
@@ -26,8 +26,10 @@ Rules:
 2. **The layer name is always part of the namespace**, not just the folder —
    this makes layer violations visible immediately in `using` statements,
    even before an architecture test catches them.
-3. **Ports vs. Adapters are named explicitly**: `Application.Ports`
-   (interfaces) vs. `Infrastructure.Adapters` (implementations) — see §2.
+3. **Adapters are named explicitly** (`Infrastructure.Adapters`); the ports
+   they implement are plain interfaces with no dedicated namespace or `Port`
+   suffix — they live directly in `Application`, next to the use case that
+   consumes them — see [§2](#2-ports--adapters-hexagonal-architecture-per-module).
 4. **`Contracts` is kept thin and in its own namespace branch**, so
    IDE autocomplete from another module only ever surfaces what that module
    is allowed to see.
@@ -42,12 +44,12 @@ Architecture](https://alistair.cockburn.us/hexagonal-architecture/) style:
 - **Domain** has no ports at all — it is persistence- and
   transaction-free by design (see [DDD Patterns](ddd-patterns.md)).
 - **Application** defines the **ports**: interfaces describing what the use
-  cases need from the outside world — repository interfaces
-  (`IArticleRepository`), `IUnitOfWork`, and any other outward-facing
-  interface a use case depends on. Ports live in `Application.Ports`
-  (or, for repositories specifically, directly in `Domain` per the Repository
-  pattern's Dependency Inversion rule — see
-  [DDD Patterns §8](ddd-patterns.md)).
+  cases need from the outside world — `IUnitOfWork` and any other
+  outward-facing interface a use case depends on. There is no dedicated
+  `Ports` namespace or `Port` suffix: each interface lives directly next to
+  the use case(s) that consume it. Repository interfaces are the one
+  exception — they live in `Domain`, per the Repository pattern's Dependency
+  Inversion rule (see [DDD Patterns §7](ddd-patterns.md#7-repository)).
 - **Infrastructure** provides the **adapters**: concrete implementations of
   those ports — an EF Core repository implementing `IArticleRepository`, an
   `IUnitOfWork` implementation wrapping a `DbContext`, an HTTP client
@@ -56,7 +58,7 @@ Architecture](https://alistair.cockburn.us/hexagonal-architecture/) style:
   (e.g. `IProfileReader`) is defined and owned by this module's
   `Application`, and only this module's `Infrastructure` is allowed to
   depend on the other module's `Contracts` to implement that port — see
-  [Modulith Architecture §3](modulith-architecture.md) for the full example.
+  [Modulith Architecture §3](modulith-architecture.md#3-contracts-how-modules-talk-to-each-other) for the full example.
 - **Api** is a *driving* adapter: it adapts an inbound HTTP request into a
   call against the Application layer (a command/query). It is not "inside"
   the hexagon; it is one of possibly several driving adapters (another could
@@ -130,11 +132,12 @@ Articles.csproj
 └── Api/
 ```
 
-A single project per module, with the same namespace convention from §1 kept
-purely as folder/namespace structure. Boundaries between layers are enforced
-by code review and by **architecture tests** (NetArchTest/ArchUnitNET
-analyzing namespaces via reflection) instead of project references — see
-[Modulith Architecture §6](modulith-architecture.md).
+A single project per module, with the same namespace convention from
+[§1](#1-namespace-per-layer) kept purely as folder/namespace structure.
+Boundaries between layers are enforced by code review and by **architecture
+tests** (NetArchTest/ArchUnitNET analyzing namespaces via reflection) instead
+of project references — see
+[Modulith Architecture §6](modulith-architecture.md#6-enforcing-boundaries-automatically).
 
 This is faster to set up and reduces project-count overhead, which is a good
 default for a new or still-evolving module.
