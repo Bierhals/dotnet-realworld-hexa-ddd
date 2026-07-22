@@ -1,3 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <ItemGroup>
+    <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
+  </ItemGroup>
 </Project>
