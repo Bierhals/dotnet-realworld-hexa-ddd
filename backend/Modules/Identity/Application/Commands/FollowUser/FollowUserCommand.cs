@@ -1,9 +1,8 @@
-using System;
 using Conduit.Shared.Application.Cqrs;
 
-namespace Conduit.Application.Commands.FollowUser;
+namespace Conduit.Identity.Application.Commands.FollowUser;
 
-public record FollowUserCommand() : ICommand
+public sealed record FollowUserCommand() : ICommand
 {
     public required string Username { get; init; }
 }

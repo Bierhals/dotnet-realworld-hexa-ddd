@@ -1,6 +1,6 @@
-namespace Conduit.Application.Queries.CurrentUser;
+namespace Conduit.Identity.Application.Queries.CurrentUser;
 
-public record User
+public sealed record User
 {
     public required string Username { get; init; }
 

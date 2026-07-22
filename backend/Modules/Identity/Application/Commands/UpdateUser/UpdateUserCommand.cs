@@ -1,9 +1,8 @@
-using Conduit.Application.Queries.CurrentUser;
 using Conduit.Shared.Application.Cqrs;
 
-namespace Conduit.Application.Commands.UpdateUser;
+namespace Conduit.Identity.Application.Commands.UpdateUser;
 
-public record UpdateUserCommand() : ICommand
+public sealed record UpdateUserCommand() : ICommand
 {
     public string? Username { get; set; }
 

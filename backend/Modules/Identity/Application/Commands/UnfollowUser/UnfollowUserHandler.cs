@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Conduit.Shared.Application.Cqrs;
 using ErrorOr;
 
-namespace Conduit.Application.Commands.UnfollowUser;
+namespace Conduit.Identity.Application.Commands.UnfollowUser;
 
-public class UnfollowUserHandler() : ICommandHandler<UnfollowUserCommand>
+public sealed class UnfollowUserHandler() : ICommandHandler<UnfollowUserCommand>
 {
     public Task<ErrorOr<Success>> Handle(UnfollowUserCommand message, CancellationToken cancellationToken)
     {

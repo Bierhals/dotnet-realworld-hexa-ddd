@@ -1,9 +1,9 @@
 using System;
 using Conduit.Shared.Application.Cqrs;
 
-namespace Conduit.Application.Commands.AuthenticateUser;
+namespace Conduit.Identity.Application.Commands.AuthenticateUser;
 
-public record AuthenticateUserCommand() : ICommand<Guid>
+public sealed record AuthenticateUserCommand() : ICommand<Guid>
 {
     public required string Email { get; init; }
 

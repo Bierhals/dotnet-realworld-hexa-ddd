@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Conduit.Shared.Application.Cqrs;
 using ErrorOr;
 
-namespace Conduit.Application.Commands.FollowUser;
+namespace Conduit.Identity.Application.Commands.FollowUser;
 
-public class FollowUserHandler() : ICommandHandler<FollowUserCommand>
+public sealed class FollowUserHandler() : ICommandHandler<FollowUserCommand>
 {
     public Task<ErrorOr<Success>> Handle(FollowUserCommand message, CancellationToken cancellationToken)
     {

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Conduit.Shared.Application.Cqrs;
 using ErrorOr;
 
-namespace Conduit.Application.Queries.CurrentUser;
+namespace Conduit.Identity.Application.Queries.CurrentUser;
 
-public class CurrentUserHandler() : IQueryHandler<CurrentUserQuery, User>
+public sealed class CurrentUserHandler() : IQueryHandler<CurrentUserQuery, User>
 {
     public Task<ErrorOr<User>> Handle(CurrentUserQuery message, CancellationToken cancellationToken)
     {

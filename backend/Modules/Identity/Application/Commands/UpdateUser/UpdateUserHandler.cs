@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Conduit.Shared.Application.Cqrs;
 using ErrorOr;
 
-namespace Conduit.Application.Commands.UpdateUser;
+namespace Conduit.Identity.Application.Commands.UpdateUser;
 
-public class UpdateUserHandler() : ICommandHandler<UpdateUserCommand>
+public sealed class UpdateUserHandler() : ICommandHandler<UpdateUserCommand>
 {
     public Task<ErrorOr<Success>> Handle(UpdateUserCommand message, CancellationToken cancellationToken)
     {

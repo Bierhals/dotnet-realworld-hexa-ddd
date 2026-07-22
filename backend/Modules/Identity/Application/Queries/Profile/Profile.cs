@@ -1,6 +1,6 @@
-namespace Conduit.Application.Queries.Profile;
+namespace Conduit.Identity.Application.Queries.Profile;
 
-public record Profile
+public sealed record Profile
 {
     public required string Username { get; init; }
 
