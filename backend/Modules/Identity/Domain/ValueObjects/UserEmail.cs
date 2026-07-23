@@ -1,3 +1,4 @@
+using Conduit.Identity.Domain.Rules;
 using ErrorOr;
 
 namespace Conduit.Identity.Domain.ValueObjects;
@@ -9,8 +10,11 @@ public sealed record UserEmail
 
     public static ErrorOr<UserEmail> Create(string value)
     {
-        // TODO: Validate the email format
-        return new UserEmail(value.Trim().ToLowerInvariant());
+        var sanitizedValue = value.Trim().ToLowerInvariant();
+
+        var check = new UserHasValidEmail(sanitizedValue).Check();
+
+        return check.IsError ? check.Errors : new UserEmail(sanitizedValue);
     }
 
     public static UserEmail Rehydrate(string value) => new(value);

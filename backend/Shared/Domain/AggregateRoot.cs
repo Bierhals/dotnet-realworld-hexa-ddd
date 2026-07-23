@@ -11,6 +11,6 @@ public abstract class AggregateRoot<TId> : Entity<TId>, IAggregateRoot
     protected AggregateRoot() { } // für EF Core
     protected AggregateRoot(TId id) : base(id) { }
 
-    protected void RaiseDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
+    protected void AddDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
     public void ClearDomainEvents() => _domainEvents.Clear();
 }

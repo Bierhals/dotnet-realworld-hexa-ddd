@@ -1,4 +1,5 @@
 using Conduit.Identity.Domain.Events;
+using Conduit.Identity.Domain.Rules;
 using Conduit.Identity.Domain.ValueObjects;
 using Conduit.Shared.Domain;
 using ErrorOr;
@@ -26,11 +27,38 @@ public sealed class User : AggregateRoot<UserId>
         Image = image;
     }
     
-    public static ErrorOr<User> RegisterNewUser(UserEmail email, Username username, string hashedPassword)
+    public static User RegisterNewUser(UserEmail email, Username username, string hashedPassword)
     {
-        // TODO: Validate
         var user = new User(UserId.New(), email, username, hashedPassword, null, null);
-        user.RaiseDomainEvent(new NewUserRegisteredDomainEvent(email.Value, username.Value));
+        user.AddDomainEvent(new NewUserRegisteredDomainEvent(email.Value, username.Value));
         return user;
+    }
+
+    public void ChangePassword(string newHashedPassword)
+    {
+        PasswordHash = newHashedPassword;
+        AddDomainEvent(new PasswordChangedDomainEvent(Username.Value));
+    }
+
+    public ErrorOr<Success> ChangeUsername(Username newUsername)
+    {
+        var usernameCheck = new NewUsernameMustBeDifferent(newUsername, Username).Check();
+        if (usernameCheck.IsError)
+        {
+            return usernameCheck.Errors;
+        }
+
+        var previousUsername = Username.Value;
+        Username = newUsername;
+        AddDomainEvent(new UsernameChangedDomainEvent(previousUsername, Username.Value));
+        return Result.Success;
+    }
+
+
+    public void ChangeProfile(UserImage? image, string? bio)
+    {
+        Image = image;
+        Bio = bio;
+        AddDomainEvent(new UserProfileChangedDomainEvent(Username.Value, Bio, Image?.Value));
     }
 }
