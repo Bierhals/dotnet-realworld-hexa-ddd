@@ -11,7 +11,7 @@ public sealed class UserLoginValidator
         _hasher = hasher;
     }
 
-    public ErrorOr<Success> ValidateAsync(User user, string plainPassword)
+    public ErrorOr<Success> Validate(User user, string plainPassword)
     {
         var isValid = _hasher.Verify(plainPassword, user.PasswordHash);
 

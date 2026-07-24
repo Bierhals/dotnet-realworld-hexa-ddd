@@ -7,8 +7,8 @@ namespace Conduit.Identity.Domain.Services;
 
 public sealed class UniqueUsernameValidator
 {
-    private readonly IUserRepository _usersRepository;
-    public UniqueUsernameValidator(IUserRepository users) => _usersRepository = users;
+    private readonly IUsersRepository _usersRepository;
+    public UniqueUsernameValidator(IUsersRepository users) => _usersRepository = users;
 
     public async Task<ErrorOr<Success>> IsUniqueAsync(Username username, UserId? excludingUserId = null, CancellationToken ct = default)
     {
