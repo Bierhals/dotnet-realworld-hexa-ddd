@@ -54,6 +54,18 @@ public sealed class User : AggregateRoot<UserId>
         return Result.Success;
     }
 
+    public ErrorOr<Success> ChangeEmail(UserEmail newEmail)
+    {
+        var emailCheck = new NewUserEmailMustBeDifferent(newEmail, Email).Check();
+        if (emailCheck.IsError)
+        {
+            return emailCheck.Errors;
+        }
+
+        Email = newEmail;
+        AddDomainEvent(new EmailChangedDomainEvent(Username.Value, Email.Value));
+        return Result.Success;
+    }
 
     public void ChangeProfile(UserImage? image, string? bio)
     {

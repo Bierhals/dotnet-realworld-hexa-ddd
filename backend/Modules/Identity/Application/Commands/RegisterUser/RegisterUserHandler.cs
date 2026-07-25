@@ -32,7 +32,7 @@ public sealed class RegisterUserHandler(IUnitOfWork unitOfWork, IUsersRepository
 
         return await User.RegisterNewUser(email.Value, username.Value, hashedPassword).ToErrorOr()
             .ThenDoAsync(async user => await usersRepository.AddAsync(user, cancellationToken))
-            .ThenDoAsync(async user => await unitOfWork.CommitAsync(cancellationToken))
+            .ThenDoAsync(async user => await unitOfWork.SaveChangesAsync(cancellationToken))
             .Then(user => user.Id.Value);
     }
 }
