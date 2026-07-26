@@ -2,5 +2,5 @@ namespace Conduit.Shared.Application;
 
 public interface ICurrentUserAccessor
 {
-    public string GetCurrentUsername();
+    public string? GetCurrentUsername();
 }

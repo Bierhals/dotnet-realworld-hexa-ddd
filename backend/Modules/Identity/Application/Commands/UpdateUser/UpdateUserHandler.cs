@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Identity.Domain;
@@ -24,9 +25,13 @@ public sealed class UpdateUserHandler(ICurrentUserAccessor currentUserAccessor, 
             .Then(_ => Result.Success);
     }
 
-    private Task<ErrorOr<User>> GetCurrentUserAsync(CancellationToken cancellationToken) =>
-        Username.Create(currentUserAccessor.GetCurrentUsername())
+    private Task<ErrorOr<User>> GetCurrentUserAsync(CancellationToken cancellationToken)
+    {
+        var currentUsername = currentUserAccessor.GetCurrentUsername() ?? throw new UnauthorizedAccessException("No authenticated user.");
+
+        return Username.Create(currentUsername)
             .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
+    }
 
     private async Task<ErrorOr<User>> ApplyUsernameAsync(User user, Optional<string> username, CancellationToken cancellationToken)
     {

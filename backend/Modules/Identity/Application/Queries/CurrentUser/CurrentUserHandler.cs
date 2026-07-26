@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Shared.Application;
@@ -10,7 +11,9 @@ public sealed class CurrentUserHandler(ICurrentUserAccessor currentUserAccessor,
 {
     public async Task<ErrorOr<User>> Handle(CurrentUserQuery message, CancellationToken cancellationToken)
     {
-        return await usersReadRepository.GetByUsernameAsync(currentUserAccessor.GetCurrentUsername(), cancellationToken)
+        var currentUsername = currentUserAccessor.GetCurrentUsername() ?? throw new UnauthorizedAccessException("No authenticated user.");
+
+        return await usersReadRepository.GetByUsernameAsync(currentUsername, cancellationToken)
             .ThenDo(user => user.Token = tokenGenerator.CreateToken(user.Username));
     }
 }
