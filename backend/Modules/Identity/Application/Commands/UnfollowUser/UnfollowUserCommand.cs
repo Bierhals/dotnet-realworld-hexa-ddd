@@ -1,4 +1,3 @@
-using System;
 using Conduit.Shared.Application.Cqrs;
 
 namespace Conduit.Identity.Application.Commands.UnfollowUser;

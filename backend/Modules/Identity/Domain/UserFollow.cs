@@ -32,4 +32,9 @@ public sealed class UserFollow : AggregateRoot<UserFollowId>
         userFollow.AddDomainEvent(new UserFollowedDomainEvent(followedUserId.Value, followerUserId.Value));
         return userFollow;
     }
+
+    public void Unfollow()
+    {
+        AddDomainEvent(new UserUnfollowedDomainEvent(FollowedUserId.Value, FollowerUserId.Value));
+    }
 }
