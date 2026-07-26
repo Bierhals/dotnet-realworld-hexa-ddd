@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Identity.Domain;
@@ -6,6 +5,7 @@ using Conduit.Identity.Domain.Services;
 using Conduit.Identity.Domain.ValueObjects;
 using Conduit.Shared.Application;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.Optional;
 using ErrorOr;
 
 namespace Conduit.Identity.Application.Commands.UpdateUser;
@@ -14,47 +14,79 @@ public sealed class UpdateUserHandler(ICurrentUserAccessor currentUserAccessor, 
 {
     public async Task<ErrorOr<Success>> Handle(UpdateUserCommand message, CancellationToken cancellationToken)
     {
-        var currentUser = await Username.Create(currentUserAccessor.GetCurrentUsername())
-            .ThenAsync(async username => await usersRepository.GetByUsernameAsync(username, cancellationToken));
-        if (currentUser.IsError)
+        return await GetCurrentUserAsync(cancellationToken)
+            .ThenAsync(user => ApplyUsernameAsync(user, message.Username, cancellationToken))
+            .ThenAsync(user => ApplyEmailAsync(user, message.Email, cancellationToken))
+            .Then(user => ApplyPassword(user, message.Password))
+            .Then(user => ApplyBio(user, message.Bio))
+            .Then(user => ApplyImage(user, message.Image))
+            .ThenDoAsync(user => unitOfWork.SaveChangesAsync(cancellationToken))
+            .Then(_ => Result.Success);
+    }
+
+    private Task<ErrorOr<User>> GetCurrentUserAsync(CancellationToken cancellationToken) =>
+        Username.Create(currentUserAccessor.GetCurrentUsername())
+            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
+
+    private async Task<ErrorOr<User>> ApplyUsernameAsync(User user, Optional<string> username, CancellationToken cancellationToken)
+    {
+        if (!username.IsSpecified)
         {
-            return currentUser.Errors;
+            return user;
         }
 
-        if (message.Username is not null)
+        return await Username.Create(username.Value)
+            .ThenEnsureAsync(async newUsername => await uniqueUsernameValidator.IsUniqueAsync(newUsername, user.Id, cancellationToken).Then(_ => newUsername))
+            .Then(newUsername => user.ChangeUsername(newUsername).Then(_ => user));
+    }
+
+    private async Task<ErrorOr<User>> ApplyEmailAsync(User user, Optional<string> email, CancellationToken cancellationToken)
+    {
+        if (!email.IsSpecified)
         {
-            var username = await Username.Create(message.Username)
-                .ThenEnsureAsync(async username => await uniqueUsernameValidator.IsUniqueAsync(username, currentUser.Value.Id, cancellationToken).Then(_ => username));
-            if (username.IsError)
-            {
-                return username.Errors;
-            }
-            currentUser.ThenEnsure(user => user.ChangeUsername(username.Value).Then(_ => user));
+            return user;
         }
 
-        if (message.Email is not null)
+        return await UserEmail.Create(email.Value)
+            .ThenEnsureAsync(async newEmail => await uniqueEmailValidator.IsUniqueAsync(newEmail, user.Id, cancellationToken).Then(_ => newEmail))
+            .Then(newEmail => user.ChangeEmail(newEmail).Then(_ => user));
+    }
+
+    private ErrorOr<User> ApplyPassword(User user, Optional<string> password)
+    {
+        if (password.IsSpecified)
         {
-            var email = await UserEmail.Create(message.Email)
-                .ThenEnsureAsync(async email => await uniqueEmailValidator.IsUniqueAsync(email, currentUser.Value.Id, cancellationToken).Then(_ => email));
-            if (email.IsError)
-            {
-                return email.Errors;
-            }
-            currentUser.ThenEnsure(user => user.ChangeEmail(email.Value).Then(_ => user));
+            user.ChangePassword(passwordHasher.Hash(password.Value));
         }
 
-        if (message.Password is not null)
+        return user;
+    }
+
+    private static ErrorOr<User> ApplyBio(User user, Optional<string?> bio)
+    {
+        if (bio.IsSpecified)
         {
-            var hashedPassword = passwordHasher.Hash(message.Password);
-            currentUser.ThenEnsure(user => user.ChangePassword(hashedPassword).Then(_ => user));
+            user.ChangeBio(bio.Value);
         }
 
-        currentUser.ThenEnsure(user => user.ChangeProfile(message.Bio, message.Image).Then(_ => user));
+        return user;
+    }
 
-        if (currentUser.IsError)
+    private static ErrorOr<User> ApplyImage(User user, Optional<string?> image)
+    {
+        if (!image.IsSpecified)
         {
-            return currentUser.Errors;
-        }       
-        return Result.Success;
+            return user;
+        }
+
+        if (image.Value is null)
+        {
+            user.ChangeImage(null);
+            return user;
+        }
+
+        return UserImage.Create(image.Value)
+            .ThenDo(userImage => user.ChangeImage(userImage))
+            .Then(_ => user);
     }
 }

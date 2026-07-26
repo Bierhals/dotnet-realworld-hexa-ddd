@@ -67,10 +67,15 @@ public sealed class User : AggregateRoot<UserId>
         return Result.Success;
     }
 
-    public void ChangeProfile(UserImage? image, string? bio)
+    public void ChangeBio(string? bio)
+    {
+        Bio = string.IsNullOrWhiteSpace(bio) ? null : bio;
+        AddDomainEvent(new UserBioChangedDomainEvent(Username.Value, Bio));
+    }
+
+    public void ChangeImage(UserImage? image)
     {
         Image = image;
-        Bio = bio;
-        AddDomainEvent(new UserProfileChangedDomainEvent(Username.Value, Bio, Image?.Value));
+        AddDomainEvent(new UserImageChangedDomainEvent(Username.Value, Image?.Value));
     }
 }

@@ -29,12 +29,6 @@ dotnet build backend/Conduit.slnx --configuration Release
 # run all backend tests
 dotnet test backend/Conduit.slnx
 
-# run one test project
-dotnet test backend/Shared/Domain.UnitTests/Conduit.Shared.Domain.UnitTests.csproj
-
-# run one test by name (xUnit v3 on Microsoft.Testing.Platform runner)
-dotnet test backend/Shared/Domain.UnitTests/Conduit.Shared.Domain.UnitTests.csproj --filter "FullyQualifiedName~MethodName"
-
 # run the full stack via .NET Aspire (Postgres + API + Vue frontend + YARP gateway)
 dotnet run --project backend/Host/AppHost/Conduit.Host.AppHost.csproj
 
