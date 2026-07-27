@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Conduit.Identity.Domain;
 using Conduit.Identity.Domain.Services;
 using Conduit.Identity.Domain.ValueObjects;
-using Conduit.Shared.Application;
 using Conduit.Shared.Application.Cqrs;
 using ErrorOr;
 

@@ -1,7 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Domain/Conduit.Identity.Domain.csproj" />
+    <ProjectReference Include="../Application/Conduit.Identity.Application.csproj" />
+    <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
+    <ProjectReference Include="../../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
