@@ -9,13 +9,13 @@ using ErrorOr;
 
 namespace Conduit.Identity.Application.Commands.AuthenticateUser;
 
-public sealed class AuthenticateUserHandler(IUsersRepository usersRepository, UserLoginValidator loginValidator) : ICommandHandler<AuthenticateUserCommand, Guid>
+public sealed class AuthenticateUserHandler(IUsersRepository usersRepository, UserLoginValidator loginValidator) : ICommandHandler<AuthenticateUserCommand, string>
 {
-    public async Task<ErrorOr<Guid>> Handle(AuthenticateUserCommand message, CancellationToken cancellationToken)
+    public async Task<ErrorOr<string>> Handle(AuthenticateUserCommand message, CancellationToken cancellationToken)
     {
         return await UserEmail.Create(message.Email)
             .ThenAsync(async email => await usersRepository.GetByEmailAsync(email, cancellationToken))
             .ThenEnsure(user => loginValidator.Validate(user, message.Password).Then(_ => user))
-            .Then(user => user.Id.Value);
+            .Then(user => user.Username.Value);
     }
 }

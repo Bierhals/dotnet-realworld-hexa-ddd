@@ -3,7 +3,7 @@ using Conduit.Shared.Application.Cqrs;
 
 namespace Conduit.Identity.Application.Commands.AuthenticateUser;
 
-public sealed record AuthenticateUserCommand() : ICommand<Guid>
+public sealed record AuthenticateUserCommand() : ICommand<string>
 {
     public required string Email { get; init; }
 
