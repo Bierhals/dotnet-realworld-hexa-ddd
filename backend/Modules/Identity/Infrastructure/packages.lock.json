@@ -136,8 +136,8 @@
         "dependencies": {
           "Conduit.Shared.Application": "[1.0.0, )",
           "Conduit.Shared.Domain": "[1.0.0, )",
-          "Microsoft.EntityFrameworkCore": "[10.0.10, )",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
+          "ErrorOr": "[2.1.1, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )"
         }
       },
       "ErrorOr": {
