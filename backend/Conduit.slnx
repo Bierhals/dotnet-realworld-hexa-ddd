@@ -8,6 +8,7 @@
 
   <Folder Name="/Modules/">
     <Folder Name="/Modules/Identity/">
+      <Project Path="Modules/Identity/Application.UnitTests/Conduit.Identity.Application.UnitTests.csproj" />
       <Project Path="Modules/Identity/Domain.UnitTests/Conduit.Identity.Domain.UnitTests.csproj" />
       <Project Path="Modules/Identity/Api/Conduit.Identity.Api.csproj" />
       <Project Path="Modules/Identity/Application/Conduit.Identity.Application.csproj" />
