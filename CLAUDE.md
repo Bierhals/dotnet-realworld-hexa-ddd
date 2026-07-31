@@ -26,8 +26,9 @@ dotnet format backend/Conduit.slnx --verify-no-changes
 # build
 dotnet build backend/Conduit.slnx --configuration Release
 
-# run all backend tests
-dotnet test backend/Conduit.slnx
+# run all backend tests (Microsoft.Testing.Platform runner, opted in via backend/global.json —
+# must run from inside backend/ so that global.json is discovered, and pass the solution via --solution)
+cd backend && dotnet test --solution Conduit.slnx
 
 # run the full stack via .NET Aspire (Postgres + API + Vue frontend + YARP gateway)
 dotnet run --project backend/Host/AppHost/Conduit.Host.AppHost.csproj
