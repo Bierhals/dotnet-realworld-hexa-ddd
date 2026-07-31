@@ -6,6 +6,7 @@ using Conduit.Host.WebApi.Features.Articles;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Favorites;
@@ -14,8 +15,11 @@ public class Delete
 {
     public record Command([Required] string Slug) : ICommand<ArticleEnvelope>;
 
-    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : ICommandHandler<Command, ArticleEnvelope>
+    public class Handler(
+        ConduitContext context,
+        ICurrentUserAccessor currentUserAccessor,
+        IProfileQueryService profileQueryService
+    ) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,
@@ -32,20 +36,10 @@ public class Delete
                     new { Article = Constants.NOT_FOUND }
                 );
 
-            var person = await context.Persons.FirstOrDefaultAsync(
-                x => x.Username == currentUserAccessor.GetCurrentUsername(),
-                cancellationToken
-            );
-            if (person is null)
-            {
-                throw new RestException(
-                    HttpStatusCode.NotFound,
-                    new { Article = Constants.NOT_FOUND }
-                );
-            }
+            var username = currentUserAccessor.GetCurrentUsername()!;
 
             var favorite = await context.ArticleFavorites.FirstOrDefaultAsync(
-                x => x.ArticleId == article.ArticleId && x.PersonId == person.PersonId,
+                x => x.ArticleId == article.ArticleId && x.Username == username,
                 cancellationToken
             );
 
@@ -65,6 +59,12 @@ public class Delete
                     new { Article = Constants.NOT_FOUND }
                 );
             }
+
+            await new[] { article }.EnrichAuthorsAsync(
+                profileQueryService,
+                username,
+                cancellationToken
+            );
 
             return new ArticleEnvelope(article);
         }

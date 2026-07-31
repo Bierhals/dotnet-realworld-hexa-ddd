@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Conduit.Host.WebApi.Domain;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Articles;
@@ -26,18 +27,18 @@ public class Create
 
     public record Command([Required] ArticleData Article) : ICommand<ArticleEnvelope>;
 
-    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : ICommandHandler<Command, ArticleEnvelope>
+    public class Handler(
+        ConduitContext context,
+        ICurrentUserAccessor currentUserAccessor,
+        IProfileQueryService profileQueryService
+    ) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,
             CancellationToken cancellationToken
         )
         {
-            var author = await context.Persons.FirstAsync(
-                x => x.Username == currentUserAccessor.GetCurrentUsername(),
-                cancellationToken
-            );
+            var authorUsername = currentUserAccessor.GetCurrentUsername()!;
             var tags = new List<Tag>();
             foreach (var tag in (message.Article.TagList ?? Enumerable.Empty<string>()))
             {
@@ -54,7 +55,7 @@ public class Create
 
             var article = new Article
             {
-                Author = author,
+                AuthorUsername = authorUsername,
                 Body = message.Article.Body,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -70,6 +71,12 @@ public class Create
             );
 
             await context.SaveChangesAsync(cancellationToken);
+
+            await new[] { article }.EnrichAuthorsAsync(
+                profileQueryService,
+                authorUsername,
+                cancellationToken
+            );
 
             return new ArticleEnvelope(article);
         }

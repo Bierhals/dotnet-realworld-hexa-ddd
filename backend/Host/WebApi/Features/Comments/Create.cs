@@ -7,6 +7,7 @@ using Conduit.Host.WebApi.Domain;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Comments;
@@ -19,8 +20,11 @@ public class Create
 
     public record Model([Required] CommentData Comment);
 
-    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : ICommandHandler<Command, CommentEnvelope>
+    public class Handler(
+        ConduitContext context,
+        ICurrentUserAccessor currentUserAccessor,
+        IProfileQueryService profileQueryService
+    ) : ICommandHandler<Command, CommentEnvelope>
     {
         public async Task<CommentEnvelope> Handle(
             Command message,
@@ -39,14 +43,11 @@ public class Create
                 );
             }
 
-            var author = await context.Persons.FirstAsync(
-                x => x.Username == currentUserAccessor.GetCurrentUsername(),
-                cancellationToken
-            );
+            var authorUsername = currentUserAccessor.GetCurrentUsername()!;
 
             var comment = new Comment
             {
-                Author = author,
+                AuthorUsername = authorUsername,
                 Body = message.Model.Comment.Body ?? string.Empty,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
@@ -56,6 +57,12 @@ public class Create
             article.Comments.Add(comment);
 
             await context.SaveChangesAsync(cancellationToken);
+
+            await new[] { comment }.EnrichAuthorsAsync(
+                profileQueryService,
+                authorUsername,
+                cancellationToken
+            );
 
             return new CommentEnvelope(comment);
         }

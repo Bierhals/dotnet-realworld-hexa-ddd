@@ -1,10 +1,9 @@
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi.Infrastructure;
-using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Articles;
@@ -20,35 +19,27 @@ public class List
         bool IsFeed = false
     ) : IQuery<ArticlesEnvelope>;
 
-    public class Handler(ConduitContext context, ICurrentUserAccessor currentUserAccessor)
-        : IQueryHandler<Query, ArticlesEnvelope>
+    public class Handler(
+        ConduitContext context,
+        ICurrentUserAccessor currentUserAccessor,
+        IProfileQueryService profileQueryService
+    ) : IQueryHandler<Query, ArticlesEnvelope>
     {
         public async Task<ArticlesEnvelope> Handle(
             Query message,
             CancellationToken cancellationToken
         )
         {
+            var currentUsername = currentUserAccessor.GetCurrentUsername();
             var queryable = context.Articles.GetAllData();
 
-            if (message.IsFeed && currentUserAccessor.GetCurrentUsername() != null)
+            if (message.IsFeed && currentUsername != null)
             {
-                var currentUser = await context
-                    .Persons.Include(x => x.Following)
-                    .FirstOrDefaultAsync(
-                        x => x.Username == currentUserAccessor.GetCurrentUsername(),
-                        cancellationToken
-                    );
-
-                if (currentUser is null)
-                {
-                    throw new RestException(
-                        HttpStatusCode.NotFound,
-                        new { User = Constants.NOT_FOUND }
-                    );
-                }
-                queryable = queryable.Where(x =>
-                    currentUser.Following.Select(y => y.TargetId).Contains(x.Author!.PersonId)
+                var followedUsernames = await profileQueryService.GetFollowedUsernamesAsync(
+                    currentUsername,
+                    cancellationToken
                 );
+                queryable = queryable.Where(x => followedUsernames.Contains(x.AuthorUsername));
             }
 
             if (!string.IsNullOrWhiteSpace(message.Tag))
@@ -71,36 +62,14 @@ public class List
 
             if (!string.IsNullOrWhiteSpace(message.Author))
             {
-                var author = await context.Persons.FirstOrDefaultAsync(
-                    x => x.Username == message.Author,
-                    cancellationToken
-                );
-                if (author != null)
-                {
-                    queryable = queryable.Where(x => x.Author == author);
-                }
-                else
-                {
-                    return new ArticlesEnvelope();
-                }
+                queryable = queryable.Where(x => x.AuthorUsername == message.Author);
             }
 
             if (!string.IsNullOrWhiteSpace(message.FavoritedUsername))
             {
-                var author = await context.Persons.FirstOrDefaultAsync(
-                    x => x.Username == message.FavoritedUsername,
-                    cancellationToken
+                queryable = queryable.Where(x =>
+                    x.ArticleFavorites.Any(y => y.Username == message.FavoritedUsername)
                 );
-                if (author != null)
-                {
-                    queryable = queryable.Where(x =>
-                        x.ArticleFavorites.Any(y => y.PersonId == author.PersonId)
-                    );
-                }
-                else
-                {
-                    return new ArticlesEnvelope();
-                }
             }
 
             var articles = await queryable
@@ -109,6 +78,12 @@ public class List
                 .Take(message.Limit ?? 20)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
+
+            await articles.EnrichAuthorsAsync(
+                profileQueryService,
+                currentUsername,
+                cancellationToken
+            );
 
             return new ArticlesEnvelope { Articles = articles, ArticlesCount = queryable.Count() };
         }

@@ -13,9 +13,21 @@ public sealed class AuthenticateUserHandler(IUsersRepository usersRepository, Us
 {
     public async Task<ErrorOr<string>> Handle(AuthenticateUserCommand message, CancellationToken cancellationToken)
     {
-        return await UserEmail.Create(message.Email)
-            .ThenAsync(async email => await usersRepository.GetByEmailAsync(email, cancellationToken))
-            .ThenEnsure(user => loginValidator.Validate(user, message.Password).Then(_ => user))
-            .Then(user => user.Username.Value);
+        var emailResult = UserEmail.Create(message.Email);
+        if (emailResult.IsError)
+        {
+            return emailResult.Errors;
+        }
+
+        var userResult = await usersRepository.GetByEmailAsync(emailResult.Value, cancellationToken);
+        if (userResult.IsError)
+        {
+            // Do not distinguish "no user for this email" from "wrong password" — both must look
+            // like invalid credentials to the caller, otherwise login becomes a user-enumeration oracle.
+            return Error.Unauthorized("User.InvalidCredentials", "The provided credentials are invalid.");
+        }
+
+        return loginValidator.Validate(userResult.Value, message.Password)
+            .Then(_ => userResult.Value.Username.Value);
     }
 }

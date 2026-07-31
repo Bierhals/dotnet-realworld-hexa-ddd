@@ -19,7 +19,11 @@ public class Article
 
     public string? Body { get; set; }
 
-    public Person? Author { get; init; }
+    [JsonIgnore]
+    public string AuthorUsername { get; set; } = null!;
+
+    [NotMapped]
+    public AuthorProfile? Author { get; set; }
 
     public List<Comment> Comments { get; init; } = new();
 

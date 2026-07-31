@@ -14,9 +14,9 @@ public sealed class User : AggregateRoot<UserId>
     public UserImage? Image { get; private set; }
     public string PasswordHash { get; private set; }
 
-    #pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Fügen Sie ggf. den „erforderlichen“ Modifizierer hinzu, oder deklarieren Sie den Modifizierer als NULL-Werte zulassend.
+#pragma warning disable CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Fügen Sie ggf. den „erforderlichen“ Modifizierer hinzu, oder deklarieren Sie den Modifizierer als NULL-Werte zulassend.
     private User() { } // für EF Core
-    #pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Fügen Sie ggf. den „erforderlichen“ Modifizierer hinzu, oder deklarieren Sie den Modifizierer als NULL-Werte zulassend.
+#pragma warning restore CS8618 // Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Fügen Sie ggf. den „erforderlichen“ Modifizierer hinzu, oder deklarieren Sie den Modifizierer als NULL-Werte zulassend.
 
     private User(UserId id, UserEmail userEmail, Username username, string hashedPassword, string? bio, UserImage? image) : base(id)
     {
@@ -26,7 +26,7 @@ public sealed class User : AggregateRoot<UserId>
         Bio = bio;
         Image = image;
     }
-    
+
     public static User RegisterNewUser(UserEmail email, Username username, string hashedPassword)
     {
         var user = new User(UserId.New(), email, username, hashedPassword, null, null);

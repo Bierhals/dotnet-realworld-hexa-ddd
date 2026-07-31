@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Conduit.Host.WebApi.Domain;
@@ -10,10 +11,11 @@ public class Comment
 
     public string? Body { get; init; }
 
-    public Person? Author { get; init; }
-
     [JsonIgnore]
-    public int AuthorId { get; init; }
+    public string AuthorUsername { get; set; } = null!;
+
+    [NotMapped]
+    public AuthorProfile? Author { get; set; }
 
     [JsonIgnore]
     public Article? Article { get; init; }

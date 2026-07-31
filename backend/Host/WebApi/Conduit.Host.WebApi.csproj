@@ -11,6 +11,7 @@
     <ProjectReference Include="../ServiceDefaults/Conduit.Host.ServiceDefaults.csproj" />
     <ProjectReference Include="../../Modules/Identity/Api/Conduit.Identity.Api.csproj" />
     <ProjectReference Include="../../Modules/Identity/Application/Conduit.Identity.Application.csproj" />
+    <ProjectReference Include="../../Modules/Identity/Contracts/Conduit.Identity.Contracts.csproj" />
     <ProjectReference Include="../../Modules/Identity/Infrastructure/Conduit.Identity.Infrastructure.csproj" />
     <ProjectReference Include="../../Shared/Application/Conduit.Shared.Application.csproj" />
     <ProjectReference Include="../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />

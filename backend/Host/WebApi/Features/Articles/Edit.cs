@@ -9,6 +9,7 @@ using Conduit.Host.WebApi.Domain;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Articles;
@@ -21,7 +22,11 @@ public class Edit
 
     public record Model([property: Required] ArticleData Article);
 
-    public class Handler(ConduitContext context) : ICommandHandler<Command, ArticleEnvelope>
+    public class Handler(
+        ConduitContext context,
+        ICurrentUserAccessor currentUserAccessor,
+        IProfileQueryService profileQueryService
+    ) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
             Command message,
@@ -86,6 +91,12 @@ public class Edit
                     new { Article = Constants.NOT_FOUND }
                 );
             }
+
+            await new[] { article }.EnrichAuthorsAsync(
+                profileQueryService,
+                currentUserAccessor.GetCurrentUsername(),
+                cancellationToken
+            );
 
             return new ArticleEnvelope(article);
         }

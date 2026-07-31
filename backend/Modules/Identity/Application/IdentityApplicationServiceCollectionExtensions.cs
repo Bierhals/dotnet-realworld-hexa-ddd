@@ -5,6 +5,7 @@ using Conduit.Identity.Application.Commands.UnfollowUser;
 using Conduit.Identity.Application.Commands.UpdateUser;
 using Conduit.Identity.Application.Queries.CurrentUser;
 using Conduit.Identity.Application.Queries.Profile;
+using Conduit.Identity.Contracts.Queries;
 using Conduit.Identity.Domain.Services;
 using Conduit.Shared.Application.Cqrs;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ public static class IdentityApplicationServiceCollectionExtensions
 
         services.AddScoped<IQueryHandler<CurrentUserQuery, User>, CurrentUserHandler>();
         services.AddScoped<IQueryHandler<ProfileQuery, Profile>, ProfileHandler>();
+        services.AddScoped<IProfileQueryService, ProfileQueryService>();
 
         services.AddScoped<UniqueUserEmailValidator>();
         services.AddScoped<UniqueUsernameValidator>();

@@ -8,6 +8,9 @@
         "resolved": "10.0.10",
         "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
+      "conduit.identity.contracts": {
+        "type": "Project"
+      },
       "conduit.identity.domain": {
         "type": "Project",
         "dependencies": {

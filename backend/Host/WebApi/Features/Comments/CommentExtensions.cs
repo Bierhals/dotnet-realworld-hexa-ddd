@@ -4,33 +4,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi.Domain;
 using Conduit.Identity.Contracts.Queries;
-using Microsoft.EntityFrameworkCore;
 
-namespace Conduit.Host.WebApi.Features.Articles;
+namespace Conduit.Host.WebApi.Features.Comments;
 
-public static class ArticleExtensions
+public static class CommentExtensions
 {
-    public static IQueryable<Article> GetAllData(this DbSet<Article> articles) =>
-        articles.Include(x => x.ArticleFavorites).Include(x => x.ArticleTags).AsNoTracking();
-
     public static async Task EnrichAuthorsAsync(
-        this IEnumerable<Article> articles,
+        this IEnumerable<Comment> comments,
         IProfileQueryService profileQueryService,
         string? viewerUsername,
         CancellationToken cancellationToken
     )
     {
-        var articleList = articles as IReadOnlyCollection<Article> ?? [.. articles];
-        var usernames = articleList.Select(x => x.AuthorUsername).Distinct().ToList();
+        var commentList = comments as IReadOnlyCollection<Comment> ?? [.. comments];
+        var usernames = commentList.Select(x => x.AuthorUsername).Distinct().ToList();
         var profiles = await profileQueryService.GetProfilesAsync(
             usernames,
             viewerUsername,
             cancellationToken
         );
 
-        foreach (var article in articleList)
+        foreach (var comment in commentList)
         {
-            article.Author = profiles.TryGetValue(article.AuthorUsername, out var profile)
+            comment.Author = profiles.TryGetValue(comment.AuthorUsername, out var profile)
                 ? new AuthorProfile
                 {
                     Username = profile.Username,
@@ -38,7 +34,7 @@ public static class ArticleExtensions
                     Image = profile.Image,
                     Following = profile.Following,
                 }
-                : new AuthorProfile { Username = article.AuthorUsername };
+                : new AuthorProfile { Username = comment.AuthorUsername };
         }
     }
 }

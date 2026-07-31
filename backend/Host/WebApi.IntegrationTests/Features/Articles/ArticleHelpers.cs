@@ -22,16 +22,16 @@ public static class ArticleHelpers
     )
     {
         // first create the default user
-        var user = await UserHelpers.CreateDefaultUser(fixture);
-        if (user.Username is null)
-        {
-            throw new RestException(HttpStatusCode.BadRequest);
-        }
+        var username = await UserHelpers.CreateDefaultUser(fixture);
 
         var dbContext = fixture.GetDbContext();
-        var currentAccessor = new StubCurrentUserAccessor(user.Username);
+        var currentAccessor = new StubCurrentUserAccessor(username);
 
-        var articleCreateHandler = new Create.Handler(dbContext, currentAccessor);
+        var articleCreateHandler = new Create.Handler(
+            dbContext,
+            currentAccessor,
+            fixture.ProfileQueryService
+        );
         var created = await articleCreateHandler.Handle(
             command,
             new System.Threading.CancellationToken()

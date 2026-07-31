@@ -17,6 +17,6 @@ public sealed class UserLoginValidator
 
         return isValid
             ? Result.Success
-            : Error.Validation("User.InvalidCredentials", "The provided credentials are invalid.");
+            : Error.Unauthorized("User.InvalidCredentials", "The provided credentials are invalid.");
     }
 }

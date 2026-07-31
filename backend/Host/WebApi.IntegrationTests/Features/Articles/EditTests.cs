@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi.Features.Articles;
+using Conduit.Host.WebApi.IntegrationTests.Features.Users;
 using Xunit;
 
 namespace Conduit.Host.WebApi.IntegrationTests.Features.Articles;
@@ -37,7 +38,8 @@ public class EditTests : SliceFixture
 
         var dbContext = GetDbContext();
 
-        var articleEditHandler = new Edit.Handler(dbContext);
+        var currentAccessor = new StubCurrentUserAccessor(UserHelpers.DefaultUserName);
+        var articleEditHandler = new Edit.Handler(dbContext, currentAccessor, ProfileQueryService);
         var edited = await articleEditHandler.Handle(
             command,
             new System.Threading.CancellationToken()

@@ -26,20 +26,17 @@ public static class CommentHelpers
     {
         if (string.IsNullOrWhiteSpace(userName))
         {
-            var user = await UserHelpers.CreateDefaultUser(fixture);
-
-            if (user.Username is null)
-            {
-                throw new RestException(HttpStatusCode.BadRequest);
-            }
-
-            userName = user.Username;
+            userName = await UserHelpers.CreateDefaultUser(fixture);
         }
 
         var dbContext = fixture.GetDbContext();
         var currentAccessor = new StubCurrentUserAccessor(userName);
 
-        var commentCreateHandler = new Create.Handler(dbContext, currentAccessor);
+        var commentCreateHandler = new Create.Handler(
+            dbContext,
+            currentAccessor,
+            fixture.ProfileQueryService
+        );
         var created = await commentCreateHandler.Handle(
             command,
             new System.Threading.CancellationToken()
@@ -47,7 +44,6 @@ public static class CommentHelpers
 
         var dbArticleWithComments = await fixture.ExecuteDbContextAsync(db =>
             db.Articles.Include(a => a.Comments)
-                .Include(a => a.Author)
                 .Where(a => a.Slug == command.Slug)
                 .SingleOrDefaultAsync()
         );
@@ -58,8 +54,7 @@ public static class CommentHelpers
         }
 
         var dbComment = dbArticleWithComments.Comments.FirstOrDefault(c =>
-            c.ArticleId == dbArticleWithComments.ArticleId
-            && c.Author == dbArticleWithComments.Author
+            c.ArticleId == dbArticleWithComments.ArticleId && c.AuthorUsername == userName
         );
 
         if (dbComment is null)

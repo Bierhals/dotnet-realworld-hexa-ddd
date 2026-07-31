@@ -4,6 +4,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
+    <ProjectReference Include="../Contracts/Conduit.Identity.Contracts.csproj" />
     <ProjectReference Include="../Domain/Conduit.Identity.Domain.csproj" />
   </ItemGroup>
 </Project>

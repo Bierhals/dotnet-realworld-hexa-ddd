@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Contracts.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,12 +16,15 @@ public class SliceFixture : IDisposable
     private readonly ServiceProvider _provider;
     private readonly string _dbName = Guid.NewGuid() + ".db";
 
+    public FakeProfileQueryService ProfileQueryService { get; } = new();
+
     public SliceFixture()
     {
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddConduit();
         services.AddJwt();
+        services.AddSingleton<IProfileQueryService>(ProfileQueryService);
 
         var builder = new DbContextOptionsBuilder<ConduitContext>();
         builder.UseInMemoryDatabase(_dbName);

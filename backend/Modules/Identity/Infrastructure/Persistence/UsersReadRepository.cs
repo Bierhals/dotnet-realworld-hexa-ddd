@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,5 +56,38 @@ public sealed class UsersReadRepository(IdentityDbContext dbContext) : IUsersRea
         }
 
         return profile;
+    }
+
+    public async Task<IReadOnlyCollection<Profile>> GetProfilesAsync(IReadOnlyCollection<string> usernames, string? currentUsername, CancellationToken ct = default)
+    {
+        var usernameVos = usernames.Select(Username.Rehydrate).ToList();
+        var currentUsernameVo = currentUsername is not null ? Username.Rehydrate(currentUsername) : null;
+
+        return await dbContext.Users.AsNoTracking()
+            .Where(u => usernameVos.Contains(u.Username))
+            .Select(u => new Profile
+            {
+                Username = u.Username.Value,
+                Bio = u.Bio,
+                Image = u.Image != null ? u.Image.Value : null,
+                Following = currentUsernameVo != null && dbContext.UserFollows.Any(f =>
+                    f.FollowedUserId == u.Id &&
+                    dbContext.Users.Any(cu => cu.Id == f.FollowerUserId && cu.Username == currentUsernameVo)),
+            })
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<string>> GetFollowedUsernamesAsync(string followerUsername, CancellationToken ct = default)
+    {
+        var followerUsernameVo = Username.Rehydrate(followerUsername);
+
+        return await dbContext.UserFollows.AsNoTracking()
+            .Where(f => dbContext.Users.Any(u => u.Id == f.FollowerUserId && u.Username == followerUsernameVo))
+            .Join(
+                dbContext.Users.AsNoTracking(),
+                f => f.FollowedUserId,
+                u => u.Id,
+                (f, u) => u.Username.Value)
+            .ToListAsync(ct);
     }
 }

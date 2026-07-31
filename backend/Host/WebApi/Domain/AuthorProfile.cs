@@ -1,6 +1,6 @@
-namespace Conduit.Identity.Application.Queries.Profile;
+namespace Conduit.Host.WebApi.Domain;
 
-public sealed record Profile
+public class AuthorProfile
 {
     public required string Username { get; init; }
 
@@ -8,5 +8,5 @@ public sealed record Profile
 
     public string? Image { get; init; }
 
-    public required bool Following { get; set; }
+    public bool Following { get; init; }
 }
