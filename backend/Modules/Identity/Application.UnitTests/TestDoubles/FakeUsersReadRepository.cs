@@ -38,19 +38,17 @@ internal sealed class FakeUsersReadRepository : IUsersReadRepository
 
     public Task<IReadOnlyCollection<Profile>> GetProfilesAsync(IReadOnlyCollection<string> usernames, string? currentUsername, CancellationToken ct = default)
     {
-        IReadOnlyCollection<Profile> profiles = _users
+        IReadOnlyCollection<Profile> profiles = [.. _users
             .Where(u => usernames.Contains(u.Username))
-            .Select(u => ToProfile(u, currentUsername is not null && _follows.Contains((currentUsername, u.Username))))
-            .ToList();
+            .Select(u => ToProfile(u, currentUsername is not null && _follows.Contains((currentUsername, u.Username))))];
         return Task.FromResult(profiles);
     }
 
     public Task<IReadOnlyCollection<string>> GetFollowedUsernamesAsync(string followerUsername, CancellationToken ct = default)
     {
-        IReadOnlyCollection<string> followed = _follows
+        IReadOnlyCollection<string> followed = [.. _follows
             .Where(f => f.Follower == followerUsername)
-            .Select(f => f.Followed)
-            .ToList();
+            .Select(f => f.Followed)];
         return Task.FromResult(followed);
     }
 
