@@ -5,7 +5,7 @@
       "label": "Start Backend",
       "type": "shell",
       "command": "dotnet",
-      "args": ["run", "--project", "backend/Conduit/Conduit.csproj"],
+      "args": ["run", "--project", "backend/Conduit.Host/Conduit.Host.csproj"],
       "isBackground": true,
       "problemMatcher": {
         "owner": "dotnet",

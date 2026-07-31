@@ -1,16 +1,26 @@
-﻿<Solution>
-  <Folder Name="/config/">
-    <File Path="Directory.Packages.props" />
-    <File Path="Directory.Build.props" />
-    <File Path=".editorconfig" />
-    <File Path="../.gitignore" />
+<Solution>
+  <Folder Name="/Host/">
+    <Project Path="Host\AppHost\Conduit.Host.AppHost.csproj" />
+    <Project Path="Host\ServiceDefaults\Conduit.Host.ServiceDefaults.csproj" />
+    <Project Path="Host\WebApi\Conduit.Host.WebApi.csproj" />
+    <Project Path="Host\WebApi.IntegrationTests\Conduit.Host.WebApi.IntegrationTests.csproj" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="Conduit\Conduit.csproj" Type="Classic C#" />
-    <Project Path="Conduit.AppHost\Conduit.AppHost.csproj" Type="Classic C#" />
-    <Project Path="Conduit.ServiceDefaults\Conduit.ServiceDefaults.csproj" Type="Classic C#" />
+
+  <Folder Name="/Modules/Identity/">
+    <Project Path="Modules/Identity/Application.UnitTests/Conduit.Identity.Application.UnitTests.csproj" />
+    <Project Path="Modules/Identity/Domain.UnitTests/Conduit.Identity.Domain.UnitTests.csproj" />
+    <Project Path="Modules/Identity/Api/Conduit.Identity.Api.csproj" />
+    <Project Path="Modules/Identity/Application/Conduit.Identity.Application.csproj" />
+    <Project Path="Modules/Identity/Contracts/Conduit.Identity.Contracts.csproj" />
+    <Project Path="Modules/Identity/Domain/Conduit.Identity.Domain.csproj" />
+    <Project Path="Modules/Identity/Infrastructure/Conduit.Identity.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests\Conduit.IntegrationTests\Conduit.IntegrationTests.csproj" Type="Classic C#" />
+
+  <Folder Name="/Shared/">
+    <Project Path="Shared/Application/Conduit.Shared.Application.csproj" />
+    <Project Path="Shared/Application.UnitTests/Conduit.Shared.Application.UnitTests.csproj" />
+    <Project Path="Shared/Domain/Conduit.Shared.Domain.csproj" />
+    <Project Path="Shared/Domain.UnitTests/Conduit.Shared.Domain.UnitTests.csproj" />
+    <Project Path="Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
   </Folder>
 </Solution>
