@@ -673,11 +673,73 @@
         "dependencies": {
           "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.4.6, )",
           "Conduit.Host.ServiceDefaults": "[1.0.0, )",
+          "Conduit.Identity.Api": "[1.0.0, )",
+          "Conduit.Identity.Application": "[1.0.0, )",
+          "Conduit.Identity.Infrastructure": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.10, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.10, )",
           "Microsoft.EntityFrameworkCore.InMemory": "[10.0.10, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.10, )",
           "Scalar.AspNetCore": "[2.14.14, )"
+        }
+      },
+      "conduit.identity.api": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Application": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.identity.application": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Domain": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
+        }
+      },
+      "conduit.identity.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Domain": "[1.0.0, )"
+        }
+      },
+      "conduit.identity.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Application": "[1.0.0, )",
+          "Conduit.Identity.Domain": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
+        }
+      },
+      "conduit.shared.application": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Domain": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
+        }
+      },
+      "conduit.shared.domain": {
+        "type": "Project",
+        "dependencies": {
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.shared.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Domain": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )"
         }
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
@@ -702,6 +764,12 @@
           "Npgsql.OpenTelemetry": "10.0.2",
           "OpenTelemetry.Extensions.Hosting": "1.15.3"
         }
+      },
+      "ErrorOr": {
+        "type": "CentralTransitive",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "Y/AhvEZ5DjSi993Db1VrnYpK8YpM4o+tonF4f+AtXDzrIHYvbjWJD7fpip+ugSwW8kMw+XXEnMlJM7E0BKJBWA=="
       },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "CentralTransitive",

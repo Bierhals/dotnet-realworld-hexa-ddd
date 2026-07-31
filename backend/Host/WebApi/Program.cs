@@ -1,22 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi;
 using Conduit.Host.WebApi.Features.Articles;
 using Conduit.Host.WebApi.Features.Comments;
 using Conduit.Host.WebApi.Features.Favorites;
-using Conduit.Host.WebApi.Features.Followers;
-using Conduit.Host.WebApi.Features.Profiles;
 using Conduit.Host.WebApi.Features.Tags;
-using Conduit.Host.WebApi.Features.Users;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
+using Conduit.Identity.Api;
+using Conduit.Identity.Infrastructure;
+using Conduit.Identity.Infrastructure.Persistence;
+using Conduit.Shared.Application.Optional;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
@@ -42,10 +47,13 @@ if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison
     {
         options.UseSqlite(connectionString);
     });
+    builder.Services.AddIdentityModule(options => options.UseSqlite(connectionString));
 }
 else if (databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal))
 {
     builder.AddNpgsqlDbContext<ConduitContext>(connectionName: "conduit-db");
+    builder.Services.AddIdentityModule(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
 }
 else
 {
@@ -58,13 +66,15 @@ builder.Services.AddLocalization(x => x.ResourcesPath = "Resources");
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureHttpJsonOptions(opt =>
+{
     opt.SerializerOptions.DefaultIgnoreCondition = System
         .Text
         .Json
         .Serialization
         .JsonIgnoreCondition
-        .WhenWritingNull
-);
+        .WhenWritingNull;
+    opt.SerializerOptions.Converters.Add(new OptionalJsonConverterFactory());
+});
 
 builder.Services.AddOpenApi(options =>
 {
@@ -164,10 +174,8 @@ app.UseAuthorization();
 app.MapArticlesEndpoints();
 app.MapCommentsEndpoints();
 app.MapFavoritesEndpoints();
-app.MapFollowersEndpoints();
-app.MapProfilesEndpoints();
 app.MapTagsEndpoints();
-app.MapUsersEndpoints();
+app.MapIdentityEndpoints();
 
 // Enable middleware to serve generated OpenAPI as a JSON endpoint
 app.MapOpenApi("openapi/{documentName}.json");
@@ -180,9 +188,23 @@ app.MapScalarApiReference(
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope
-        .ServiceProvider.GetRequiredService<ConduitContext>()
-        .Database.EnsureCreated();
-    // use context
+    // ConduitContext and IdentityDbContext can share one physical database. EnsureCreated()
+    // and IRelationalDatabaseCreator.HasTables() only check whether *any* table exists in that
+    // database, not whether this context's own tables do, so they can't reliably decide whether
+    // Identity's tables still need to be created. Create them directly instead, and treat
+    // "already exists" as success (they were created by a previous run of this same host).
+    scope.ServiceProvider.GetRequiredService<ConduitContext>().Database.EnsureCreated();
+
+    var identityDatabaseCreator = scope
+        .ServiceProvider.GetRequiredService<IdentityDbContext>()
+        .GetService<IRelationalDatabaseCreator>();
+    try
+    {
+        identityDatabaseCreator.CreateTables();
+    }
+    catch (DbException)
+    {
+        // Identity's tables already exist from a previous run.
+    }
 }
 app.Run();

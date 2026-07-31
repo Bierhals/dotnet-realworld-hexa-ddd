@@ -1,11 +1,12 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Conduit.Identity.Application;
 using Microsoft.Extensions.Options;
 
 namespace Conduit.Host.WebApi.Infrastructure.Security;
 
-public class JwtTokenGenerator(IOptions<JwtIssuerOptions> jwtOptions) : IJwtTokenGenerator
+public class JwtTokenGenerator(IOptions<JwtIssuerOptions> jwtOptions) : ITokenGenerator
 {
     private readonly JwtIssuerOptions _jwtOptions = jwtOptions.Value;
 

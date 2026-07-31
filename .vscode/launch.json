@@ -8,7 +8,7 @@
             "name": "C#: Conduit-API Debug",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/backend/Conduit.Host/Conduit.Host.csproj"
+            "projectPath": "${workspaceFolder}/backend/Host/WebApi/Conduit.Host.WebApi.csproj"
         },
         {
             "name": "Attach: Conduit API",

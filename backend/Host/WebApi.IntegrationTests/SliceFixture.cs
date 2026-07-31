@@ -22,7 +22,7 @@ public class SliceFixture : IDisposable
         services.AddConduit();
         services.AddJwt();
 
-        var builder = new DbContextOptionsBuilder();
+        var builder = new DbContextOptionsBuilder<ConduitContext>();
         builder.UseInMemoryDatabase(_dbName);
         services.AddSingleton(new ConduitContext(builder.Options));
 

@@ -108,7 +108,8 @@
         "type": "Project",
         "dependencies": {
           "Conduit.Identity.Domain": "[1.0.0, )",
-          "Conduit.Shared.Application": "[1.0.0, )"
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.10, )"
         }
       },
       "conduit.identity.domain": {

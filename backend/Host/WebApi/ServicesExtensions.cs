@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Security;
 using Conduit.Host.WebApi.Shared.RequestHandling;
+using Conduit.Identity.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,10 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Articles = Conduit.Host.WebApi.Features.Articles;
 using Comments = Conduit.Host.WebApi.Features.Comments;
 using Favorites = Conduit.Host.WebApi.Features.Favorites;
-using Followers = Conduit.Host.WebApi.Features.Followers;
-using Profiles = Conduit.Host.WebApi.Features.Profiles;
 using Tags = Conduit.Host.WebApi.Features.Tags;
-using Users = Conduit.Host.WebApi.Features.Users;
 
 namespace Conduit.Host.WebApi;
 
@@ -25,44 +23,7 @@ public static class ServicesExtensions
         services.AddValidation();
 
 
-        services.AddTransient<Users.Create.Handler>();
-        services.AddTransient<ICommandHandler<Users.Create.Command, Users.UserEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Users.Create.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Users.Create.Command, Users.UserEnvelope>(dbContext, handler);
-        });
-        services.AddTransient<Users.Login.Handler>();
-        services.AddTransient<ICommandHandler<Users.Login.Command, Users.UserEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Users.Login.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Users.Login.Command, Users.UserEnvelope>(dbContext, handler);
-        });
-        services.AddTransient<IQueryHandler<Users.Details.Query, Users.UserEnvelope>, Users.Details.Handler>();
-        services.AddTransient<Users.Edit.Handler>();
-        services.AddTransient<ICommandHandler<Users.Edit.Command, Users.UserEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Users.Edit.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Users.Edit.Command, Users.UserEnvelope>(dbContext, handler);
-        });
         services.AddTransient<IQueryHandler<Tags.List.Query, Tags.TagsEnvelope>, Tags.List.QueryHandler>();
-        services.AddTransient<IQueryHandler<Profiles.Details.Query, Profiles.ProfileEnvelope>, Profiles.Details.QueryHandler>();
-        services.AddTransient<Followers.Add.Handler>();
-        services.AddTransient<ICommandHandler<Followers.Add.Command, Profiles.ProfileEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Followers.Add.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Followers.Add.Command, Profiles.ProfileEnvelope>(dbContext, handler);
-        });
-        services.AddTransient<Followers.Delete.Handler>();
-        services.AddTransient<ICommandHandler<Followers.Delete.Command, Profiles.ProfileEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Followers.Delete.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Followers.Delete.Command, Profiles.ProfileEnvelope>(dbContext, handler);
-        });
         services.AddTransient<Favorites.Add.Handler>();
         services.AddTransient<ICommandHandler<Favorites.Add.Command, Articles.ArticleEnvelope>>(provider =>
         {
@@ -116,11 +77,15 @@ public static class ServicesExtensions
             return new DBContextTransacionCommandDecorator<Articles.Edit.Command, Articles.ArticleEnvelope>(dbContext, handler);
         });
 
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
-        services.AddScoped<Profiles.IProfileReader, Profiles.ProfileReader>();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        services.AddScoped<CurrentUserContext>();
+        services.AddScoped<Conduit.Shared.Application.ICurrentUserAccessor>(provider =>
+            provider.GetRequiredService<CurrentUserContext>());
+        services.AddScoped<Conduit.Shared.Infrastructure.ICurrentUserSetter>(provider =>
+            provider.GetRequiredService<CurrentUserContext>());
     }
 
     public static void AddJwt(this IServiceCollection services)

@@ -343,6 +343,67 @@
           "OpenTelemetry.Instrumentation.Runtime": "[1.16.0, )"
         }
       },
+      "conduit.identity.api": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Application": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.identity.application": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Domain": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )"
+        }
+      },
+      "conduit.identity.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Domain": "[1.0.0, )"
+        }
+      },
+      "conduit.identity.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Identity.Application": "[1.0.0, )",
+          "Conduit.Identity.Domain": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
+        }
+      },
+      "conduit.shared.application": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Domain": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.shared.domain": {
+        "type": "Project",
+        "dependencies": {
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.shared.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Domain": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )"
+        }
+      },
+      "ErrorOr": {
+        "type": "CentralTransitive",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "Y/AhvEZ5DjSi993Db1VrnYpK8YpM4o+tonF4f+AtXDzrIHYvbjWJD7fpip+ugSwW8kMw+XXEnMlJM7E0BKJBWA=="
+      },
       "Microsoft.EntityFrameworkCore": {
         "type": "CentralTransitive",
         "requested": "[10.0.10, )",

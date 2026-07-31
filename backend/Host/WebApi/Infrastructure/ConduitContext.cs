@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Conduit.Host.WebApi.Infrastructure;
 
-public class ConduitContext(DbContextOptions options) : DbContext(options)
+public class ConduitContext(DbContextOptions<ConduitContext> options) : DbContext(options)
 {
     private IDbContextTransaction? _currentTransaction;
 
