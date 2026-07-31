@@ -36,7 +36,7 @@ public class Delete
                     new { Article = Constants.NOT_FOUND }
                 );
 
-            var username = currentUserAccessor.GetCurrentUsername()!;
+            var username = currentUserAccessor.GetCurrentUsername();
 
             var favorite = await context.ArticleFavorites.FirstOrDefaultAsync(
                 x => x.ArticleId == article.ArticleId && x.Username == username,
