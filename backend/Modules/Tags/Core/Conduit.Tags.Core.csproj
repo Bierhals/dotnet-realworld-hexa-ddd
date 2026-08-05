@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ErrorOr" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
+    <ProjectReference Include="../../../Shared/Domain/Conduit.Shared.Domain.csproj" />
+    <ProjectReference Include="../../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="../Contracts/Conduit.Tags.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

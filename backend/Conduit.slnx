@@ -16,6 +16,12 @@
     <Project Path="Modules/Identity/Infrastructure/Conduit.Identity.Infrastructure.csproj" />
   </Folder>
 
+  <Folder Name="/Modules/Tags/">
+    <Project Path="Modules/Tags/Core.UnitTests/Conduit.Tags.Core.UnitTests.csproj" />
+    <Project Path="Modules/Tags/Contracts/Conduit.Tags.Contracts.csproj" />
+    <Project Path="Modules/Tags/Core/Conduit.Tags.Core.csproj" />
+  </Folder>
+
   <Folder Name="/Shared/">
     <Project Path="Shared/Application/Conduit.Shared.Application.csproj" />
     <Project Path="Shared/Application.UnitTests/Conduit.Shared.Application.UnitTests.csproj" />

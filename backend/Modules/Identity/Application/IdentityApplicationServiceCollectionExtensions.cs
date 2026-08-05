@@ -16,9 +16,7 @@ public static class IdentityApplicationServiceCollectionExtensions
 {
     public static IServiceCollection AddIdentityApplication(this IServiceCollection services)
     {
-        // ICqrsMediator is not needed by any other module yet; if a future module needs it too,
-        // move this registration somewhere shared instead of leaving it owned by Identity.
-        services.AddScoped<ICqrsMediator, CqrsMediator>();
+        services.AddCqrsMediator();
 
         services.AddScoped<ICommandHandler<RegisterUserCommand, string>, RegisterUserHandler>();
         services.AddScoped<ICommandHandler<AuthenticateUserCommand, string>, AuthenticateUserHandler>();

@@ -345,9 +345,9 @@ Based on the RealWorld domain, this project uses three modules:
 
 | Module | Responsibility | Owned entities | Owned use cases |
 |---|---|---|---|
-| **Identity** | Authentication, account credentials, public profile data, and the follow/unfollow relationship between accounts | `Person` (`Username`, `Email`, `Hash`, `Salt`, `Bio`, `Image`), `FollowedPeople` | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit`, `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
+| **Identity** | Authentication, account credentials, public profile data, and the follow/unfollow relationship between accounts | `User`, `UserFollow` | `Users/Create`, `Users/Login`, `Users/Details`, `Users/Edit`, `Profiles/Details`, `Followers/Add`, `Followers/Delete` |
 | **Articles** | Authoring and browsing articles, commenting, favoriting, and tagging of articles | `Article`, `Comment`, `ArticleFavorite`, `ArticleTag` | `Articles/Create`, `Articles/Edit`, `Articles/Delete`, `Articles/List`, `Articles/Details`, `Comments/Create`, `Comments/Delete`, `Comments/List`, `Favorites/Add`, `Favorites/Delete` |
-| **Tags** | Tag catalog (the set of known tag names) | `Tag` | `Tags/List` |
+| **Tags** | Tag catalog | `Tag` | `Tags/List` |
 
 ### Why Identity absorbs Profiles and Followers
 
@@ -391,7 +391,7 @@ articles.
 ### Cross-module data needs
 
 - **Articles** references author display data (`Username`, `Bio`, `Image`) →
-  depends on a read-only **Identity** contract (`IProfileReader`-style),
+  depends on a read-only **Identity** contract (`IProfileQueryService`-style),
   never on `Email`/`Hash`/`Salt`, since article/comment authoring only needs
   public profile fields.
 - **Comments** and **Favorites** reference `Article` directly in-process — no
@@ -401,38 +401,33 @@ articles.
 - `ArticleTag` is owned by **Articles**, not **Tags** — it's the join between
   an article and a tag, and tagging an article is part of the `Article`
   aggregate's own lifecycle (set on create/edit, deleted when the article is
-  deleted). **Tags** owns only the `Tag` catalog itself and exposes:
-  - a read contract (`ITagReader`) that **Articles** depends on when
-    listing/validating existing tags, and
-  - a write contract (`ITagWriter.GetOrCreateAsync(tagName)`) that
-    **Articles** depends on when creating/editing an article, since an
-    article may introduce a brand-new tag name that doesn't yet exist in the
-    catalog. **Articles** never inserts `Tag` rows itself — it always goes
-    through `ITagWriter`, mirroring how **Identity** exposes a read contract
-    for data it owns.
-  **Articles** exposes the article's current tag list to other modules via
-  its own `IArticleReader` contract; no other module queries `ArticleTag`
-  directly.
-- **Identity** owns `Person` and `FollowedPeople` directly, so
-  `Users/Create`, `Users/Details`, `Users/Edit`, `Profiles/Details`, and
-  `Followers/*` are all single-module operations with no cross-module
-  contract calls needed.
+  deleted). **Tags** owns only the `Tag` catalog itself and exposes a single
+  write contract, `ITagCatalogService`:
+  - `ReferenceTagsAsync(tagNames)` — called when an article starts using a
+    tag. Names that aren't in the catalog yet are added, and each name's
+    reference count goes up by one.
+  - `ReleaseTagsAsync(tagNames)` — called when an article stops using a tag
+    (on edit, or when the article is deleted). A tag that loses its last
+    reference is removed from the catalog, so `Tags/List` never returns a tag
+    that no article uses.
 
 ### Module boundary diagram
 
 ```text
-              ┌──────────────────┐         IProfileReader          ┌───────────────────────────┐
-              │     Identity      │◄────────(contract)─────────────│         Articles           │
+              ┌───────────────────┐      IProfileQueryService       ┌───────────────────────────┐
+              │     Identity      │◀─────────(contract)─────────────│         Articles          │
               │ (Person: Username,│                                 │ (Article, Comment,        │
               │  Email, Hash,     │                                 │  ArticleFavorite,         │
-              │  Salt, Bio, Image;│                                 │  ArticleTag)               │
-              │  FollowedPeople)  │                                 └────────────▲────────────────┘
-              └───────────────────┘                                              │ ITagReader (contract)
-                                                                                  │ ITagWriter (contract)
-                                                                         ┌────────┴────────┐
-                                                                         │      Tags        │
-                                                                         │      (Tag)        │
-                                                                         └───────────────────┘
+              │  Salt, Bio, Image;│                                 │  ArticleTag)              │
+              │  FollowedPeople)  │                                 └───────────────────────────┘
+              └───────────────────┘                                              │
+                                                                                 │ ITagCatalogService (contract)
+                                                                                 ▼
+                                                                        ┌───────────────────┐
+                                                                        │       Tags        │
+                                                                        │ (Tag: TagName,    │
+                                                                        │  ReferenceCount)  │
+                                                                        └───────────────────┘
 ```
 
 Legend: an arrow is an allowed dependency, mediated exclusively through the

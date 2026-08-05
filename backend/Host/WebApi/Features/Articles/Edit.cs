@@ -10,6 +10,7 @@ using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
 using Conduit.Identity.Contracts.Queries;
+using Conduit.Tags.Contracts.Catalog;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Host.WebApi.Features.Articles;
@@ -25,7 +26,8 @@ public class Edit
     public class Handler(
         ConduitContext context,
         ICurrentUserAccessor currentUserAccessor,
-        IProfileQueryService profileQueryService
+        IProfileQueryService profileQueryService,
+        ITagCatalogService tagCatalogService
     ) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
@@ -67,9 +69,23 @@ public class Edit
                 article.UpdatedAt = DateTime.UtcNow;
             }
 
-            // ensure context is tracking any tags that are about to be created so that it won't attempt to insert a duplicate
-            context.Tags.AttachRange(
-                [.. articleTagsToCreate.Where(x => x.Tag is not null).Select(a => a.Tag!)]
+            // The tag catalog is owned by the Tags module: announce the tags this article starts
+            // using and give up the ones it no longer uses.
+            var reference = await tagCatalogService.ReferenceTagsAsync(
+                [.. articleTagsToCreate.Where(x => x.TagId is not null).Select(x => x.TagId!)],
+                cancellationToken
+            );
+            if (reference.IsError)
+            {
+                throw new RestException(
+                    HttpStatusCode.UnprocessableEntity,
+                    new { TagList = reference.FirstError.Description }
+                );
+            }
+
+            await tagCatalogService.ReleaseTagsAsync(
+                [.. articleTagsToDelete.Where(x => x.TagId is not null).Select(x => x.TagId!)],
+                cancellationToken
             );
 
             // add the new article tags
@@ -119,7 +135,6 @@ public class Edit
                     {
                         Article = article,
                         ArticleId = article.ArticleId,
-                        Tag = new Tag { TagId = tag },
                         TagId = tag,
                     };
                     articleTagsToCreate.Add(at);
