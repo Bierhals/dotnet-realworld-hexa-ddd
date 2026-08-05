@@ -13,6 +13,8 @@
     <ProjectReference Include="../../Modules/Identity/Application/Conduit.Identity.Application.csproj" />
     <ProjectReference Include="../../Modules/Identity/Contracts/Conduit.Identity.Contracts.csproj" />
     <ProjectReference Include="../../Modules/Identity/Infrastructure/Conduit.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Tags/Contracts/Conduit.Tags.Contracts.csproj" />
+    <ProjectReference Include="../../Modules/Tags/Core/Conduit.Tags.Core.csproj" />
     <ProjectReference Include="../../Shared/Application/Conduit.Shared.Application.csproj" />
     <ProjectReference Include="../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
   </ItemGroup>

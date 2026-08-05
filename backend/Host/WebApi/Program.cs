@@ -7,13 +7,15 @@ using Conduit.Host.WebApi;
 using Conduit.Host.WebApi.Features.Articles;
 using Conduit.Host.WebApi.Features.Comments;
 using Conduit.Host.WebApi.Features.Favorites;
-using Conduit.Host.WebApi.Features.Tags;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Identity.Api;
 using Conduit.Identity.Infrastructure;
 using Conduit.Identity.Infrastructure.Persistence;
 using Conduit.Shared.Application.Optional;
+using Conduit.Tags.Core.Api;
+using Conduit.Tags.Core.Infrastructure;
+using Conduit.Tags.Core.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -48,11 +50,14 @@ if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison
         options.UseSqlite(connectionString);
     });
     builder.Services.AddIdentityModule(options => options.UseSqlite(connectionString));
+    builder.Services.AddTagsModule(options => options.UseSqlite(connectionString));
 }
 else if (databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal))
 {
     builder.AddNpgsqlDbContext<ConduitContext>(connectionName: "conduit-db");
     builder.Services.AddIdentityModule(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
+    builder.Services.AddTagsModule(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
 }
 else
@@ -188,23 +193,26 @@ app.MapScalarApiReference(
 
 using (var scope = app.Services.CreateScope())
 {
-    // ConduitContext and IdentityDbContext can share one physical database. EnsureCreated()
+    // ConduitContext and the module contexts can share one physical database. EnsureCreated()
     // and IRelationalDatabaseCreator.HasTables() only check whether *any* table exists in that
     // database, not whether this context's own tables do, so they can't reliably decide whether
-    // Identity's tables still need to be created. Create them directly instead, and treat
+    // a module's tables still need to be created. Create them directly instead, and treat
     // "already exists" as success (they were created by a previous run of this same host).
     scope.ServiceProvider.GetRequiredService<ConduitContext>().Database.EnsureCreated();
 
-    var identityDatabaseCreator = scope
-        .ServiceProvider.GetRequiredService<IdentityDbContext>()
-        .GetService<IRelationalDatabaseCreator>();
+    CreateModuleTables(scope.ServiceProvider.GetRequiredService<IdentityDbContext>());
+    CreateModuleTables(scope.ServiceProvider.GetRequiredService<TagsDbContext>());
+}
+
+static void CreateModuleTables(DbContext moduleDbContext)
+{
     try
     {
-        identityDatabaseCreator.CreateTables();
+        moduleDbContext.GetService<IRelationalDatabaseCreator>().CreateTables();
     }
     catch (DbException)
     {
-        // Identity's tables already exist from a previous run.
+        // The module's tables already exist from a previous run.
     }
 }
 app.Run();

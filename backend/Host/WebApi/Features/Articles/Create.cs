@@ -1,14 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Host.WebApi.Domain;
 using Conduit.Host.WebApi.Infrastructure;
+using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Host.WebApi.Shared.RequestHandling;
 using Conduit.Identity.Contracts.Queries;
-using Microsoft.EntityFrameworkCore;
+using Conduit.Tags.Contracts.Catalog;
 
 namespace Conduit.Host.WebApi.Features.Articles;
 
@@ -30,7 +31,8 @@ public class Create
     public class Handler(
         ConduitContext context,
         ICurrentUserAccessor currentUserAccessor,
-        IProfileQueryService profileQueryService
+        IProfileQueryService profileQueryService,
+        ITagCatalogService tagCatalogService
     ) : ICommandHandler<Command, ArticleEnvelope>
     {
         public async Task<ArticleEnvelope> Handle(
@@ -39,18 +41,17 @@ public class Create
         )
         {
             var authorUsername = currentUserAccessor.GetCurrentUsername()!;
-            var tags = new List<Tag>();
-            foreach (var tag in (message.Article.TagList ?? Enumerable.Empty<string>()))
+            var tagNames = (message.Article.TagList ?? []).Distinct(StringComparer.Ordinal).ToList();
+
+            // The tag catalog is owned by the Tags module, so the article never creates tag rows
+            // itself - it only announces that it now uses these tags.
+            var reference = await tagCatalogService.ReferenceTagsAsync(tagNames, cancellationToken);
+            if (reference.IsError)
             {
-                var t = await context.Tags.FindAsync(tag);
-                if (t == null)
-                {
-                    t = new Tag { TagId = tag };
-                    await context.Tags.AddAsync(t, cancellationToken);
-                    //save immediately for reuse
-                    await context.SaveChangesAsync(cancellationToken);
-                }
-                tags.Add(t);
+                throw new RestException(
+                    HttpStatusCode.UnprocessableEntity,
+                    new { TagList = reference.FirstError.Description }
+                );
             }
 
             var article = new Article
@@ -66,7 +67,7 @@ public class Create
             await context.Articles.AddAsync(article, cancellationToken);
 
             await context.ArticleTags.AddRangeAsync(
-                tags.Select(x => new ArticleTag { Article = article, Tag = x }),
+                tagNames.Select(x => new ArticleTag { Article = article, TagId = x }),
                 cancellationToken
             );
 

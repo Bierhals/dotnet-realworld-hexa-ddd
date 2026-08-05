@@ -11,7 +11,6 @@ public class ConduitContext(DbContextOptions<ConduitContext> options) : DbContex
 
     public DbSet<Article> Articles { get; init; } = null!;
     public DbSet<Comment> Comments { get; init; } = null!;
-    public DbSet<Tag> Tags { get; init; } = null!;
     public DbSet<ArticleTag> ArticleTags { get; init; } = null!;
     public DbSet<ArticleFavorite> ArticleFavorites { get; init; } = null!;
 
@@ -24,8 +23,6 @@ public class ConduitContext(DbContextOptions<ConduitContext> options) : DbContex
             b.HasOne(pt => pt.Article)
                 .WithMany(p => p.ArticleTags)
                 .HasForeignKey(pt => pt.ArticleId);
-
-            b.HasOne(pt => pt.Tag).WithMany(t => t.ArticleTags).HasForeignKey(pt => pt.TagId);
         });
 
         modelBuilder.Entity<ArticleFavorite>(b =>

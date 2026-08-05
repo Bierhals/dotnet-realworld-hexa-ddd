@@ -12,7 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using Articles = Conduit.Host.WebApi.Features.Articles;
 using Comments = Conduit.Host.WebApi.Features.Comments;
 using Favorites = Conduit.Host.WebApi.Features.Favorites;
-using Tags = Conduit.Host.WebApi.Features.Tags;
 
 namespace Conduit.Host.WebApi;
 
@@ -22,8 +21,6 @@ public static class ServicesExtensions
     {
         services.AddValidation();
 
-
-        services.AddTransient<IQueryHandler<Tags.List.Query, Tags.TagsEnvelope>, Tags.List.QueryHandler>();
         services.AddTransient<Favorites.Add.Handler>();
         services.AddTransient<ICommandHandler<Favorites.Add.Command, Articles.ArticleEnvelope>>(provider =>
         {
@@ -55,27 +52,17 @@ public static class ServicesExtensions
         });
         services.AddTransient<IQueryHandler<Articles.List.Query, Articles.ArticlesEnvelope>, Articles.List.Handler>();
         services.AddTransient<IQueryHandler<Articles.Details.Query, Articles.ArticleEnvelope>, Articles.Details.Handler>();
-        services.AddTransient<Articles.Create.Handler>();
-        services.AddTransient<ICommandHandler<Articles.Create.Command, Articles.ArticleEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Articles.Create.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Articles.Create.Command, Articles.ArticleEnvelope>(dbContext, handler);
-        });
-        services.AddTransient<Articles.Delete.Handler>();
-        services.AddTransient<ICommandHandler<Articles.Delete.Command>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Articles.Delete.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Articles.Delete.Command>(dbContext, handler);
-        });
-        services.AddTransient<Articles.Edit.Handler>();
-        services.AddTransient<ICommandHandler<Articles.Edit.Command, Articles.ArticleEnvelope>>(provider =>
-        {
-            var handler = provider.GetRequiredService<Articles.Edit.Handler>();
-            var dbContext = provider.GetRequiredService<ConduitContext>();
-            return new DBContextTransacionCommandDecorator<Articles.Edit.Command, Articles.ArticleEnvelope>(dbContext, handler);
-        });
+
+        // The article commands are deliberately NOT wrapped in DBContextTransacionCommandDecorator.
+        // Each of them persists through a single SaveChangesAsync, which EF Core already runs in
+        // its own transaction, so the decorator would add no atomicity. It would, however, hold an
+        // open write transaction on ConduitContext for the whole handler - and these handlers also
+        // talk to the Tags module, which writes through its own DbContext and connection. On SQLite
+        // (both contexts share one file) that second connection cannot get a write lock and the
+        // request fails with "database is locked".
+        services.AddTransient<ICommandHandler<Articles.Create.Command, Articles.ArticleEnvelope>, Articles.Create.Handler>();
+        services.AddTransient<ICommandHandler<Articles.Delete.Command>, Articles.Delete.Handler>();
+        services.AddTransient<ICommandHandler<Articles.Edit.Command, Articles.ArticleEnvelope>, Articles.Edit.Handler>();
 
         services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();

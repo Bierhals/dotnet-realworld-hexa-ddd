@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Conduit.Host.WebApi.Infrastructure;
 using Conduit.Host.WebApi.Shared.RequestHandling;
 using Conduit.Identity.Contracts.Queries;
+using Conduit.Tags.Contracts.Catalog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,8 @@ public class SliceFixture : IDisposable
 
     public FakeProfileQueryService ProfileQueryService { get; } = new();
 
+    public FakeTagCatalogService TagCatalogService { get; } = new();
+
     public SliceFixture()
     {
         var services = new ServiceCollection();
@@ -25,6 +28,7 @@ public class SliceFixture : IDisposable
         services.AddConduit();
         services.AddJwt();
         services.AddSingleton<IProfileQueryService>(ProfileQueryService);
+        services.AddSingleton<ITagCatalogService>(TagCatalogService);
 
         var builder = new DbContextOptionsBuilder<ConduitContext>();
         builder.UseInMemoryDatabase(_dbName);

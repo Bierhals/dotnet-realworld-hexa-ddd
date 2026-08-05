@@ -39,7 +39,12 @@ public class EditTests : SliceFixture
         var dbContext = GetDbContext();
 
         var currentAccessor = new StubCurrentUserAccessor(UserHelpers.DefaultUserName);
-        var articleEditHandler = new Edit.Handler(dbContext, currentAccessor, ProfileQueryService);
+        var articleEditHandler = new Edit.Handler(
+            dbContext,
+            currentAccessor,
+            ProfileQueryService,
+            TagCatalogService
+        );
         var edited = await articleEditHandler.Handle(
             command,
             new System.Threading.CancellationToken()

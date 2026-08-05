@@ -30,7 +30,8 @@ public static class ArticleHelpers
         var articleCreateHandler = new Create.Handler(
             dbContext,
             currentAccessor,
-            fixture.ProfileQueryService
+            fixture.ProfileQueryService,
+            fixture.TagCatalogService
         );
         var created = await articleCreateHandler.Handle(
             command,
