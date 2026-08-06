@@ -3,7 +3,16 @@
     <Project Path="Host\AppHost\Conduit.Host.AppHost.csproj" />
     <Project Path="Host\ServiceDefaults\Conduit.Host.ServiceDefaults.csproj" />
     <Project Path="Host\WebApi\Conduit.Host.WebApi.csproj" />
-    <Project Path="Host\WebApi.IntegrationTests\Conduit.Host.WebApi.IntegrationTests.csproj" />
+  </Folder>
+
+  <Folder Name="/Modules/Articles/">
+    <Project Path="Modules/Articles/Application.UnitTests/Conduit.Articles.Application.UnitTests.csproj" />
+    <Project Path="Modules/Articles/Domain.UnitTests/Conduit.Articles.Domain.UnitTests.csproj" />
+    <Project Path="Modules/Articles/Api/Conduit.Articles.Api.csproj" />
+    <Project Path="Modules/Articles/Application/Conduit.Articles.Application.csproj" />
+    <Project Path="Modules/Articles/Contracts/Conduit.Articles.Contracts.csproj" />
+    <Project Path="Modules/Articles/Domain/Conduit.Articles.Domain.csproj" />
+    <Project Path="Modules/Articles/Infrastructure/Conduit.Articles.Infrastructure.csproj" />
   </Folder>
 
   <Folder Name="/Modules/Identity/">

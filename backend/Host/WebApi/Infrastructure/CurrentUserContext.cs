@@ -1,11 +1,13 @@
 using System.Linq;
 using System.Security.Claims;
+using Conduit.Shared.Application;
+using Conduit.Shared.Infrastructure;
 using Microsoft.AspNetCore.Http;
 
 namespace Conduit.Host.WebApi.Infrastructure;
 
 public sealed class CurrentUserContext(IHttpContextAccessor httpContextAccessor)
-    : Conduit.Shared.Application.ICurrentUserAccessor, Conduit.Shared.Infrastructure.ICurrentUserSetter
+    : ICurrentUserAccessor, ICurrentUserSetter
 {
     private string? _username;
 

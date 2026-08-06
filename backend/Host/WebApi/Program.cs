@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using Conduit.Articles.Api;
+using Conduit.Articles.Infrastructure;
+using Conduit.Articles.Infrastructure.Persistence;
 using Conduit.Host.WebApi;
-using Conduit.Host.WebApi.Features.Articles;
-using Conduit.Host.WebApi.Features.Comments;
-using Conduit.Host.WebApi.Features.Favorites;
-using Conduit.Host.WebApi.Infrastructure;
-using Conduit.Host.WebApi.Infrastructure.Errors;
 using Conduit.Identity.Api;
 using Conduit.Identity.Infrastructure;
 using Conduit.Identity.Infrastructure.Persistence;
@@ -45,19 +43,17 @@ var databaseProvider = Environment.GetEnvironmentVariable("DATABASE_PROVIDER") ?
 
 if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison.Ordinal))
 {
-    builder.Services.AddDbContext<ConduitContext>(options =>
-    {
-        options.UseSqlite(connectionString);
-    });
     builder.Services.AddIdentityModule(options => options.UseSqlite(connectionString));
     builder.Services.AddTagsModule(options => options.UseSqlite(connectionString));
+    builder.Services.AddArticlesModule(options => options.UseSqlite(connectionString));
 }
 else if (databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal))
 {
-    builder.AddNpgsqlDbContext<ConduitContext>(connectionName: "conduit-db");
     builder.Services.AddIdentityModule(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
     builder.Services.AddTagsModule(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
+    builder.Services.AddArticlesModule(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
 }
 else
@@ -170,15 +166,12 @@ var app = builder.Build();
 
 app.UseForwardedHeaders();
 app.UseRouting();
-app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapArticlesEndpoints();
-app.MapCommentsEndpoints();
-app.MapFavoritesEndpoints();
 app.MapTagsEndpoints();
 app.MapIdentityEndpoints();
 
@@ -193,22 +186,32 @@ app.MapScalarApiReference(
 
 using (var scope = app.Services.CreateScope())
 {
-    // ConduitContext and the module contexts can share one physical database. EnsureCreated()
-    // and IRelationalDatabaseCreator.HasTables() only check whether *any* table exists in that
+    // The module contexts can share one physical database. EnsureCreated() and
+    // IRelationalDatabaseCreator.HasTables() only check whether *any* table exists in that
     // database, not whether this context's own tables do, so they can't reliably decide whether
     // a module's tables still need to be created. Create them directly instead, and treat
     // "already exists" as success (they were created by a previous run of this same host).
-    scope.ServiceProvider.GetRequiredService<ConduitContext>().Database.EnsureCreated();
-
     CreateModuleTables(scope.ServiceProvider.GetRequiredService<IdentityDbContext>());
     CreateModuleTables(scope.ServiceProvider.GetRequiredService<TagsDbContext>());
+    CreateModuleTables(scope.ServiceProvider.GetRequiredService<ArticlesDbContext>());
+
+    ArticlesModuleInitializer.EnsureCommentNumbersReady(
+        scope.ServiceProvider.GetRequiredService<ArticlesDbContext>());
 }
 
 static void CreateModuleTables(DbContext moduleDbContext)
 {
+    var creator = moduleDbContext.GetService<IRelationalDatabaseCreator>();
+
+    // Whichever module runs first has to bring the physical database into existence.
+    if (!creator.Exists())
+    {
+        creator.Create();
+    }
+
     try
     {
-        moduleDbContext.GetService<IRelationalDatabaseCreator>().CreateTables();
+        creator.CreateTables();
     }
     catch (DbException)
     {

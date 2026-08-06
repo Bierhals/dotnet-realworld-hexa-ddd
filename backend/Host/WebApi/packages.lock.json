@@ -33,15 +33,6 @@
           "Microsoft.OpenApi": "2.0.0"
         }
       },
-      "Microsoft.EntityFrameworkCore.InMemory": {
-        "type": "Direct",
-        "requested": "[10.0.10, )",
-        "resolved": "10.0.10",
-        "contentHash": "QRsBDbyAoEVwPu/jesXXs4/uomaA577+hl+HsPfSuFq+uxAd6TyAklU/+OB/7bYvb+eikDuC41VTEFz9l79otA==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.10"
-        }
-      },
       "Microsoft.EntityFrameworkCore.Sqlite": {
         "type": "Direct",
         "requested": "[10.0.10, )",
@@ -329,6 +320,45 @@
         "dependencies": {
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.2",
           "Microsoft.IdentityModel.Tokens": "8.19.2"
+        }
+      },
+      "conduit.articles.api": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Articles.Application": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "ErrorOr": "[2.1.1, )"
+        }
+      },
+      "conduit.articles.application": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Articles.Contracts": "[1.0.0, )",
+          "Conduit.Articles.Domain": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )"
+        }
+      },
+      "conduit.articles.contracts": {
+        "type": "Project"
+      },
+      "conduit.articles.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Shared.Domain": "[1.0.0, )"
+        }
+      },
+      "conduit.articles.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Conduit.Articles.Application": "[1.0.0, )",
+          "Conduit.Articles.Domain": "[1.0.0, )",
+          "Conduit.Identity.Contracts": "[1.0.0, )",
+          "Conduit.Shared.Application": "[1.0.0, )",
+          "Conduit.Shared.Infrastructure": "[1.0.0, )",
+          "Conduit.Tags.Contracts": "[1.0.0, )",
+          "Microsoft.EntityFrameworkCore": "[10.0.10, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
         }
       },
       "conduit.host.servicedefaults": {
