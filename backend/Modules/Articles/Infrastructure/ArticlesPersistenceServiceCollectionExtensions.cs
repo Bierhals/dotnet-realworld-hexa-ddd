@@ -23,6 +23,8 @@ public static class ArticlesPersistenceServiceCollectionExtensions
         });
 
         services.AddScoped<IArticlesRepository, ArticlesRepository>();
+        services.AddScoped<ICommentsRepository, CommentsRepository>();
+        services.AddScoped<IArticleFavoritesRepository, ArticleFavoritesRepository>();
         services.AddScoped<IArticlesReadRepository, ArticlesReadRepository>();
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ArticlesDbContext>());
 

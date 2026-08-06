@@ -35,6 +35,9 @@ internal sealed class FakeArticlesRepository : IArticlesRepository
     public Task<Article?> GetBySlugAsync(ArticleSlug slug, CancellationToken cancellationToken = default) =>
         Task.FromResult(_articles.Find(article => article.Slug == slug));
 
+    public Task<ArticleId?> GetIdBySlugAsync(ArticleSlug slug, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_articles.Find(article => article.Slug == slug)?.Id);
+
     public void Add(Article article) => _articles.Add(article);
 
     public void Remove(Article article) => _articles.Remove(article);

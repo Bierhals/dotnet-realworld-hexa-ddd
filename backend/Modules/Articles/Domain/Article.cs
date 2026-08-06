@@ -10,15 +10,12 @@ using ErrorOr;
 namespace Conduit.Articles.Domain;
 
 /// <summary>
-/// An article together with everything that only exists as part of it: its comments, its favorites
-/// and the tags it uses. Comments and favorites share the article's lifecycle and are therefore
-/// reached exclusively through this aggregate root.
+/// An article and the tags it carries. Comments and favorites are their own aggregates: they have
+/// their own identity and their own rules, and refer back to the article by id.
 /// </summary>
 public sealed class Article : AggregateRoot<ArticleId>
 {
-    private readonly List<Comment> _comments = [];
-    private readonly List<ArticleTag> _tags = [];
-    private readonly List<ArticleFavorite> _favorites = [];
+    private readonly List<TagName> _tags = [];
 
     public ArticleSlug Slug { get; private set; }
     public ArticleTitle Title { get; private set; }
@@ -28,11 +25,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
-
-    public IReadOnlyCollection<TagName> TagNames => [.. _tags.Select(tag => tag.TagName)];
-
-    public int FavoritesCount => _favorites.Count;
+    public IReadOnlyCollection<TagName> Tags => _tags.AsReadOnly();
 
 #pragma warning disable CS8618 // Non-nullable properties are populated by EF Core when materializing.
     private Article() { } // for EF Core
@@ -65,10 +58,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     {
         var article = new Article(ArticleId.New(), author, title, description, body, nowUtc);
 
-        foreach (var tagName in tagNames.Distinct())
-        {
-            article._tags.Add(new ArticleTag(article.Id, tagName));
-        }
+        article._tags.AddRange(tagNames.Distinct());
 
         article.AddDomainEvent(new ArticlePublishedDomainEvent(article.Id.Value, article.Slug.Value, author.Value));
 
@@ -130,77 +120,15 @@ public sealed class Article : AggregateRoot<ArticleId>
     public ErrorOr<Success> EnsureCanBeDeletedBy(AuthorUsername requester) =>
         new OnlyTheAuthorCanChangeTheArticle(Author, requester).Check();
 
-    /// <summary>
-    /// Favoriting an article the account already favorited is a no-op, so that a repeated request
-    /// does not double-count.
-    /// </summary>
-    public void Favorite(AuthorUsername username)
-    {
-        if (IsFavoritedBy(username))
-        {
-            return;
-        }
-
-        _favorites.Add(new ArticleFavorite(Id, username));
-        AddDomainEvent(new ArticleFavoritedDomainEvent(Id.Value, username.Value));
-    }
-
-    public void Unfavorite(AuthorUsername username)
-    {
-        var favorite = _favorites.Find(x => x.Username == username);
-        if (favorite is null)
-        {
-            return;
-        }
-
-        _favorites.Remove(favorite);
-        AddDomainEvent(new ArticleUnfavoritedDomainEvent(Id.Value, username.Value));
-    }
-
-    public bool IsFavoritedBy(AuthorUsername username) => _favorites.Exists(x => x.Username == username);
-
-    public Comment AddComment(CommentId id, AuthorUsername author, CommentBody body, DateTime nowUtc)
-    {
-        var comment = new Comment(id, Id, author, body, nowUtc);
-        _comments.Add(comment);
-        AddDomainEvent(new CommentAddedDomainEvent(Id.Value, id.Value, author.Value));
-
-        return comment;
-    }
-
-    public ErrorOr<Success> DeleteComment(CommentId id, AuthorUsername requester)
-    {
-        var comment = _comments.Find(x => x.Id == id);
-        if (comment is null)
-        {
-            return Error.NotFound("Comment.NotFound", "The comment does not exist.");
-        }
-
-        var check = new OnlyTheAuthorCanDeleteTheComment(comment.Author, requester).Check();
-        if (check.IsError)
-        {
-            return check.Errors;
-        }
-
-        _comments.Remove(comment);
-        AddDomainEvent(new CommentDeletedDomainEvent(Id.Value, id.Value));
-
-        return Result.Success;
-    }
-
     private TagChanges ApplyTags(IReadOnlyCollection<TagName> tagNames)
     {
         var wanted = tagNames.Distinct().ToList();
-        var current = _tags.ConvertAll(tag => tag.TagName);
 
-        var added = wanted.Where(tagName => !current.Contains(tagName)).ToList();
-        var removed = current.Where(tagName => !wanted.Contains(tagName)).ToList();
+        var added = wanted.Where(tagName => !_tags.Contains(tagName)).ToList();
+        var removed = _tags.Where(tagName => !wanted.Contains(tagName)).ToList();
 
-        _tags.RemoveAll(tag => removed.Contains(tag.TagName));
-        foreach (var tagName in added)
-        {
-            _tags.Add(new ArticleTag(Id, tagName));
-        }
+        _tags.RemoveAll(removed.Contains);
+        _tags.AddRange(added);
 
         return new TagChanges(added, removed);
     }

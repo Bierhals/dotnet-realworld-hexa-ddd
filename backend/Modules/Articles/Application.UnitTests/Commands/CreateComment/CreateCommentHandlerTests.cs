@@ -10,12 +10,13 @@ namespace Conduit.Articles.Application.UnitTests.Commands.CreateComment;
 public class CreateCommentHandlerTests
 {
     private readonly FakeArticlesRepository _articles = new();
+    private readonly FakeCommentsRepository _comments = new();
     private readonly FakeUnitOfWork _unitOfWork = new();
     private readonly FakeCommentNumberGenerator _commentNumbers = new();
     private readonly FakeProfileReader _profiles = new();
 
     private Task<ErrorOr<CommentReadModel>> Comment(string slug, string? author = "bob", string body = "nice one") =>
-        new CreateCommentHandler(_articles, _unitOfWork, _commentNumbers, _profiles, new StubCurrentUserAccessor(author))
+        new CreateCommentHandler(_articles, _comments, _unitOfWork, _commentNumbers, _profiles, new StubCurrentUserAccessor(author))
             .Handle(new CreateCommentCommand { Slug = slug, Body = body }, CancellationToken.None);
 
     [Fact]

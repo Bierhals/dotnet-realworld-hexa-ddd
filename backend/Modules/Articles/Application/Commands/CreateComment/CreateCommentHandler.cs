@@ -12,6 +12,7 @@ namespace Conduit.Articles.Application.Commands.CreateComment;
 
 public sealed class CreateCommentHandler(
     IArticlesRepository articlesRepository,
+    ICommentsRepository commentsRepository,
     IUnitOfWork unitOfWork,
     ICommentNumberGenerator commentNumberGenerator,
     IProfileReader profileReader,
@@ -33,17 +34,20 @@ public sealed class CreateCommentHandler(
             return body.Errors;
         }
 
-        var article = await articlesRepository.GetBySlugAsync(
+        // Only the article's identity is needed here - a comment is its own aggregate and never
+        // goes through the article.
+        var articleId = await articlesRepository.GetIdBySlugAsync(
             ArticleSlug.Rehydrate(command.Slug),
             cancellationToken);
-        if (article is null)
+        if (articleId is null)
         {
             return Error.NotFound("Article.NotFound", "The article does not exist.");
         }
 
         var commentId = await commentNumberGenerator.NextAsync(cancellationToken);
-        var comment = article.AddComment(commentId, author.Value, body.Value, DateTime.UtcNow);
+        var comment = Comment.Post(commentId, articleId.Value, author.Value, body.Value, DateTime.UtcNow);
 
+        commentsRepository.Add(comment);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var readModels = await AuthorProfileResolver.ToReadModelsAsync(

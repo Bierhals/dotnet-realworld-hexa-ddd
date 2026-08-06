@@ -46,30 +46,19 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
         builder.Property(article => article.CreatedAt).IsRequired();
         builder.Property(article => article.UpdatedAt).IsRequired();
 
-        // The aggregate owns these collections; EF Core reaches them through their backing fields
-        // so they stay private on the outside.
-        builder.HasMany(article => article.Comments)
-            .WithOne()
-            .HasForeignKey(comment => comment.ArticleId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Navigation(article => article.Comments)
-            .HasField("_comments")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        // A tag on an article is just a name, so the aggregate holds plain tag names and the
+        // mapping - not the domain - is what spreads them over their own table.
+        builder.OwnsMany(article => article.Tags, tag =>
+        {
+            tag.ToTable("ArticleTags");
+            tag.WithOwner().HasForeignKey("ArticleId");
+            tag.Property(tagName => tagName.Value)
+                .HasColumnName("TagName")
+                .HasMaxLength(TagNameIsValid.MaximumLength);
+            tag.HasKey("ArticleId", "Value");
+        });
+        builder.Navigation(article => article.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.HasMany<ArticleTag>("_tags")
-            .WithOne()
-            .HasForeignKey(tag => tag.ArticleId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Navigation("_tags").UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.HasMany<ArticleFavorite>("_favorites")
-            .WithOne()
-            .HasForeignKey(favorite => favorite.ArticleId)
-            .OnDelete(DeleteBehavior.Cascade);
-        builder.Navigation("_favorites").UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Ignore(article => article.TagNames);
-        builder.Ignore(article => article.FavoritesCount);
         builder.Ignore(article => article.DomainEvents);
     }
 }

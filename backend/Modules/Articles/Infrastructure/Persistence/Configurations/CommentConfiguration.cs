@@ -1,4 +1,5 @@
 using Conduit.Articles.Domain;
+using Conduit.Articles.Domain.Rules;
 using Conduit.Articles.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,9 +19,12 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .HasConversion(id => id.Value, value => CommentId.From(value))
             .ValueGeneratedNever();
 
+        // A plain column, not a foreign key: a comment is its own aggregate and stays independent
+        // of the article in the database too. Removing them together is the use case's job.
         builder.Property(comment => comment.ArticleId)
             .HasConversion(id => id.Value, value => ArticleId.Rehydrate(value.ToString()))
             .IsRequired();
+        builder.HasIndex(comment => comment.ArticleId);
 
         builder.Property(comment => comment.Body)
             .HasConversion(body => body.Value, value => CommentBody.Rehydrate(value))
@@ -28,9 +32,12 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 
         builder.Property(comment => comment.Author)
             .HasConversion(author => author.Value, value => AuthorUsername.Rehydrate(value))
+            .HasMaxLength(AuthorUsernameIsValid.MaximumLength)
             .IsRequired();
 
         builder.Property(comment => comment.CreatedAt).IsRequired();
         builder.Property(comment => comment.UpdatedAt).IsRequired();
+
+        builder.Ignore(comment => comment.DomainEvents);
     }
 }

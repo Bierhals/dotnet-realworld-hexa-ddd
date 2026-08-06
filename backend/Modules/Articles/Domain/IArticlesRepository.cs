@@ -6,11 +6,13 @@ namespace Conduit.Articles.Domain;
 
 public interface IArticlesRepository
 {
-    /// <summary>
-    /// Loads an article with everything the aggregate needs to enforce its rules: its comments,
-    /// its favorites and its tags.
-    /// </summary>
     public Task<Article?> GetBySlugAsync(ArticleSlug slug, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Resolves the public slug to the identity that comments and favorites refer to, without
+    /// loading the article itself.
+    /// </summary>
+    public Task<ArticleId?> GetIdBySlugAsync(ArticleSlug slug, CancellationToken cancellationToken = default);
 
     public void Add(Article article);
 

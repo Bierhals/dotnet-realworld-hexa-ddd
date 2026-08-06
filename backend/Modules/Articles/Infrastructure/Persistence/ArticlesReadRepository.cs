@@ -35,9 +35,8 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
 
         if (!string.IsNullOrWhiteSpace(filter.Tag))
         {
-            var tagName = TagName.Rehydrate(filter.Tag);
-            query = query.Where(article => dbContext.ArticleTags
-                .Any(tag => tag.ArticleId == article.Id && tag.TagName == tagName));
+            var tagName = filter.Tag;
+            query = query.Where(article => article.Tags.Any(tag => tag.Value == tagName));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Author))
@@ -122,10 +121,7 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
             article.Title,
             article.Description,
             article.Body,
-            dbContext.ArticleTags
-                .Where(tag => tag.ArticleId == article.Id)
-                .Select(tag => tag.TagName)
-                .ToList(),
+            article.Tags.Select(tag => tag.Value).ToList(),
             article.CreatedAt,
             article.UpdatedAt,
             viewer != null && dbContext.ArticleFavorites
@@ -139,7 +135,7 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
         row.Title.Value,
         row.Description.Value,
         row.Body.Value,
-        row.TagList.ConvertAll(tagName => tagName.Value),
+        row.TagList,
         row.CreatedAt,
         row.UpdatedAt,
         row.Favorited,
@@ -151,7 +147,7 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
         ArticleTitle Title,
         ArticleDescription Description,
         ArticleBody Body,
-        List<TagName> TagList,
+        List<string> TagList,
         System.DateTime CreatedAt,
         System.DateTime UpdatedAt,
         bool Favorited,

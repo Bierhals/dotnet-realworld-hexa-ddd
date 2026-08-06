@@ -10,6 +10,7 @@ namespace Conduit.Articles.Application.Commands.FavoriteArticle;
 
 public sealed class FavoriteArticleHandler(
     IArticlesRepository articlesRepository,
+    IArticleFavoritesRepository favoritesRepository,
     IUnitOfWork unitOfWork,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<FavoriteArticleCommand>
 {
@@ -21,15 +22,22 @@ public sealed class FavoriteArticleHandler(
             return user.Errors;
         }
 
-        var article = await articlesRepository.GetBySlugAsync(
+        var articleId = await articlesRepository.GetIdBySlugAsync(
             ArticleSlug.Rehydrate(command.Slug),
             cancellationToken);
-        if (article is null)
+        if (articleId is null)
         {
             return Error.NotFound("Article.NotFound", "The article does not exist.");
         }
 
-        article.Favorite(user.Value);
+        // Favoriting an article that is already favorited must not count twice.
+        var existing = await favoritesRepository.GetAsync(articleId.Value, user.Value, cancellationToken);
+        if (existing is not null)
+        {
+            return Result.Success;
+        }
+
+        favoritesRepository.Add(ArticleFavorite.Create(articleId.Value, user.Value));
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success;

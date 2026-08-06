@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:5199/openapi/v1.json)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

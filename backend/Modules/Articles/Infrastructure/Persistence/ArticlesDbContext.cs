@@ -25,8 +25,6 @@ public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> option
 
     // Exposed for the read side only. Writes always go through the Article aggregate, which owns
     // these rows and keeps them consistent.
-    public DbSet<ArticleTag> ArticleTags => Set<ArticleTag>();
-
     public DbSet<ArticleFavorite> ArticleFavorites => Set<ArticleFavorite>();
 
     /// <summary>
@@ -35,7 +33,7 @@ public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> option
     /// </summary>
     public static bool SupportsSequences(string? providerName) =>
         providerName is not null
-        && !providerName.Contains("Sqlite", StringComparison.OrdinalIgnoreCase);
+        && providerName.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

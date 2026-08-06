@@ -10,6 +10,8 @@ namespace Conduit.Articles.Application.Commands.DeleteArticle;
 
 public sealed class DeleteArticleHandler(
     IArticlesRepository articlesRepository,
+    ICommentsRepository commentsRepository,
+    IArticleFavoritesRepository favoritesRepository,
     IUnitOfWork unitOfWork,
     ITagCatalog tagCatalog,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<DeleteArticleCommand>
@@ -36,10 +38,15 @@ public sealed class DeleteArticleHandler(
             return check.Errors;
         }
 
-        // Read the tag names before the article - and with it its tags - is gone.
-        var tagNames = TagNameList.ToValues(article.TagNames);
+        // Read the tag names before the article is gone.
+        var tagNames = TagNameList.ToValues(article.Tags);
 
+        // Comments and favorites are their own aggregates and are deliberately independent of the
+        // article in the database as well, so nothing cascades on its own. This use case is the
+        // one place that knows neither of them can outlive the article they belong to.
         articlesRepository.Remove(article);
+        await commentsRepository.RemoveAllForArticleAsync(article.Id, cancellationToken);
+        await favoritesRepository.RemoveAllForArticleAsync(article.Id, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         // The article no longer uses these tags; the Tags module drops the ones that nothing

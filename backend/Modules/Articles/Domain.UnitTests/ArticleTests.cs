@@ -43,7 +43,7 @@ public class ArticleTests
     {
         var article = AnArticle("alice", "dragons", "dragons");
 
-        article.TagNames.ShouldHaveSingleItem().Value.ShouldBe("dragons");
+        article.Tags.ShouldHaveSingleItem().Value.ShouldBe("dragons");
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class ArticleTests
         result.IsError.ShouldBeFalse();
         result.Value.Added.ShouldHaveSingleItem().Value.ShouldBe("flying");
         result.Value.Removed.ShouldHaveSingleItem().Value.ShouldBe("training");
-        article.TagNames.Select(tag => tag.Value).ShouldBe(["dragons", "flying"], ignoreOrder: true);
+        article.Tags.Select(tag => tag.Value).ShouldBe(["dragons", "flying"], ignoreOrder: true);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class ArticleTests
 
         result.Value.Added.ShouldBeEmpty();
         result.Value.Removed.ShouldBeEmpty();
-        article.TagNames.ShouldHaveSingleItem().Value.ShouldBe("dragons");
+        article.Tags.ShouldHaveSingleItem().Value.ShouldBe("dragons");
     }
 
     [Fact]
@@ -127,94 +127,5 @@ public class ArticleTests
 
         article.EnsureCanBeDeletedBy(User("bob")).FirstError.Type.ShouldBe(ErrorType.Forbidden);
         article.EnsureCanBeDeletedBy(User("alice")).IsError.ShouldBeFalse();
-    }
-
-    [Fact]
-    public void An_article_counts_as_favorited_only_for_the_people_who_favorited_it()
-    {
-        var article = AnArticle("alice");
-
-        article.Favorite(User("bob"));
-
-        article.IsFavoritedBy(User("bob")).ShouldBeTrue();
-        article.IsFavoritedBy(User("alice")).ShouldBeFalse();
-        article.FavoritesCount.ShouldBe(1);
-        article.DomainEvents.OfType<ArticleFavoritedDomainEvent>().Single().Username.ShouldBe("bob");
-    }
-
-    [Fact]
-    public void Favoriting_an_article_twice_counts_once()
-    {
-        var article = AnArticle("alice");
-
-        article.Favorite(User("bob"));
-        article.Favorite(User("bob"));
-
-        article.FavoritesCount.ShouldBe(1);
-        article.DomainEvents.OfType<ArticleFavoritedDomainEvent>().Count().ShouldBe(1);
-    }
-
-    [Fact]
-    public void Unfavoriting_an_article_nobody_favorited_changes_nothing()
-    {
-        var article = AnArticle("alice");
-        article.ClearDomainEvents();
-
-        article.Unfavorite(User("bob"));
-
-        article.FavoritesCount.ShouldBe(0);
-        article.DomainEvents.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public void A_comment_is_added_under_the_number_it_was_handed()
-    {
-        var article = AnArticle("alice");
-
-        var comment = article.AddComment(CommentId.From(7), User("bob"), CommentBody.Create("nice").Value, EditedAt);
-
-        comment.Id.Value.ShouldBe(7);
-        comment.Author.Value.ShouldBe("bob");
-        comment.CreatedAt.ShouldBe(EditedAt);
-        article.Comments.ShouldHaveSingleItem().Id.ShouldBe(CommentId.From(7));
-        article.DomainEvents.OfType<CommentAddedDomainEvent>().Single().CommentId.ShouldBe(7);
-    }
-
-    [Fact]
-    public void A_comment_can_only_be_deleted_by_its_author()
-    {
-        var article = AnArticle("alice");
-        article.AddComment(CommentId.From(1), User("bob"), CommentBody.Create("nice").Value, EditedAt);
-
-        var result = article.DeleteComment(CommentId.From(1), User("alice"));
-
-        result.IsError.ShouldBeTrue();
-        result.FirstError.Type.ShouldBe(ErrorType.Forbidden);
-        article.Comments.ShouldHaveSingleItem();
-    }
-
-    [Fact]
-    public void Deleting_your_own_comment_removes_it_from_the_article()
-    {
-        var article = AnArticle("alice");
-        article.AddComment(CommentId.From(1), User("bob"), CommentBody.Create("nice").Value, EditedAt);
-        article.ClearDomainEvents();
-
-        var result = article.DeleteComment(CommentId.From(1), User("bob"));
-
-        result.IsError.ShouldBeFalse();
-        article.Comments.ShouldBeEmpty();
-        article.DomainEvents.OfType<CommentDeletedDomainEvent>().Single().CommentId.ShouldBe(1);
-    }
-
-    [Fact]
-    public void Deleting_a_comment_that_does_not_exist_reports_it_as_missing()
-    {
-        var article = AnArticle("alice");
-
-        var result = article.DeleteComment(CommentId.From(99), User("bob"));
-
-        result.IsError.ShouldBeTrue();
-        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
     }
 }

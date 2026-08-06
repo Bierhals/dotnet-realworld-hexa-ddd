@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Articles.Application.Commands.DeleteComment;
@@ -11,24 +12,25 @@ namespace Conduit.Articles.Application.UnitTests.Commands.DeleteComment;
 
 public class DeleteCommentHandlerTests
 {
-    private static readonly System.DateTime CommentedAt = new(2026, 1, 2, 12, 0, 0, System.DateTimeKind.Utc);
+    private static readonly DateTime CommentedAt = new(2026, 1, 2, 12, 0, 0, DateTimeKind.Utc);
 
     private readonly FakeArticlesRepository _articles = new();
+    private readonly FakeCommentsRepository _comments = new();
     private readonly FakeUnitOfWork _unitOfWork = new();
 
     private Task<ErrorOr<Success>> Delete(string slug, int commentId, string? requester = "bob") =>
-        new DeleteCommentHandler(_articles, _unitOfWork, new StubCurrentUserAccessor(requester))
+        new DeleteCommentHandler(_articles, _comments, _unitOfWork, new StubCurrentUserAccessor(requester))
             .Handle(new DeleteCommentCommand { Slug = slug, CommentId = commentId }, CancellationToken.None);
 
-    private Article AnArticleCommentedOnBy(string commenter)
+    private Article AnArticleCommentedOnBy(string commenter, int commentNumber = 1)
     {
         var article = _articles.Seed();
-        article.AddComment(
-            CommentId.From(1),
+        _comments.Seed(Comment.Post(
+            CommentId.From(commentNumber),
+            article.Id,
             AuthorUsername.Create(commenter).Value,
             CommentBody.Create("nice one").Value,
-            CommentedAt);
-        article.ClearDomainEvents();
+            CommentedAt));
 
         return article;
     }
@@ -36,25 +38,25 @@ public class DeleteCommentHandlerTests
     [Fact]
     public async Task Deleting_your_own_comment_removes_it()
     {
-        var article = AnArticleCommentedOnBy("bob");
+        AnArticleCommentedOnBy("bob");
 
         var result = await Delete("how-to-train-your-dragon", 1);
 
         result.IsError.ShouldBeFalse();
-        article.Comments.ShouldBeEmpty();
+        _comments.Comments.ShouldBeEmpty();
         _unitOfWork.SaveCount.ShouldBe(1);
     }
 
     [Fact]
     public async Task A_comment_you_did_not_write_cannot_be_deleted()
     {
-        var article = AnArticleCommentedOnBy("bob");
+        AnArticleCommentedOnBy("bob");
 
         var result = await Delete("how-to-train-your-dragon", 1, requester: "alice");
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.Forbidden);
-        article.Comments.ShouldHaveSingleItem();
+        _comments.Comments.ShouldHaveSingleItem();
         _unitOfWork.SaveCount.ShouldBe(0);
     }
 
@@ -66,6 +68,25 @@ public class DeleteCommentHandlerTests
         var result = await Delete("how-to-train-your-dragon", 99);
 
         result.FirstError.Type.ShouldBe(ErrorType.NotFound);
+    }
+
+    [Fact]
+    public async Task A_comment_written_on_another_article_cannot_be_deleted_through_this_one()
+    {
+        AnArticleCommentedOnBy("bob");
+        var otherArticle = _articles.Seed("Another dragon story", "alice");
+        _comments.Seed(Comment.Post(
+            CommentId.From(2),
+            otherArticle.Id,
+            AuthorUsername.Create("bob").Value,
+            CommentBody.Create("elsewhere").Value,
+            CommentedAt));
+
+        var result = await Delete("how-to-train-your-dragon", 2);
+
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Type.ShouldBe(ErrorType.NotFound);
+        _comments.Comments.Count.ShouldBe(2);
     }
 
     [Fact]
