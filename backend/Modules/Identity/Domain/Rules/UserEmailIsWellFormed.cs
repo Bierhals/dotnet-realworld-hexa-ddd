@@ -4,16 +4,16 @@ using ErrorOr;
 
 namespace Conduit.Identity.Domain.Rules;
 
-public sealed class UserHasValidEmail : IBusinessRule
+public sealed class UserEmailIsWellFormed : IBusinessRule
 {
     private readonly string _email;
-    public UserHasValidEmail(string email) => _email = email;
+    public UserEmailIsWellFormed(string email) => _email = email;
 
     public ErrorOr<Success> Check()
     {
-        var mailIsValid = MailAddress.TryCreate(_email, out _);
+        var emailIsWellFormed = MailAddress.TryCreate(_email, out _);
 
-        return !mailIsValid
+        return !emailIsWellFormed
             ? Error.Validation("User.InvalidEmail", "The user must have a valid email address.")
             : Result.Success;
     }

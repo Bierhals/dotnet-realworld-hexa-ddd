@@ -13,7 +13,7 @@ public sealed record ArticleDescription
     {
         var sanitizedValue = value?.Trim() ?? string.Empty;
 
-        var check = new ArticleDescriptionIsValid(sanitizedValue).Check();
+        var check = new ArticleDescriptionLengthIsInRange(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new ArticleDescription(sanitizedValue);
     }

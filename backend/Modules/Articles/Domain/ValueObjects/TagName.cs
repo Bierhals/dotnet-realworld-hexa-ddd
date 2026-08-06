@@ -18,7 +18,7 @@ public sealed record TagName
     {
         var sanitizedValue = value?.Trim() ?? string.Empty;
 
-        var check = new TagNameIsValid(sanitizedValue).Check();
+        var check = new TagNameLengthIsInRange(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new TagName(sanitizedValue);
     }

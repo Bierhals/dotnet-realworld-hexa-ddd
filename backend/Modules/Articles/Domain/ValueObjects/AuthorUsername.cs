@@ -17,7 +17,7 @@ public sealed record AuthorUsername
     {
         var sanitizedValue = value?.Trim() ?? string.Empty;
 
-        var check = new AuthorUsernameIsValid(sanitizedValue).Check();
+        var check = new AuthorUsernameLengthIsInRange(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new AuthorUsername(sanitizedValue);
     }

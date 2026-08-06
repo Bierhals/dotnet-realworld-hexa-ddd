@@ -3,7 +3,7 @@ using ErrorOr;
 
 namespace Conduit.Tags.Core.Domain.Rules;
 
-public sealed class TagNameIsValid(string tagName) : IBusinessRule
+public sealed class TagNameLengthIsInRange(string tagName) : IBusinessRule
 {
     public const int MaximumLength = 64;
 

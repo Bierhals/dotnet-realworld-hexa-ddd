@@ -14,7 +14,7 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Id)
             .HasConversion(name => name.Value, value => TagName.Rehydrate(value))
-            .HasMaxLength(TagNameIsValid.MaximumLength)
+            .HasMaxLength(TagNameLengthIsInRange.MaximumLength)
             .ValueGeneratedNever();
 
         builder.Property(t => t.ReferenceCount).IsRequired();

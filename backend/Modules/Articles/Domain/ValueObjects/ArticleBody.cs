@@ -13,7 +13,7 @@ public sealed record ArticleBody
     {
         var sanitizedValue = value ?? string.Empty;
 
-        var check = new ArticleBodyIsValid(sanitizedValue).Check();
+        var check = new ArticleBodyIsNotEmpty(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new ArticleBody(sanitizedValue);
     }

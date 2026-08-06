@@ -25,12 +25,12 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
 
         builder.Property(article => article.Title)
             .HasConversion(title => title.Value, value => ArticleTitle.Rehydrate(value))
-            .HasMaxLength(ArticleTitleIsValid.MaximumLength)
+            .HasMaxLength(ArticleTitleLengthIsInRange.MaximumLength)
             .IsRequired();
 
         builder.Property(article => article.Description)
             .HasConversion(description => description.Value, value => ArticleDescription.Rehydrate(value))
-            .HasMaxLength(ArticleDescriptionIsValid.MaximumLength)
+            .HasMaxLength(ArticleDescriptionLengthIsInRange.MaximumLength)
             .IsRequired();
 
         builder.Property(article => article.Body)
@@ -39,7 +39,7 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
 
         builder.Property(article => article.Author)
             .HasConversion(author => author.Value, value => AuthorUsername.Rehydrate(value))
-            .HasMaxLength(AuthorUsernameIsValid.MaximumLength)
+            .HasMaxLength(AuthorUsernameLengthIsInRange.MaximumLength)
             .IsRequired();
         builder.HasIndex(article => article.Author);
 
@@ -54,7 +54,7 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             tag.WithOwner().HasForeignKey("ArticleId");
             tag.Property(tagName => tagName.Value)
                 .HasColumnName("TagName")
-                .HasMaxLength(TagNameIsValid.MaximumLength);
+                .HasMaxLength(TagNameLengthIsInRange.MaximumLength);
             tag.HasKey("ArticleId", "Value");
         });
         builder.Navigation(article => article.Tags).UsePropertyAccessMode(PropertyAccessMode.Field);

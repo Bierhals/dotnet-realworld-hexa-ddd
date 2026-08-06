@@ -3,10 +3,10 @@ using ErrorOr;
 
 namespace Conduit.Articles.Domain.Rules;
 
-public sealed class CommentBodyIsValid(string body) : IBusinessRule
+public sealed class ArticleBodyIsNotEmpty(string body) : IBusinessRule
 {
     public ErrorOr<Success> Check() =>
         string.IsNullOrWhiteSpace(body)
-            ? Error.Validation("Comment.BodyRequired", "A comment body must not be empty.")
+            ? Error.Validation("Article.BodyRequired", "An article body must not be empty.")
             : Result.Success;
 }

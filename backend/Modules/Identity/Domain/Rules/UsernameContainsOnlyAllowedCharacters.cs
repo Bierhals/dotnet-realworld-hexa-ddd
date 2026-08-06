@@ -4,20 +4,20 @@ using ErrorOr;
 
 namespace Conduit.Identity.Domain.Rules;
 
-public sealed partial class UserHasValidUsername : IBusinessRule
+public sealed partial class UsernameContainsOnlyAllowedCharacters : IBusinessRule
 {
     private readonly string _username;
-    public UserHasValidUsername(string username) => _username = username;
+    public UsernameContainsOnlyAllowedCharacters(string username) => _username = username;
 
     public ErrorOr<Success> Check()
     {
-        var usernameIsValid = ValidUsernameRegEx().IsMatch(_username);
+        var containsOnlyAllowedCharacters = AllowedUsernameCharactersRegEx().IsMatch(_username);
 
-        return !usernameIsValid
+        return !containsOnlyAllowedCharacters
             ? Error.Validation("User.InvalidUsername", "The user must have a valid username.")
             : Result.Success;
     }
 
     [GeneratedRegex("^[A-Za-z0-9_.-]+$")]
-    private static partial Regex ValidUsernameRegEx();
+    private static partial Regex AllowedUsernameCharactersRegEx();
 }

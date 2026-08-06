@@ -12,7 +12,7 @@ public sealed record Username
     {
         var sanitizedValue = value.Trim();
 
-        var check = new UserHasValidUsername(sanitizedValue).Check();
+        var check = new UsernameContainsOnlyAllowedCharacters(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new Username(sanitizedValue);
     }

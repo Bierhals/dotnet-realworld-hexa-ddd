@@ -12,7 +12,7 @@ public sealed record UserEmail
     {
         var sanitizedValue = value.Trim().ToLowerInvariant();
 
-        var check = new UserHasValidEmail(sanitizedValue).Check();
+        var check = new UserEmailIsWellFormed(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new UserEmail(sanitizedValue);
     }

@@ -12,7 +12,7 @@ public sealed record UserImage
     {
         var sanitizedValue = value.Trim();
 
-        var check = new UserImageIsValidUrl(sanitizedValue).Check();
+        var check = new UserImageUrlIsWellFormed(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new UserImage(sanitizedValue);
     }

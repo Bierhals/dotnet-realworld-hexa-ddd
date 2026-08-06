@@ -13,7 +13,7 @@ public sealed record CommentBody
     {
         var sanitizedValue = value ?? string.Empty;
 
-        var check = new CommentBodyIsValid(sanitizedValue).Check();
+        var check = new CommentBodyIsNotEmpty(sanitizedValue).Check();
 
         return check.IsError ? check.Errors : new CommentBody(sanitizedValue);
     }
