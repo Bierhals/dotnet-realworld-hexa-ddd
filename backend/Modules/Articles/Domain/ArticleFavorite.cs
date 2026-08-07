@@ -11,19 +11,19 @@ namespace Conduit.Articles.Domain;
 public sealed class ArticleFavorite : AggregateRoot<ArticleFavoriteId>
 {
     public ArticleId ArticleId { get; private set; }
-    public AuthorUsername Username { get; private set; }
+    public Username Username { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable properties are populated by EF Core when materializing.
     private ArticleFavorite() { } // for EF Core
 #pragma warning restore CS8618
 
-    private ArticleFavorite(ArticleFavoriteId id, ArticleId articleId, AuthorUsername username) : base(id)
+    private ArticleFavorite(ArticleFavoriteId id, ArticleId articleId, Username username) : base(id)
     {
         ArticleId = articleId;
         Username = username;
     }
 
-    public static ArticleFavorite Create(ArticleId articleId, AuthorUsername username)
+    public static ArticleFavorite Create(ArticleId articleId, Username username)
     {
         var favorite = new ArticleFavorite(ArticleFavoriteId.New(), articleId, username);
         favorite.AddDomainEvent(new ArticleFavoritedDomainEvent(articleId.Value, username.Value));

@@ -4,7 +4,7 @@ using ErrorOr;
 
 namespace Conduit.Articles.Domain.Rules;
 
-public sealed class OnlyTheAuthorCanDeleteTheComment(AuthorUsername author, AuthorUsername requester) : IBusinessRule
+public sealed class OnlyTheAuthorCanDeleteTheComment(Username author, Username requester) : IBusinessRule
 {
     public ErrorOr<Success> Check() =>
         author == requester

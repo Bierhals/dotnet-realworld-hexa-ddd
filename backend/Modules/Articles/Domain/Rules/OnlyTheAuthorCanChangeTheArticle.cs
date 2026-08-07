@@ -4,7 +4,7 @@ using ErrorOr;
 
 namespace Conduit.Articles.Domain.Rules;
 
-public sealed class OnlyTheAuthorCanChangeTheArticle(AuthorUsername author, AuthorUsername requester) : IBusinessRule
+public sealed class OnlyTheAuthorCanChangeTheArticle(Username author, Username requester) : IBusinessRule
 {
     public ErrorOr<Success> Check() =>
         author == requester

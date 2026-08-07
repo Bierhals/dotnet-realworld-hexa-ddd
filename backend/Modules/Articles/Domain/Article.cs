@@ -21,7 +21,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     public ArticleTitle Title { get; private set; }
     public ArticleDescription Description { get; private set; }
     public ArticleBody Body { get; private set; }
-    public AuthorUsername Author { get; private set; }
+    public Username Author { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
@@ -33,7 +33,7 @@ public sealed class Article : AggregateRoot<ArticleId>
 
     private Article(
         ArticleId id,
-        AuthorUsername author,
+        Username author,
         ArticleTitle title,
         ArticleDescription description,
         ArticleBody body,
@@ -49,7 +49,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     }
 
     public static Article Publish(
-        AuthorUsername author,
+        Username author,
         ArticleTitle title,
         ArticleDescription description,
         ArticleBody body,
@@ -70,7 +70,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     /// which tags the article started and stopped using, so the caller can update the tag catalog.
     /// </summary>
     public ErrorOr<TagChanges> Edit(
-        AuthorUsername editor,
+        Username editor,
         ArticleTitle? title,
         ArticleDescription? description,
         ArticleBody? body,
@@ -117,7 +117,7 @@ public sealed class Article : AggregateRoot<ArticleId>
         return tagChanges;
     }
 
-    public ErrorOr<Success> EnsureCanBeDeletedBy(AuthorUsername requester) =>
+    public ErrorOr<Success> EnsureCanBeDeletedBy(Username requester) =>
         new OnlyTheAuthorCanChangeTheArticle(Author, requester).Check();
 
     private TagChanges ApplyTags(IReadOnlyCollection<TagName> tagNames)

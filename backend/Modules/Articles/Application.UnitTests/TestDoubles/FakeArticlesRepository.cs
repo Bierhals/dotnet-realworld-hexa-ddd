@@ -19,7 +19,7 @@ internal sealed class FakeArticlesRepository : IArticlesRepository
     public Article Seed(string title = "How to train your dragon", string author = "alice", params string[] tags)
     {
         var article = Article.Publish(
-            AuthorUsername.Create(author).Value,
+            Username.Create(author).Value,
             ArticleTitle.Create(title).Value,
             ArticleDescription.Create("Ever wonder how?").Value,
             ArticleBody.Create("You have to believe").Value,

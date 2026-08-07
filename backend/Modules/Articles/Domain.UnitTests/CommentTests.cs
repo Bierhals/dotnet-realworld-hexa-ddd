@@ -13,7 +13,7 @@ public class CommentTests
     private static readonly DateTime PostedAt = new(2026, 1, 2, 12, 0, 0, DateTimeKind.Utc);
     private static readonly ArticleId Article = ArticleId.New();
 
-    private static AuthorUsername User(string name) => AuthorUsername.Create(name).Value;
+    private static Username User(string name) => Username.Create(name).Value;
 
     private static Comment AComment(string author = "bob", int number = 1) =>
         Comment.Post(

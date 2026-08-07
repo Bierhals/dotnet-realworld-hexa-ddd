@@ -8,7 +8,7 @@ public interface IArticleFavoritesRepository
 {
     public Task<ArticleFavorite?> GetAsync(
         ArticleId articleId,
-        AuthorUsername username,
+        Username username,
         CancellationToken cancellationToken = default);
 
     public void Add(ArticleFavorite favorite);

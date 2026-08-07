@@ -28,7 +28,7 @@ public class DeleteCommentHandlerTests
         _comments.Seed(Comment.Post(
             CommentId.From(commentNumber),
             article.Id,
-            AuthorUsername.Create(commenter).Value,
+            Username.Create(commenter).Value,
             CommentBody.Create("nice one").Value,
             CommentedAt));
 
@@ -78,7 +78,7 @@ public class DeleteCommentHandlerTests
         _comments.Seed(Comment.Post(
             CommentId.From(2),
             otherArticle.Id,
-            AuthorUsername.Create("bob").Value,
+            Username.Create("bob").Value,
             CommentBody.Create("elsewhere").Value,
             CommentedAt));
 

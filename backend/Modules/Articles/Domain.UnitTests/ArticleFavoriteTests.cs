@@ -10,7 +10,7 @@ public class ArticleFavoriteTests
 {
     private static readonly ArticleId Article = ArticleId.New();
 
-    private static AuthorUsername User(string name) => AuthorUsername.Create(name).Value;
+    private static Username User(string name) => Username.Create(name).Value;
 
     [Fact]
     public void Favoriting_an_article_records_who_favorited_which_article()

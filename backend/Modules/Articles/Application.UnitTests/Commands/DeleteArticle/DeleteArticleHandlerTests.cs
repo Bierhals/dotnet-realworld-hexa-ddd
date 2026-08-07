@@ -66,7 +66,7 @@ public class DeleteArticleHandlerTests
         _comments.Seed(Comment.Post(
             CommentId.From(1),
             article.Id,
-            AuthorUsername.Create("bob").Value,
+            Username.Create("bob").Value,
             CommentBody.Create("nice one").Value,
             CommentedAt));
         _favorites.Seed(article.Id, "bob");
@@ -86,7 +86,7 @@ public class DeleteArticleHandlerTests
         _comments.Seed(Comment.Post(
             CommentId.From(1),
             other.Id,
-            AuthorUsername.Create("bob").Value,
+            Username.Create("bob").Value,
             CommentBody.Create("elsewhere").Value,
             CommentedAt));
         _favorites.Seed(other.Id, "bob");

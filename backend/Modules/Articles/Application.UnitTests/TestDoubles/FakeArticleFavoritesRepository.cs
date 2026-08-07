@@ -17,14 +17,14 @@ internal sealed class FakeArticleFavoritesRepository : IArticleFavoritesReposito
 
     public void Seed(ArticleId articleId, string username)
     {
-        var favorite = ArticleFavorite.Create(articleId, AuthorUsername.Create(username).Value);
+        var favorite = ArticleFavorite.Create(articleId, Username.Create(username).Value);
         favorite.ClearDomainEvents();
         _favorites.Add(favorite);
     }
 
     public Task<ArticleFavorite?> GetAsync(
         ArticleId articleId,
-        AuthorUsername username,
+        Username username,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(_favorites.Find(favorite =>
             favorite.ArticleId == articleId && favorite.Username == username));

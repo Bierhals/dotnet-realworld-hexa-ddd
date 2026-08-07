@@ -3,7 +3,7 @@ using ErrorOr;
 
 namespace Conduit.Articles.Domain.Rules;
 
-public sealed class AuthorUsernameLengthIsInRange(string username) : IBusinessRule
+public sealed class UsernameLengthIsInRange(string username) : IBusinessRule
 {
     public const int MaximumLength = 255;
 

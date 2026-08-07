@@ -14,7 +14,7 @@ public class ArticleTests
     private static readonly DateTime PublishedAt = new(2026, 1, 1, 12, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime EditedAt = new(2026, 2, 2, 12, 0, 0, DateTimeKind.Utc);
 
-    private static AuthorUsername User(string name) => AuthorUsername.Create(name).Value;
+    private static Username User(string name) => Username.Create(name).Value;
 
     private static TagName Tag(string name) => TagName.Create(name).Value;
 

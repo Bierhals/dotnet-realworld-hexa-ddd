@@ -14,7 +14,7 @@ namespace Conduit.Articles.Domain;
 public sealed class Comment : AggregateRoot<CommentId>
 {
     public ArticleId ArticleId { get; private set; }
-    public AuthorUsername Author { get; private set; }
+    public Username Author { get; private set; }
     public CommentBody Body { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -23,7 +23,7 @@ public sealed class Comment : AggregateRoot<CommentId>
     private Comment() { } // for EF Core
 #pragma warning restore CS8618
 
-    private Comment(CommentId id, ArticleId articleId, AuthorUsername author, CommentBody body, DateTime createdAtUtc)
+    private Comment(CommentId id, ArticleId articleId, Username author, CommentBody body, DateTime createdAtUtc)
         : base(id)
     {
         ArticleId = articleId;
@@ -36,7 +36,7 @@ public sealed class Comment : AggregateRoot<CommentId>
     public static Comment Post(
         CommentId id,
         ArticleId articleId,
-        AuthorUsername author,
+        Username author,
         CommentBody body,
         DateTime nowUtc)
     {
@@ -48,7 +48,7 @@ public sealed class Comment : AggregateRoot<CommentId>
 
     public bool BelongsTo(ArticleId articleId) => ArticleId == articleId;
 
-    public ErrorOr<Success> EnsureCanBeDeletedBy(AuthorUsername requester) =>
+    public ErrorOr<Success> EnsureCanBeDeletedBy(Username requester) =>
         new OnlyTheAuthorCanDeleteTheComment(Author, requester).Check();
 
     /// <summary>

@@ -7,20 +7,20 @@ namespace Conduit.Articles.Domain.ValueObjects;
 /// The username of the account that authored or favorited something. Accounts are owned by the
 /// Identity module, so this only carries the identifier - never any profile data.
 /// </summary>
-public sealed record AuthorUsername
+public sealed record Username
 {
     public string Value { get; }
 
-    private AuthorUsername(string value) => Value = value;
+    private Username(string value) => Value = value;
 
-    public static ErrorOr<AuthorUsername> Create(string value)
+    public static ErrorOr<Username> Create(string value)
     {
         var sanitizedValue = value?.Trim() ?? string.Empty;
 
-        var check = new AuthorUsernameLengthIsInRange(sanitizedValue).Check();
+        var check = new UsernameLengthIsInRange(sanitizedValue).Check();
 
-        return check.IsError ? check.Errors : new AuthorUsername(sanitizedValue);
+        return check.IsError ? check.Errors : new Username(sanitizedValue);
     }
 
-    public static AuthorUsername Rehydrate(string value) => new(value);
+    public static Username Rehydrate(string value) => new(value);
 }

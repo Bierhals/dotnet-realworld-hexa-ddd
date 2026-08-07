@@ -41,20 +41,20 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
 
         if (!string.IsNullOrWhiteSpace(filter.Author))
         {
-            var author = AuthorUsername.Rehydrate(filter.Author);
+            var author = Username.Rehydrate(filter.Author);
             query = query.Where(article => article.Author == author);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.FavoritedBy))
         {
-            var favoritedBy = AuthorUsername.Rehydrate(filter.FavoritedBy);
+            var favoritedBy = Username.Rehydrate(filter.FavoritedBy);
             query = query.Where(article => dbContext.ArticleFavorites
                 .Any(favorite => favorite.ArticleId == article.Id && favorite.Username == favoritedBy));
         }
 
         if (filter.Authors is not null)
         {
-            var authors = filter.Authors.Select(AuthorUsername.Rehydrate).ToList();
+            var authors = filter.Authors.Select(Username.Rehydrate).ToList();
             query = query.Where(article => authors.Contains(article.Author));
         }
 
@@ -114,7 +114,7 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
     /// </summary>
     private IQueryable<ArticleRow> Project(IQueryable<Article> articles, string? viewerUsername)
     {
-        var viewer = viewerUsername is null ? null : AuthorUsername.Rehydrate(viewerUsername);
+        var viewer = viewerUsername is null ? null : Username.Rehydrate(viewerUsername);
 
         return articles.Select(article => new ArticleRow(
             article.Slug,
@@ -152,12 +152,12 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
         System.DateTime UpdatedAt,
         bool Favorited,
         int FavoritesCount,
-        AuthorUsername Author);
+        Username Author);
 
     private sealed record CommentRow(
         CommentId Id,
         CommentBody Body,
         System.DateTime CreatedAt,
         System.DateTime UpdatedAt,
-        AuthorUsername Author);
+        Username Author);
 }

@@ -11,7 +11,7 @@ public sealed class ArticleFavoritesRepository(ArticlesDbContext dbContext) : IA
 {
     public Task<ArticleFavorite?> GetAsync(
         ArticleId articleId,
-        AuthorUsername username,
+        Username username,
         CancellationToken cancellationToken = default) =>
         dbContext.ArticleFavorites.FirstOrDefaultAsync(
             favorite => favorite.ArticleId == articleId && favorite.Username == username,

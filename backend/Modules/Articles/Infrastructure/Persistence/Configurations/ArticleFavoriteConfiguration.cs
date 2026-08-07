@@ -24,8 +24,8 @@ public sealed class ArticleFavoriteConfiguration : IEntityTypeConfiguration<Arti
             .IsRequired();
 
         builder.Property(favorite => favorite.Username)
-            .HasConversion(username => username.Value, value => AuthorUsername.Rehydrate(value))
-            .HasMaxLength(AuthorUsernameLengthIsInRange.MaximumLength)
+            .HasConversion(username => username.Value, value => Username.Rehydrate(value))
+            .HasMaxLength(UsernameLengthIsInRange.MaximumLength)
             .IsRequired();
 
         // An account can favorite an article once.

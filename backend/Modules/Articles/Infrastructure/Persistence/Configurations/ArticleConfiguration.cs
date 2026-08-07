@@ -38,8 +38,8 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
             .IsRequired();
 
         builder.Property(article => article.Author)
-            .HasConversion(author => author.Value, value => AuthorUsername.Rehydrate(value))
-            .HasMaxLength(AuthorUsernameLengthIsInRange.MaximumLength)
+            .HasConversion(author => author.Value, value => Username.Rehydrate(value))
+            .HasMaxLength(UsernameLengthIsInRange.MaximumLength)
             .IsRequired();
         builder.HasIndex(article => article.Author);
 

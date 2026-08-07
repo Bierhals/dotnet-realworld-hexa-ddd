@@ -31,8 +31,8 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .IsRequired();
 
         builder.Property(comment => comment.Author)
-            .HasConversion(author => author.Value, value => AuthorUsername.Rehydrate(value))
-            .HasMaxLength(AuthorUsernameLengthIsInRange.MaximumLength)
+            .HasConversion(author => author.Value, value => Username.Rehydrate(value))
+            .HasMaxLength(UsernameLengthIsInRange.MaximumLength)
             .IsRequired();
 
         builder.Property(comment => comment.CreatedAt).IsRequired();
