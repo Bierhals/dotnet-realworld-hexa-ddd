@@ -12,9 +12,9 @@ public sealed record Username
     {
         var sanitizedValue = value.Trim();
 
-        var check = new UsernameContainsOnlyAllowedCharacters(sanitizedValue).Check();
-
-        return check.IsError ? check.Errors : new Username(sanitizedValue);
+        return new UsernameContainsOnlyAllowedCharacters(sanitizedValue).Check()
+            .Then(_ => new UsernameLengthIsInRange(sanitizedValue).Check())
+            .Then(_ => new Username(sanitizedValue));
     }
 
     public static Username Rehydrate(string value) => new(value);

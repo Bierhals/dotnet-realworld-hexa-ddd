@@ -1,3 +1,4 @@
+using Conduit.Identity.Domain.Rules;
 using Conduit.Identity.Domain.ValueObjects;
 using Shouldly;
 
@@ -29,6 +30,16 @@ public class UserEmailTests
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Code.ShouldBe("User.InvalidEmail");
+    }
+
+    [Fact]
+    public void An_email_address_longer_than_the_maximum_length_is_invalid()
+    {
+        var localPart = new string('a', UserEmailLengthIsInRange.MaximumLength);
+        var result = UserEmail.Create($"{localPart}@jake.jake");
+
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("User.EmailTooLong");
     }
 
     [Fact]

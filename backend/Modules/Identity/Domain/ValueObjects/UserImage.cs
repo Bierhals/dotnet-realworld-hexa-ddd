@@ -12,9 +12,9 @@ public sealed record UserImage
     {
         var sanitizedValue = value.Trim();
 
-        var check = new UserImageUrlIsWellFormed(sanitizedValue).Check();
-
-        return check.IsError ? check.Errors : new UserImage(sanitizedValue);
+        return new UserImageUrlIsWellFormed(sanitizedValue).Check()
+            .Then(_ => new UserImageUrlLengthIsInRange(sanitizedValue).Check())
+            .Then(_ => new UserImage(sanitizedValue));
     }
 
     public static UserImage Rehydrate(string value) => new(value);

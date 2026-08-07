@@ -12,9 +12,9 @@ public sealed record UserEmail
     {
         var sanitizedValue = value.Trim().ToLowerInvariant();
 
-        var check = new UserEmailIsWellFormed(sanitizedValue).Check();
-
-        return check.IsError ? check.Errors : new UserEmail(sanitizedValue);
+        return new UserEmailIsWellFormed(sanitizedValue).Check()
+            .Then(_ => new UserEmailLengthIsInRange(sanitizedValue).Check())
+            .Then(_ => new UserEmail(sanitizedValue));
     }
 
     public static UserEmail Rehydrate(string value) => new(value);
