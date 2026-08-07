@@ -22,8 +22,8 @@ public sealed class Article : AggregateRoot<ArticleId>
     public ArticleDescription Description { get; private set; }
     public ArticleBody Body { get; private set; }
     public Username Author { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime CreatedAtUtc { get; private set; }
+    public DateTime UpdatedAtUtc { get; private set; }
 
     public IReadOnlyCollection<TagName> Tags => _tags.AsReadOnly();
 
@@ -44,8 +44,8 @@ public sealed class Article : AggregateRoot<ArticleId>
         Description = description;
         Body = body;
         Slug = ArticleSlug.FromTitle(title);
-        CreatedAt = createdAtUtc;
-        UpdatedAt = createdAtUtc;
+        CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = createdAtUtc;
     }
 
     public static Article Publish(
@@ -111,7 +111,7 @@ public sealed class Article : AggregateRoot<ArticleId>
             return tagChanges;
         }
 
-        UpdatedAt = nowUtc;
+        UpdatedAtUtc = nowUtc;
         AddDomainEvent(new ArticleEditedDomainEvent(Id.Value, Slug.Value));
 
         return tagChanges;

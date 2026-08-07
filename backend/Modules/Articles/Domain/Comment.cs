@@ -16,8 +16,8 @@ public sealed class Comment : AggregateRoot<CommentId>
     public ArticleId ArticleId { get; private set; }
     public Username Author { get; private set; }
     public CommentBody Body { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
+    public DateTime CreatedAtUtc { get; private set; }
+    public DateTime UpdatedAtUtc { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable properties are populated by EF Core when materializing.
     private Comment() { } // for EF Core
@@ -29,8 +29,8 @@ public sealed class Comment : AggregateRoot<CommentId>
         ArticleId = articleId;
         Author = author;
         Body = body;
-        CreatedAt = createdAtUtc;
-        UpdatedAt = createdAtUtc;
+        CreatedAtUtc = createdAtUtc;
+        UpdatedAtUtc = createdAtUtc;
     }
 
     public static Comment Post(

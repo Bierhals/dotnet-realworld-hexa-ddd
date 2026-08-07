@@ -35,8 +35,8 @@ public sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .HasMaxLength(UsernameLengthIsInRange.MaximumLength)
             .IsRequired();
 
-        builder.Property(comment => comment.CreatedAt).IsRequired();
-        builder.Property(comment => comment.UpdatedAt).IsRequired();
+        builder.Property(comment => comment.CreatedAtUtc).IsRequired();
+        builder.Property(comment => comment.UpdatedAtUtc).IsRequired();
 
         builder.Ignore(comment => comment.DomainEvents);
     }

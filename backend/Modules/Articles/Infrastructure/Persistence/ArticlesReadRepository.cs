@@ -64,7 +64,7 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
         // Ordering and paging happen on the articles themselves; projecting first would leave the
         // database sorting by a shape it cannot translate.
         var page = query
-            .OrderByDescending(article => article.CreatedAt)
+            .OrderByDescending(article => article.CreatedAtUtc)
             .Skip(filter.Offset)
             .Take(filter.Limit);
 
@@ -95,8 +95,8 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
             .Select(comment => new CommentRow(
                 comment.Id,
                 comment.Body,
-                comment.CreatedAt,
-                comment.UpdatedAt,
+                comment.CreatedAtUtc,
+                comment.UpdatedAtUtc,
                 comment.Author))
             .ToListAsync(cancellationToken);
 
@@ -122,8 +122,8 @@ public sealed class ArticlesReadRepository(ArticlesDbContext dbContext) : IArtic
             article.Description,
             article.Body,
             article.Tags.Select(tag => tag.Value).ToList(),
-            article.CreatedAt,
-            article.UpdatedAt,
+            article.CreatedAtUtc,
+            article.UpdatedAtUtc,
             viewer != null && dbContext.ArticleFavorites
                 .Any(favorite => favorite.ArticleId == article.Id && favorite.Username == viewer),
             dbContext.ArticleFavorites.Count(favorite => favorite.ArticleId == article.Id),

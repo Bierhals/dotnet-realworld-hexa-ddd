@@ -54,8 +54,8 @@ public sealed class CreateCommentHandler(
             [new CommentProjection(
                 comment.Id.Value,
                 comment.Body.Value,
-                comment.CreatedAt,
-                comment.UpdatedAt,
+                comment.CreatedAtUtc,
+                comment.UpdatedAtUtc,
                 comment.Author.Value)],
             profileReader,
             author.Value.Value,

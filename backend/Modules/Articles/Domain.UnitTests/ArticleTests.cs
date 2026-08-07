@@ -33,8 +33,8 @@ public class ArticleTests
         var article = AnArticle();
 
         article.Slug.Value.ShouldBe("how-to-train-your-dragon");
-        article.CreatedAt.ShouldBe(PublishedAt);
-        article.UpdatedAt.ShouldBe(PublishedAt);
+        article.CreatedAtUtc.ShouldBe(PublishedAt);
+        article.UpdatedAtUtc.ShouldBe(PublishedAt);
         article.DomainEvents.OfType<ArticlePublishedDomainEvent>().Single().Author.ShouldBe("alice");
     }
 
@@ -55,7 +55,7 @@ public class ArticleTests
 
         result.IsError.ShouldBeFalse();
         article.Slug.Value.ShouldBe("how-to-tame-your-dragon");
-        article.UpdatedAt.ShouldBe(EditedAt);
+        article.UpdatedAtUtc.ShouldBe(EditedAt);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ArticleTests
         var result = article.Edit(User("alice"), null, null, null, null, EditedAt);
 
         result.IsError.ShouldBeFalse();
-        article.UpdatedAt.ShouldBe(PublishedAt);
+        article.UpdatedAtUtc.ShouldBe(PublishedAt);
         article.DomainEvents.ShouldBeEmpty();
     }
 

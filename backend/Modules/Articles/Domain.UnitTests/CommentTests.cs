@@ -31,8 +31,8 @@ public class CommentTests
         comment.Id.Value.ShouldBe(7);
         comment.ArticleId.ShouldBe(Article);
         comment.Author.Value.ShouldBe("bob");
-        comment.CreatedAt.ShouldBe(PostedAt);
-        comment.UpdatedAt.ShouldBe(PostedAt);
+        comment.CreatedAtUtc.ShouldBe(PostedAt);
+        comment.UpdatedAtUtc.ShouldBe(PostedAt);
         comment.DomainEvents.OfType<CommentAddedDomainEvent>().Single().CommentId.ShouldBe(7);
     }
 
