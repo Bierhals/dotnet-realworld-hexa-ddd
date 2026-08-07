@@ -17,7 +17,7 @@ public sealed class CreateArticleHandler(
 {
     public async Task<ErrorOr<string>> Handle(CreateArticleCommand command, CancellationToken cancellationToken)
     {
-        var author = CurrentAuthor.Resolve(currentUserAccessor);
+        var author = CurrentUser.Resolve(currentUserAccessor);
         if (author.IsError)
         {
             return author.Errors;

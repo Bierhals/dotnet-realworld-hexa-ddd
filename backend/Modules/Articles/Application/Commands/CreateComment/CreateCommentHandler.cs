@@ -22,7 +22,7 @@ public sealed class CreateCommentHandler(
         CreateCommentCommand command,
         CancellationToken cancellationToken)
     {
-        var author = CurrentAuthor.Resolve(currentUserAccessor);
+        var author = CurrentUser.Resolve(currentUserAccessor);
         if (author.IsError)
         {
             return author.Errors;

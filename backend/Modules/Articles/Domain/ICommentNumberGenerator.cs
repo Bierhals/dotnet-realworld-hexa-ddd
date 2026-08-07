@@ -1,8 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Articles.Domain;
 
-namespace Conduit.Articles.Application;
+namespace Conduit.Articles.Domain;
 
 /// <summary>
 /// Hands out the next comment number from a database sequence. Keeping this behind a port lets the

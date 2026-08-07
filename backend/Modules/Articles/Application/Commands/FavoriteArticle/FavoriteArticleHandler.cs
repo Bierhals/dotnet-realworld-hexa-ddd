@@ -16,7 +16,7 @@ public sealed class FavoriteArticleHandler(
 {
     public async Task<ErrorOr<Success>> Handle(FavoriteArticleCommand command, CancellationToken cancellationToken)
     {
-        var user = CurrentAuthor.Resolve(currentUserAccessor);
+        var user = CurrentUser.Resolve(currentUserAccessor);
         if (user.IsError)
         {
             return user.Errors;

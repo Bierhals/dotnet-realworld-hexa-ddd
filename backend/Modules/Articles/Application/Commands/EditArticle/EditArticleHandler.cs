@@ -18,7 +18,7 @@ public sealed class EditArticleHandler(
 {
     public async Task<ErrorOr<string>> Handle(EditArticleCommand command, CancellationToken cancellationToken)
     {
-        var editor = CurrentAuthor.Resolve(currentUserAccessor);
+        var editor = CurrentUser.Resolve(currentUserAccessor);
         if (editor.IsError)
         {
             return editor.Errors;

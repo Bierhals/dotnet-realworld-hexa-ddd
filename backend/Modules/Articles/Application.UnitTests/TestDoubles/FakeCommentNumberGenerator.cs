@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Articles.Application;
 using Conduit.Articles.Domain;
 
 namespace Conduit.Articles.Application.UnitTests.TestDoubles;

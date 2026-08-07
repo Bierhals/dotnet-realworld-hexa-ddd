@@ -16,7 +16,7 @@ public sealed class DeleteCommentHandler(
 {
     public async Task<ErrorOr<Success>> Handle(DeleteCommentCommand command, CancellationToken cancellationToken)
     {
-        var requester = CurrentAuthor.Resolve(currentUserAccessor);
+        var requester = CurrentUser.Resolve(currentUserAccessor);
         if (requester.IsError)
         {
             return requester.Errors;

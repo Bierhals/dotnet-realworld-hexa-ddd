@@ -4,7 +4,7 @@ using ErrorOr;
 
 namespace Conduit.Articles.Application;
 
-internal static class CurrentAuthor
+internal static class CurrentUser
 {
     public static ErrorOr<Username> Resolve(ICurrentUserAccessor currentUserAccessor) =>
         currentUserAccessor.GetCurrentUsername() is { } username

@@ -16,7 +16,7 @@ public sealed class UnfavoriteArticleHandler(
 {
     public async Task<ErrorOr<Success>> Handle(UnfavoriteArticleCommand command, CancellationToken cancellationToken)
     {
-        var user = CurrentAuthor.Resolve(currentUserAccessor);
+        var user = CurrentUser.Resolve(currentUserAccessor);
         if (user.IsError)
         {
             return user.Errors;

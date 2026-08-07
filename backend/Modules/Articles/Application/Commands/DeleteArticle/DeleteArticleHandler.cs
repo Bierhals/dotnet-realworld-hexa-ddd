@@ -18,7 +18,7 @@ public sealed class DeleteArticleHandler(
 {
     public async Task<ErrorOr<Success>> Handle(DeleteArticleCommand command, CancellationToken cancellationToken)
     {
-        var requester = CurrentAuthor.Resolve(currentUserAccessor);
+        var requester = CurrentUser.Resolve(currentUserAccessor);
         if (requester.IsError)
         {
             return requester.Errors;
