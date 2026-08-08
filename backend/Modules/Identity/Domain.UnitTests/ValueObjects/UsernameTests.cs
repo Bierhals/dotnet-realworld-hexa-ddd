@@ -1,3 +1,4 @@
+using Conduit.Identity.Domain.Rules;
 using Conduit.Identity.Domain.ValueObjects;
 using Shouldly;
 
@@ -38,6 +39,15 @@ public class UsernameTests
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Code.ShouldBe("User.InvalidUsername");
+    }
+
+    [Fact]
+    public void A_username_longer_than_the_maximum_length_is_invalid()
+    {
+        var result = Username.Create(new string('a', UsernameLengthIsInRange.MaximumLength + 1));
+
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("User.UsernameTooLong");
     }
 
     [Fact]

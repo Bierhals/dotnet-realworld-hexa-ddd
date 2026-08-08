@@ -19,15 +19,5 @@ public sealed class UserFollowConfiguration : IEntityTypeConfiguration<UserFollo
             .HasConversion(id => id.Value, value => UserId.Rehydrate(value.ToString()));
 
         builder.HasIndex(f => new { f.FollowedUserId, f.FollowerUserId }).IsUnique();
-
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(f => f.FollowedUserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(f => f.FollowerUserId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

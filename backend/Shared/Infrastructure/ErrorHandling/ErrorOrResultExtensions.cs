@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -8,6 +10,30 @@ namespace Conduit.Shared.Infrastructure.ErrorHandling;
 
 public static class ErrorOrResultExtensions
 {
+    public static Results<Ok<TValue>, ProblemHttpResult> ToOkResult<TValue>(this ErrorOr<TValue> errorOr) =>
+        errorOr.Match<Results<Ok<TValue>, ProblemHttpResult>>(
+            value => TypedResults.Ok(value),
+            errors => errors.ToProblemResult());
+
+    public static async Task<Results<Ok<TValue>, ProblemHttpResult>> ToOkResult<TValue>(this Task<ErrorOr<TValue>> errorOrTask) =>
+        (await errorOrTask).ToOkResult();
+
+    public static Results<Created<TValue>, ProblemHttpResult> ToCreatedResult<TValue>(this ErrorOr<TValue> errorOr, Func<TValue, string?> locationFactory) =>
+        errorOr.Match<Results<Created<TValue>, ProblemHttpResult>>(
+            value => TypedResults.Created(locationFactory(value), value),
+            errors => errors.ToProblemResult());
+
+    public static async Task<Results<Created<TValue>, ProblemHttpResult>> ToCreatedResult<TValue>(this Task<ErrorOr<TValue>> errorOrTask, Func<TValue, string?> locationFactory) =>
+        (await errorOrTask).ToCreatedResult(locationFactory);
+
+    public static Results<NoContent, ProblemHttpResult> ToNoContentResult(this ErrorOr<Success> errorOr) =>
+        errorOr.Match<Results<NoContent, ProblemHttpResult>>(
+            _ => TypedResults.NoContent(),
+            errors => errors.ToProblemResult());
+
+    public static async Task<Results<NoContent, ProblemHttpResult>> ToNoContentResult(this Task<ErrorOr<Success>> errorOrTask) =>
+        (await errorOrTask).ToNoContentResult();
+
     public static ProblemHttpResult ToProblemResult(this List<Error> errors)
     {
         if (errors.Count == 0)

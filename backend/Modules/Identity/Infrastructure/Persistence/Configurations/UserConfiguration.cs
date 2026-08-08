@@ -1,4 +1,5 @@
 using Conduit.Identity.Domain;
+using Conduit.Identity.Domain.Rules;
 using Conduit.Identity.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -16,18 +17,21 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Username)
             .HasConversion(username => username.Value, value => Username.Rehydrate(value))
+            .HasMaxLength(UsernameLengthIsInRange.MaximumLength)
             .IsRequired();
         builder.HasIndex(u => u.Username).IsUnique();
 
         builder.Property(u => u.Email)
             .HasConversion(email => email.Value, value => UserEmail.Rehydrate(value))
+            .HasMaxLength(UserEmailLengthIsInRange.MaximumLength)
             .IsRequired();
         builder.HasIndex(u => u.Email).IsUnique();
 
         builder.Property(u => u.Image)
             .HasConversion(
                 image => image == null ? null : image.Value,
-                value => value == null ? null : UserImage.Rehydrate(value));
+                value => value == null ? null : UserImage.Rehydrate(value))
+            .HasMaxLength(UserImageUrlLengthIsInRange.MaximumLength);
 
         builder.Property(u => u.PasswordHash).IsRequired();
     }

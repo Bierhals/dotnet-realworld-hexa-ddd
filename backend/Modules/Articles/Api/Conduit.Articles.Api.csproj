@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ErrorOr" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="../Application/Conduit.Articles.Application.csproj" />
+    <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
+  </ItemGroup>
+
+</Project>

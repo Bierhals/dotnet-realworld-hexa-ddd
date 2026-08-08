@@ -3,12 +3,13 @@
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Scalar.AspNetCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../ServiceDefaults/Conduit.Host.ServiceDefaults.csproj" />
+    <ProjectReference Include="../../Modules/Articles/Api/Conduit.Articles.Api.csproj" />
+    <ProjectReference Include="../../Modules/Articles/Infrastructure/Conduit.Articles.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/Identity/Api/Conduit.Identity.Api.csproj" />
     <ProjectReference Include="../../Modules/Identity/Application/Conduit.Identity.Application.csproj" />
     <ProjectReference Include="../../Modules/Identity/Contracts/Conduit.Identity.Contracts.csproj" />

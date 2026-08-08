@@ -1,0 +1,62 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
+using System.Threading.Tasks;
+using Conduit.Articles.Api.Endpoints.Comments.Dtos;
+using Conduit.Articles.Application.Commands.CreateComment;
+using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Infrastructure.ApiEndpoints;
+using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing;
+
+namespace Conduit.Articles.Api.Endpoints.Comments;
+
+internal sealed class CreateCommentEndpoint : IEndpoint
+{
+    public static void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapPost("", HandleAsync)
+            .RequireAuthorization()
+            .WithSummary("Create a comment for an article")
+            .WithDescription("Create a comment for an article. Auth is required<br/><a href=\"https://realworld-docs.netlify.app/specifications/backend/endpoints#add-comments-to-an-article\">Conduit Spec for add comment endpoint</a>")
+            .Produces<CommentEnvelope>(StatusCodes.Status201Created)
+            .ProducesValidationProblem(StatusCodes.Status401Unauthorized)
+            .ProducesValidationProblem(StatusCodes.Status404NotFound)
+            .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
+    }
+
+    private static Task<Results<Created<CommentEnvelope>, ProblemHttpResult>> HandleAsync(
+        [Required][Description("Slug of the article that you want to create a comment for")] string slug,
+        [Description("Comment you want to create")] Request request,
+        ICqrsMediator mediator,
+        LinkGenerator linkGenerator,
+        HttpContext httpContext,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateCommentCommand
+        {
+            Slug = slug,
+            Body = request.Comment.Body,
+        };
+
+        return mediator.Send(command, cancellationToken)
+            .Then(comment => new CommentEnvelope(CommentEnvelopeFactory.Create(comment)))
+            .ToCreatedResult(_ => linkGenerator.GetPathByName(httpContext, ListCommentsEndpoint.Name, new { slug }));
+    }
+
+    public sealed record Request
+    {
+        [Required]
+        public required Data Comment { get; init; }
+
+        public sealed record Data
+        {
+            [Required]
+            public required string Body { get; init; }
+        }
+    }
+}

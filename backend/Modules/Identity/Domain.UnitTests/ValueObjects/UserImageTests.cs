@@ -1,3 +1,4 @@
+using Conduit.Identity.Domain.Rules;
 using Conduit.Identity.Domain.ValueObjects;
 using Shouldly;
 
@@ -29,5 +30,15 @@ public class UserImageTests
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Code.ShouldBe("UserImage.InvalidImage");
+    }
+
+    [Fact]
+    public void A_user_image_url_longer_than_the_maximum_length_is_invalid()
+    {
+        var path = new string('a', UserImageUrlLengthIsInRange.MaximumLength);
+        var result = UserImage.Create($"https://example.com/{path}");
+
+        result.IsError.ShouldBeTrue();
+        result.FirstError.Code.ShouldBe("UserImage.UrlTooLong");
     }
 }
