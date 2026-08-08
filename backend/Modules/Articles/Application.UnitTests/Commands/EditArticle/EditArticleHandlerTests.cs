@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Articles.Application.Commands.EditArticle;
 using Conduit.Articles.Application.UnitTests.TestDoubles;
+using Conduit.Shared.Application.Optional;
 using ErrorOr;
 using Shouldly;
 
@@ -18,9 +18,9 @@ public class EditArticleHandlerTests
     private Task<ErrorOr<string>> Edit(
         string slug,
         string? editor = "alice",
-        string? title = null,
-        string? body = null,
-        IReadOnlyCollection<string>? tags = null) =>
+        Optional<string> title = default,
+        Optional<string> body = default,
+        Optional<string[]> tags = default) =>
         new EditArticleHandler(_articles, _unitOfWork, _tagCatalog, new StubCurrentUserAccessor(editor))
             .Handle(
                 new EditArticleCommand { Slug = slug, Title = title, Body = body, TagList = tags },
@@ -31,7 +31,7 @@ public class EditArticleHandlerTests
     {
         _articles.Seed();
 
-        var result = await Edit("how-to-train-your-dragon", title: "How to tame your dragon");
+        var result = await Edit("how-to-train-your-dragon", title: new Optional<string>("How to tame your dragon"));
 
         result.IsError.ShouldBeFalse();
         result.Value.ShouldBe("how-to-tame-your-dragon");
@@ -44,7 +44,7 @@ public class EditArticleHandlerTests
         _articles.Seed("How to train your dragon", "alice", "dragons", "training");
         _tagCatalog.Seed("dragons", "training");
 
-        await Edit("how-to-train-your-dragon", tags: ["dragons", "flying"]);
+        await Edit("how-to-train-your-dragon", tags: new Optional<string[]>(["dragons", "flying"]));
 
         _tagCatalog.Tags.ShouldBe(["dragons", "flying"], ignoreOrder: true);
         _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
@@ -57,7 +57,7 @@ public class EditArticleHandlerTests
         _articles.Seed("How to train your dragon", "alice", "dragons");
         _tagCatalog.Seed("dragons");
 
-        await Edit("how-to-train-your-dragon", body: "Believe harder");
+        await Edit("how-to-train-your-dragon", body: new Optional<string>("Believe harder"));
 
         _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
     }
@@ -67,7 +67,7 @@ public class EditArticleHandlerTests
     {
         var article = _articles.Seed();
 
-        var result = await Edit("how-to-train-your-dragon", editor: "bob", title: "Hijacked");
+        var result = await Edit("how-to-train-your-dragon", editor: "bob", title: new Optional<string>("Hijacked"));
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.Forbidden);
@@ -78,7 +78,7 @@ public class EditArticleHandlerTests
     [Fact]
     public async Task Editing_an_article_that_does_not_exist_reports_it_as_missing()
     {
-        var result = await Edit("no-such-article", title: "Whatever");
+        var result = await Edit("no-such-article", title: new Optional<string>("Whatever"));
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.NotFound);
@@ -90,7 +90,7 @@ public class EditArticleHandlerTests
         _articles.Seed();
         _tagCatalog.RejectReferencesWith = Error.Validation("Tag.NameTooLong", "too long");
 
-        var result = await Edit("how-to-train-your-dragon", tags: ["flying"]);
+        var result = await Edit("how-to-train-your-dragon", tags: new Optional<string[]>(["flying"]));
 
         result.IsError.ShouldBeTrue();
         _unitOfWork.SaveCount.ShouldBe(0);

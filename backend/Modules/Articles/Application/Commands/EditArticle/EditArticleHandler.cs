@@ -6,6 +6,7 @@ using Conduit.Articles.Domain;
 using Conduit.Articles.Domain.ValueObjects;
 using Conduit.Shared.Application;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.Optional;
 using ErrorOr;
 
 namespace Conduit.Articles.Application.Commands.EditArticle;
@@ -33,9 +34,9 @@ public sealed class EditArticleHandler(
         }
 
         ArticleTitle? title = null;
-        if (command.Title is not null)
+        if (command.Title.IsSpecified)
         {
-            var created = ArticleTitle.Create(command.Title);
+            var created = ArticleTitle.Create(command.Title.Value);
             if (created.IsError)
             {
                 return created.Errors;
@@ -45,9 +46,9 @@ public sealed class EditArticleHandler(
         }
 
         ArticleDescription? description = null;
-        if (command.Description is not null)
+        if (command.Description.IsSpecified)
         {
-            var created = ArticleDescription.Create(command.Description);
+            var created = ArticleDescription.Create(command.Description.Value);
             if (created.IsError)
             {
                 return created.Errors;
@@ -57,9 +58,9 @@ public sealed class EditArticleHandler(
         }
 
         ArticleBody? body = null;
-        if (command.Body is not null)
+        if (command.Body.IsSpecified)
         {
-            var created = ArticleBody.Create(command.Body);
+            var created = ArticleBody.Create(command.Body.Value);
             if (created.IsError)
             {
                 return created.Errors;
@@ -69,9 +70,9 @@ public sealed class EditArticleHandler(
         }
 
         List<TagName>? tagNames = null;
-        if (command.TagList is not null)
+        if (command.TagList.IsSpecified)
         {
-            var created = TagNameList.Create(command.TagList);
+            var created = TagNameList.Create(command.TagList.Value);
             if (created.IsError)
             {
                 return created.Errors;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Commands.EditArticle;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.Optional;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
@@ -58,18 +59,15 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
         [Required]
         public required Data Article { get; init; }
 
-        /// <summary>
-        /// Every field is optional; the ones left out keep the value the article already has.
-        /// </summary>
         public sealed record Data
         {
-            public string? Title { get; init; }
+            public Optional<string> Title { get; init; }
 
-            public string? Description { get; init; }
+            public Optional<string> Description { get; init; }
 
-            public string? Body { get; init; }
+            public Optional<string> Body { get; init; }
 
-            public string[]? TagList { get; init; }
+            public Optional<string[]> TagList { get; init; }
         }
     }
 }
