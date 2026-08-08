@@ -4,10 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Commands.CreateArticle;
-using Conduit.Articles.Application.Queries.ArticleDetails;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -29,7 +29,7 @@ internal sealed class CreateArticleEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Created<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Created<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
         [Description("The article to create")] Request request,
         ICqrsMediator mediator,
         LinkGenerator linkGenerator,
@@ -44,21 +44,9 @@ internal sealed class CreateArticleEndpoint : IEndpoint
             TagList = request.Article.TagList,
         };
 
-        var slug = await mediator.Send(command, cancellationToken);
-        if (slug.IsError)
-        {
-            return slug.Errors.ToProblemResult();
-        }
-
-        var article = await mediator.Send(new ArticleDetailsQuery { Slug = slug.Value }, cancellationToken);
-        if (article.IsError)
-        {
-            return article.Errors.ToProblemResult();
-        }
-
-        var location = linkGenerator.GetPathByName(httpContext, GetArticleEndpoint.Name, new { slug = slug.Value });
-
-        return TypedResults.Created(location, new ArticleEnvelope(ArticleEnvelopeFactory.Create(article.Value)));
+        return mediator.Send(command, cancellationToken)
+            .ThenAsync(slug => ArticleEnvelopeFactory.BuildAsync(slug, mediator, cancellationToken))
+            .ToCreatedResult(envelope => linkGenerator.GetPathByName(httpContext, GetArticleEndpoint.Name, new { slug = envelope.Article.Slug }));
     }
 
     public sealed record Request

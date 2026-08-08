@@ -9,6 +9,7 @@ using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,7 +29,7 @@ internal sealed class RegisterUserEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Created<UserEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Created<UserEnvelope>, ProblemHttpResult>> HandleAsync(
         [Description("Details of the new user to register")]
         Request request,
         ICqrsMediator mediator,
@@ -44,21 +45,14 @@ internal sealed class RegisterUserEndpoint : IEndpoint
             Password = request.User.Password,
         };
 
-        var result = await mediator.Send(command, cancellationToken);
-        if (result.IsError)
-        {
-            return result.Errors.ToProblemResult();
-        }
-
-        currentUserSetter.SetCurrentUsername(result.Value);
-        var currentUser = await mediator.Send(new CurrentUserQuery(), cancellationToken);
-        if (currentUser.IsError)
-        {
-            return currentUser.Errors.ToProblemResult();
-        }
-
-        var location = linkGenerator.GetPathByName(httpContext, GetCurrentUserEndpoint.Name, null);
-        return TypedResults.Created(location, UserEnvelopeFactory.Create(currentUser.Value));
+        return mediator.Send(command, cancellationToken)
+            .ThenAsync(username =>
+            {
+                currentUserSetter.SetCurrentUsername(username);
+                return mediator.Send(new CurrentUserQuery(), cancellationToken);
+            })
+            .Then(UserEnvelopeFactory.Create)
+            .ToCreatedResult(_ => linkGenerator.GetPathByName(httpContext, GetCurrentUserEndpoint.Name, null));
     }
 
     public sealed record Request

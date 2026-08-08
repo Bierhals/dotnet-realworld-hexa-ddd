@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Conduit.Identity.Api.Endpoints.Profiles.Dtos;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
+using Conduit.Shared.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -30,5 +31,5 @@ internal sealed class GetProfileEndpoint : IEndpoint
         string username,
         ICqrsMediator mediator,
         CancellationToken cancellationToken
-    ) => ProfileEnvelopeFactory.BuildAsync(username, mediator, cancellationToken);
+    ) => ProfileEnvelopeFactory.BuildAsync(username, mediator, cancellationToken).ToOkResult();
 }

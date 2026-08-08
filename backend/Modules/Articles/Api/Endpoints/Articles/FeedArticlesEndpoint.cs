@@ -6,6 +6,7 @@ using Conduit.Articles.Application.Queries.ArticleFeed;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -26,7 +27,7 @@ internal sealed class FeedArticlesEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<ArticlesEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<ArticlesEnvelope>, ProblemHttpResult>> HandleAsync(
         [Description("The number of items to skip before starting to collect the result set.")] int? offset,
         [Description("The numbers of items to return.")][DefaultValue(20)] int? limit,
         ICqrsMediator mediator,
@@ -38,10 +39,8 @@ internal sealed class FeedArticlesEndpoint : IEndpoint
             Offset = offset ?? 0,
         };
 
-        var articles = await mediator.Send(query, cancellationToken);
-
-        return articles.IsError
-            ? articles.Errors.ToProblemResult()
-            : TypedResults.Ok(ArticleEnvelopeFactory.Create(articles.Value));
+        return mediator.Send(query, cancellationToken)
+            .Then(ArticleEnvelopeFactory.Create)
+            .ToOkResult();
     }
 }

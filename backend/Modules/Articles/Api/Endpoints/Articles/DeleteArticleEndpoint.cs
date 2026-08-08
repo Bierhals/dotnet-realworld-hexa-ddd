@@ -27,15 +27,9 @@ internal sealed class DeleteArticleEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<NoContent, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<NoContent, ProblemHttpResult>> HandleAsync(
         [Required][Description("The slug of the article to delete")] string slug,
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var result = await mediator.Send(new DeleteArticleCommand { Slug = slug }, cancellationToken);
-
-        return result.IsError
-            ? result.Errors.ToProblemResult()
-            : TypedResults.NoContent();
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new DeleteArticleCommand { Slug = slug }, cancellationToken).ToNoContentResult();
 }

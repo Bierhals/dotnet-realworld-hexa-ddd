@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Conduit.Articles.Application;
 using Conduit.Articles.Application.Queries.ArticleDetails;
 using Conduit.Shared.Application.Cqrs;
-using Conduit.Shared.Infrastructure.ErrorHandling;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using ErrorOr;
 
 namespace Conduit.Articles.Api.Endpoints.Articles.Dtos;
 
@@ -17,17 +15,12 @@ internal static class ArticleEnvelopeFactory
     /// Renders an article by slug. Commands return only the slug they affected and let this build
     /// the response, so that the shape of an article is assembled in exactly one place.
     /// </summary>
-    public static async Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> BuildAsync(
+    public static Task<ErrorOr<ArticleEnvelope>> BuildAsync(
         string slug,
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var article = await mediator.Send(new ArticleDetailsQuery { Slug = slug }, cancellationToken);
-
-        return article.IsError
-            ? article.Errors.ToProblemResult()
-            : TypedResults.Ok(new ArticleEnvelope(Create(article.Value)));
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new ArticleDetailsQuery { Slug = slug }, cancellationToken)
+            .Then(article => new ArticleEnvelope(Create(article)));
 
     public static ArticleResponse Create(ArticleReadModel article) => new()
     {

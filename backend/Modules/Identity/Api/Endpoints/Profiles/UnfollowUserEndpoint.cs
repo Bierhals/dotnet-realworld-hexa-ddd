@@ -7,6 +7,7 @@ using Conduit.Identity.Application.Commands.UnfollowUser;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,19 +29,13 @@ internal sealed class UnfollowUserEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<ProfileEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<ProfileEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required]
         [Description("Username of the profile you want to unfollow")]
         string username,
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var result = await mediator.Send(new UnfollowUserCommand { Username = username }, cancellationToken);
-        if (result.IsError)
-        {
-            return result.Errors.ToProblemResult();
-        }
-
-        return await ProfileEnvelopeFactory.BuildAsync(username, mediator, cancellationToken);
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new UnfollowUserCommand { Username = username }, cancellationToken)
+            .ThenAsync(_ => ProfileEnvelopeFactory.BuildAsync(username, mediator, cancellationToken))
+            .ToOkResult();
 }

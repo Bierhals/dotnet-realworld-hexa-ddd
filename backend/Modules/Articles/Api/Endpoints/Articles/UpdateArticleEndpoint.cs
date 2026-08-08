@@ -8,6 +8,7 @@ using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Application.Optional;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -30,7 +31,7 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required][Description("The slug of the article to update")] string slug,
         [Description("The article to update")] Request request,
         ICqrsMediator mediator,
@@ -45,13 +46,9 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
             TagList = request.Article.TagList,
         };
 
-        var updatedSlug = await mediator.Send(command, cancellationToken);
-        if (updatedSlug.IsError)
-        {
-            return updatedSlug.Errors.ToProblemResult();
-        }
-
-        return await ArticleEnvelopeFactory.BuildAsync(updatedSlug.Value, mediator, cancellationToken);
+        return mediator.Send(command, cancellationToken)
+            .ThenAsync(updatedSlug => ArticleEnvelopeFactory.BuildAsync(updatedSlug, mediator, cancellationToken))
+            .ToOkResult();
     }
 
     public sealed record Request

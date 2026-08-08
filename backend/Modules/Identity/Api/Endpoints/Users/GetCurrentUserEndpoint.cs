@@ -5,6 +5,7 @@ using Conduit.Identity.Application.Queries.CurrentUser;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,16 +28,10 @@ internal sealed class GetCurrentUserEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<UserEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<UserEnvelope>, ProblemHttpResult>> HandleAsync(
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var result = await mediator.Send(new CurrentUserQuery(), cancellationToken);
-        if (result.IsError)
-        {
-            return result.Errors.ToProblemResult();
-        }
-
-        return TypedResults.Ok(UserEnvelopeFactory.Create(result.Value));
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new CurrentUserQuery(), cancellationToken)
+            .Then(UserEnvelopeFactory.Create)
+            .ToOkResult();
 }

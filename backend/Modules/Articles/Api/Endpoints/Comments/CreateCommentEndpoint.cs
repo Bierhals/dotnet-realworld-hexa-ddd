@@ -7,6 +7,7 @@ using Conduit.Articles.Application.Commands.CreateComment;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,7 +29,7 @@ internal sealed class CreateCommentEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Created<CommentEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Created<CommentEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required][Description("Slug of the article that you want to create a comment for")] string slug,
         [Description("Comment you want to create")] Request request,
         ICqrsMediator mediator,
@@ -42,15 +43,9 @@ internal sealed class CreateCommentEndpoint : IEndpoint
             Body = request.Comment.Body,
         };
 
-        var comment = await mediator.Send(command, cancellationToken);
-        if (comment.IsError)
-        {
-            return comment.Errors.ToProblemResult();
-        }
-
-        var location = linkGenerator.GetPathByName(httpContext, ListCommentsEndpoint.Name, new { slug });
-
-        return TypedResults.Created(location, new CommentEnvelope(CommentEnvelopeFactory.Create(comment.Value)));
+        return mediator.Send(command, cancellationToken)
+            .Then(comment => new CommentEnvelope(CommentEnvelopeFactory.Create(comment)))
+            .ToCreatedResult(_ => linkGenerator.GetPathByName(httpContext, ListCommentsEndpoint.Name, new { slug }));
     }
 
     public sealed record Request

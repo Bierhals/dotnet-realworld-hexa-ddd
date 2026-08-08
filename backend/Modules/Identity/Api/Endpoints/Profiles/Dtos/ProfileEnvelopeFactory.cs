@@ -2,31 +2,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Identity.Application.Queries.Profile;
 using Conduit.Shared.Application.Cqrs;
-using Conduit.Shared.Infrastructure.ErrorHandling;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using ErrorOr;
 
 namespace Conduit.Identity.Api.Endpoints.Profiles.Dtos;
 
 internal static class ProfileEnvelopeFactory
 {
-    public static async Task<Results<Ok<ProfileEnvelope>, ProblemHttpResult>> BuildAsync(
+    public static Task<ErrorOr<ProfileEnvelope>> BuildAsync(
         string username,
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var profile = await mediator.Send(new ProfileQuery { Username = username }, cancellationToken);
-        if (profile.IsError)
-        {
-            return profile.Errors.ToProblemResult();
-        }
-
-        return TypedResults.Ok(new ProfileEnvelope(new ProfileResponse
-        {
-            Username = profile.Value.Username,
-            Bio = profile.Value.Bio,
-            Image = profile.Value.Image,
-            Following = profile.Value.Following,
-        }));
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new ProfileQuery { Username = username }, cancellationToken)
+            .Then(profile => new ProfileEnvelope(new ProfileResponse
+            {
+                Username = profile.Username,
+                Bio = profile.Bio,
+                Image = profile.Image,
+                Following = profile.Following,
+            }));
 }

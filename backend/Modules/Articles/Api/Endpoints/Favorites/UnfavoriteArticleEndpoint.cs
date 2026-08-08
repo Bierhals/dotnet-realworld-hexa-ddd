@@ -7,6 +7,7 @@ using Conduit.Articles.Application.Commands.UnfavoriteArticle;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,17 +29,11 @@ internal sealed class UnfavoriteArticleEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required][Description("Slug of the article that you want to unfavorite")] string slug,
         ICqrsMediator mediator,
-        CancellationToken cancellationToken)
-    {
-        var result = await mediator.Send(new UnfavoriteArticleCommand { Slug = slug }, cancellationToken);
-        if (result.IsError)
-        {
-            return result.Errors.ToProblemResult();
-        }
-
-        return await ArticleEnvelopeFactory.BuildAsync(slug, mediator, cancellationToken);
-    }
+        CancellationToken cancellationToken) =>
+        mediator.Send(new UnfavoriteArticleCommand { Slug = slug }, cancellationToken)
+            .ThenAsync(_ => ArticleEnvelopeFactory.BuildAsync(slug, mediator, cancellationToken))
+            .ToOkResult();
 }

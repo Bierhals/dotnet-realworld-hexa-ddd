@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
+using Conduit.Shared.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -32,5 +33,5 @@ internal sealed class GetArticleEndpoint : IEndpoint
         [Required][Description("Slug of the article to get")] string slug,
         ICqrsMediator mediator,
         CancellationToken cancellationToken) =>
-        ArticleEnvelopeFactory.BuildAsync(slug, mediator, cancellationToken);
+        ArticleEnvelopeFactory.BuildAsync(slug, mediator, cancellationToken).ToOkResult();
 }

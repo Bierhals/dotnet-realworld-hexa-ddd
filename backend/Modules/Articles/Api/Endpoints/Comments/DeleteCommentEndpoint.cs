@@ -27,7 +27,7 @@ internal sealed class DeleteCommentEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<NoContent, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<NoContent, ProblemHttpResult>> HandleAsync(
         [Required][Description("Slug of the article that you want to delete a comment for")] string slug,
         [Description("ID of the comment you want to delete")] int id,
         ICqrsMediator mediator,
@@ -35,10 +35,6 @@ internal sealed class DeleteCommentEndpoint : IEndpoint
     {
         var command = new DeleteCommentCommand { Slug = slug, CommentId = id };
 
-        var result = await mediator.Send(command, cancellationToken);
-
-        return result.IsError
-            ? result.Errors.ToProblemResult()
-            : TypedResults.NoContent();
+        return mediator.Send(command, cancellationToken).ToNoContentResult();
     }
 }

@@ -9,6 +9,7 @@ using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Application.Optional;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using ErrorOr;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -28,7 +29,7 @@ internal sealed class UpdateCurrentUserEndpoint : IEndpoint
             .ProducesValidationProblem(StatusCodes.Status422UnprocessableEntity);
     }
 
-    private static async Task<Results<Ok<UserEnvelope>, ProblemHttpResult>> HandleAsync(
+    private static Task<Results<Ok<UserEnvelope>, ProblemHttpResult>> HandleAsync(
         [Description("User details to update. At least one field is required.")]
         Request request,
         ICqrsMediator mediator,
@@ -43,19 +44,10 @@ internal sealed class UpdateCurrentUserEndpoint : IEndpoint
             Image = request.User.Image,
         };
 
-        var result = await mediator.Send(command, cancellationToken);
-        if (result.IsError)
-        {
-            return result.Errors.ToProblemResult();
-        }
-
-        var currentUser = await mediator.Send(new CurrentUserQuery(), cancellationToken);
-        if (currentUser.IsError)
-        {
-            return currentUser.Errors.ToProblemResult();
-        }
-
-        return TypedResults.Ok(UserEnvelopeFactory.Create(currentUser.Value));
+        return mediator.Send(command, cancellationToken)
+            .ThenAsync(_ => mediator.Send(new CurrentUserQuery(), cancellationToken))
+            .Then(UserEnvelopeFactory.Create)
+            .ToOkResult();
     }
 
     public sealed record Request
