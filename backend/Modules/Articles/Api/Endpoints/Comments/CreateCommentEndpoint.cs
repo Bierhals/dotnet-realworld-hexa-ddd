@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Articles.Api.Endpoints.Comments.Dtos;
 using Conduit.Articles.Application.Commands.CreateComment;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
@@ -29,7 +30,7 @@ internal sealed class CreateCommentEndpoint : IEndpoint
 
     private static async Task<Results<Created<CommentEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required][Description("Slug of the article that you want to create a comment for")] string slug,
-        [Description("Comment you want to create")] CreateCommentRequest request,
+        [Description("Comment you want to create")] Request request,
         ICqrsMediator mediator,
         LinkGenerator linkGenerator,
         HttpContext httpContext,
@@ -50,5 +51,17 @@ internal sealed class CreateCommentEndpoint : IEndpoint
         var location = linkGenerator.GetPathByName(httpContext, ListCommentsEndpoint.Name, new { slug });
 
         return TypedResults.Created(location, new CommentEnvelope(CommentEnvelopeFactory.Create(comment.Value)));
+    }
+
+    public sealed record Request
+    {
+        [Required]
+        public required Data Comment { get; init; }
+
+        public sealed record Data
+        {
+            [Required]
+            public required string Body { get; init; }
+        }
     }
 }

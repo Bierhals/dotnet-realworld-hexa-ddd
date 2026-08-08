@@ -1,6 +1,6 @@
 using CurrentUserQueries = Conduit.Identity.Application.Queries.CurrentUser;
 
-namespace Conduit.Identity.Api.Endpoints.Users;
+namespace Conduit.Identity.Api.Endpoints.Users.Dtos;
 
 internal static class UserEnvelopeFactory
 {

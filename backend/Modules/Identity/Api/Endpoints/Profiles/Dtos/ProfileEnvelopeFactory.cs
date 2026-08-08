@@ -6,7 +6,7 @@ using Conduit.Shared.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Conduit.Identity.Api.Endpoints.Profiles;
+namespace Conduit.Identity.Api.Endpoints.Profiles.Dtos;
 
 internal static class ProfileEnvelopeFactory
 {

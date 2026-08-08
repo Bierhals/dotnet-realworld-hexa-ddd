@@ -1,6 +1,8 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Identity.Api.Endpoints.Users.Dtos;
 using Conduit.Identity.Application.Commands.RegisterUser;
 using Conduit.Identity.Application.Queries.CurrentUser;
 using Conduit.Shared.Application.Cqrs;
@@ -28,7 +30,7 @@ internal sealed class RegisterUserEndpoint : IEndpoint
 
     private static async Task<Results<Created<UserEnvelope>, ProblemHttpResult>> HandleAsync(
         [Description("Details of the new user to register")]
-        RegisterUserRequest request,
+        Request request,
         ICqrsMediator mediator,
         ICurrentUserSetter currentUserSetter,
         LinkGenerator linkGenerator,
@@ -57,5 +59,24 @@ internal sealed class RegisterUserEndpoint : IEndpoint
 
         var location = linkGenerator.GetPathByName(httpContext, GetCurrentUserEndpoint.Name, null);
         return TypedResults.Created(location, UserEnvelopeFactory.Create(currentUser.Value));
+    }
+
+    public sealed record Request
+    {
+        [Required]
+        public required Data User { get; init; }
+
+        public sealed record Data
+        {
+            [Required]
+            public required string Username { get; init; }
+
+            [Required]
+            [EmailAddress]
+            public required string Email { get; init; }
+
+            [Required]
+            public required string Password { get; init; }
+        }
     }
 }

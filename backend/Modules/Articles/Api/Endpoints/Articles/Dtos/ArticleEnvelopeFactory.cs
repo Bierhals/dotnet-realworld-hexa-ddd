@@ -9,7 +9,7 @@ using Conduit.Shared.Infrastructure.ErrorHandling;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Conduit.Articles.Api.Endpoints.Articles;
+namespace Conduit.Articles.Api.Endpoints.Articles.Dtos;
 
 internal static class ArticleEnvelopeFactory
 {
@@ -46,7 +46,7 @@ internal static class ArticleEnvelopeFactory
     public static ArticlesEnvelope Create(ArticleListReadModel articles) =>
         new([.. articles.Articles.Select(Create)], articles.ArticlesCount);
 
-    public static AuthorResponse Create(AuthorProfile author) => new()
+    public static ArticleResponse.AuthorResponse Create(AuthorProfile author) => new()
     {
         Username = author.Username,
         Bio = author.Bio,

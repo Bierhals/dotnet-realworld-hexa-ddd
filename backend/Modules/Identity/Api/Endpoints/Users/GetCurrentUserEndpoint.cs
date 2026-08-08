@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Identity.Api.Endpoints.Users.Dtos;
 using Conduit.Identity.Application.Queries.CurrentUser;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;

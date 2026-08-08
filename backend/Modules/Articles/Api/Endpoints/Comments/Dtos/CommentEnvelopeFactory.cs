@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Conduit.Articles.Api.Endpoints.Articles;
+using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application;
 
-namespace Conduit.Articles.Api.Endpoints.Comments;
+namespace Conduit.Articles.Api.Endpoints.Comments.Dtos;
 
 internal static class CommentEnvelopeFactory
 {

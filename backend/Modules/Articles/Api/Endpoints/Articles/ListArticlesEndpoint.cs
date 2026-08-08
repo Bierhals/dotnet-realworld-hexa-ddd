@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Queries.ArticleList;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;

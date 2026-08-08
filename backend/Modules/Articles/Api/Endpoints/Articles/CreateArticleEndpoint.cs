@@ -1,6 +1,8 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Commands.CreateArticle;
 using Conduit.Articles.Application.Queries.ArticleDetails;
 using Conduit.Shared.Application.Cqrs;
@@ -28,7 +30,7 @@ internal sealed class CreateArticleEndpoint : IEndpoint
     }
 
     private static async Task<Results<Created<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
-        [Description("The article to create")] CreateArticleRequest request,
+        [Description("The article to create")] Request request,
         ICqrsMediator mediator,
         LinkGenerator linkGenerator,
         HttpContext httpContext,
@@ -57,5 +59,25 @@ internal sealed class CreateArticleEndpoint : IEndpoint
         var location = linkGenerator.GetPathByName(httpContext, GetArticleEndpoint.Name, new { slug = slug.Value });
 
         return TypedResults.Created(location, new ArticleEnvelope(ArticleEnvelopeFactory.Create(article.Value)));
+    }
+
+    public sealed record Request
+    {
+        [Required]
+        public required Data Article { get; init; }
+
+        public sealed record Data
+        {
+            [Required]
+            public required string Title { get; init; }
+
+            [Required]
+            public required string Description { get; init; }
+
+            [Required]
+            public required string Body { get; init; }
+
+            public string[]? TagList { get; init; }
+        }
     }
 }

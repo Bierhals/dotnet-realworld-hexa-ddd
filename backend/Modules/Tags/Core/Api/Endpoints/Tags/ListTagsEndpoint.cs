@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
 using Conduit.Shared.Infrastructure.ErrorHandling;
+using Conduit.Tags.Core.Api.Endpoints.Tags.Dtos;
 using Conduit.Tags.Core.Application.Queries.TagCatalog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

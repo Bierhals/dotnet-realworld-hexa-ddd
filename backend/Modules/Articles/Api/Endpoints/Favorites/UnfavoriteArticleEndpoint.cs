@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Conduit.Articles.Api.Endpoints.Articles;
+using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Commands.UnfavoriteArticle;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;

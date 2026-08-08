@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Conduit.Articles.Api.Endpoints.Articles.Dtos;
 using Conduit.Articles.Application.Commands.EditArticle;
 using Conduit.Shared.Application.Cqrs;
 using Conduit.Shared.Infrastructure.ApiEndpoints;
@@ -30,7 +31,7 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
 
     private static async Task<Results<Ok<ArticleEnvelope>, ProblemHttpResult>> HandleAsync(
         [Required][Description("The slug of the article to update")] string slug,
-        [Description("The article to update")] UpdateArticleRequest request,
+        [Description("The article to update")] Request request,
         ICqrsMediator mediator,
         CancellationToken cancellationToken)
     {
@@ -50,5 +51,25 @@ internal sealed class UpdateArticleEndpoint : IEndpoint
         }
 
         return await ArticleEnvelopeFactory.BuildAsync(updatedSlug.Value, mediator, cancellationToken);
+    }
+
+    public sealed record Request
+    {
+        [Required]
+        public required Data Article { get; init; }
+
+        /// <summary>
+        /// Every field is optional; the ones left out keep the value the article already has.
+        /// </summary>
+        public sealed record Data
+        {
+            public string? Title { get; init; }
+
+            public string? Description { get; init; }
+
+            public string? Body { get; init; }
+
+            public string[]? TagList { get; init; }
+        }
     }
 }

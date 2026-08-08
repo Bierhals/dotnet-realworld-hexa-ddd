@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Conduit.Identity.Api.Endpoints.Profiles;
+namespace Conduit.Identity.Api.Endpoints.Profiles.Dtos;
 
 public sealed record ProfileResponse
 {
@@ -16,5 +16,3 @@ public sealed record ProfileResponse
 
     public required bool Following { get; init; }
 }
-
-public sealed record ProfileEnvelope(ProfileResponse Profile);

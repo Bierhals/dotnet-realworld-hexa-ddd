@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Conduit.Identity.Api.Endpoints.Users;
+namespace Conduit.Identity.Api.Endpoints.Users.Dtos;
 
 public sealed record UserResponse
 {
@@ -18,5 +18,3 @@ public sealed record UserResponse
 
     public required string Token { get; init; }
 }
-
-public sealed record UserEnvelope(UserResponse User);
