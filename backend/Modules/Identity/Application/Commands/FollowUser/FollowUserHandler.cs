@@ -16,33 +16,30 @@ public sealed class FollowUserHandler(
     IUnitOfWork unitOfWork
 ) : ICommandHandler<FollowUserCommand>
 {
-    public async Task<ErrorOr<Success>> Handle(FollowUserCommand message, CancellationToken cancellationToken)
+    public Task<ErrorOr<Success>> Handle(FollowUserCommand message, CancellationToken cancellationToken)
     {
         var currentUsername = currentUserAccessor.GetCurrentUsername()
             ?? throw new UnauthorizedAccessException("No authenticated user.");
 
-        var follower = await Username.Create(currentUsername)
-            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
-        if (follower.IsError)
-        {
-            return follower.Errors;
-        }
+        return Username.Create(currentUsername)
+            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken))
+            .ThenAsync(async follower =>
+            {
+                var target = await Username.Create(message.Username)
+                    .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
 
-        var target = await Username.Create(message.Username)
-            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
-        if (target.IsError)
-        {
-            return target.Errors;
-        }
+                return await target.ThenAsync(async t =>
+                {
+                    if (await userFollowsRepository.ExistsAsync(t.Id, follower.Id, cancellationToken))
+                    {
+                        return Result.Success;
+                    }
 
-        if (await userFollowsRepository.ExistsAsync(target.Value.Id, follower.Value.Id, cancellationToken))
-        {
-            return Result.Success;
-        }
-
-        return await UserFollow.Create(target.Value.Id, follower.Value.Id)
-            .ThenDoAsync(userFollow => userFollowsRepository.AddAsync(userFollow, cancellationToken))
-            .ThenDoAsync(_ => unitOfWork.SaveChangesAsync(cancellationToken))
-            .Then(_ => Result.Success);
+                    return await UserFollow.Create(t.Id, follower.Id)
+                        .ThenDoAsync(userFollow => userFollowsRepository.AddAsync(userFollow, cancellationToken))
+                        .ThenDoAsync(_ => unitOfWork.SaveChangesAsync(cancellationToken))
+                        .Then(_ => Result.Success);
+                });
+            });
     }
 }

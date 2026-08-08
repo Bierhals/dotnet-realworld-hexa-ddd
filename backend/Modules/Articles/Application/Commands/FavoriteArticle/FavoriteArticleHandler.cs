@@ -14,32 +14,27 @@ public sealed class FavoriteArticleHandler(
     IUnitOfWork unitOfWork,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<FavoriteArticleCommand>
 {
-    public async Task<ErrorOr<Success>> Handle(FavoriteArticleCommand command, CancellationToken cancellationToken)
-    {
-        var user = CurrentUser.Resolve(currentUserAccessor);
-        if (user.IsError)
-        {
-            return user.Errors;
-        }
+    public Task<ErrorOr<Success>> Handle(FavoriteArticleCommand command, CancellationToken cancellationToken) =>
+        CurrentUser.Resolve(currentUserAccessor)
+            .ThenAsync(async user =>
+            {
+                var articleId = await articlesRepository.GetIdBySlugAsync(
+                    ArticleSlug.Rehydrate(command.Slug),
+                    cancellationToken);
 
-        var articleId = await articlesRepository.GetIdBySlugAsync(
-            ArticleSlug.Rehydrate(command.Slug),
-            cancellationToken);
-        if (articleId is null)
-        {
-            return Error.NotFound("Article.NotFound", "The article does not exist.");
-        }
+                return await articleId.ToErrorOr(Error.NotFound("Article.NotFound", "The article does not exist."))
+                    .ThenDoAsync(async id =>
+                    {
+                        // Favoriting an article that is already favorited must not count twice.
+                        var existing = await favoritesRepository.GetAsync(id, user, cancellationToken);
+                        if (existing is not null)
+                        {
+                            return;
+                        }
 
-        // Favoriting an article that is already favorited must not count twice.
-        var existing = await favoritesRepository.GetAsync(articleId.Value, user.Value, cancellationToken);
-        if (existing is not null)
-        {
-            return Result.Success;
-        }
-
-        favoritesRepository.Add(ArticleFavorite.Create(articleId.Value, user.Value));
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result.Success;
-    }
+                        favoritesRepository.Add(ArticleFavorite.Create(id, user));
+                        await unitOfWork.SaveChangesAsync(cancellationToken);
+                    })
+                    .Then(_ => Result.Success);
+            });
 }

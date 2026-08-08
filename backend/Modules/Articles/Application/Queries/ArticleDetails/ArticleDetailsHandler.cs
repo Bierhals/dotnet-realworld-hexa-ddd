@@ -15,19 +15,13 @@ public sealed class ArticleDetailsHandler(
     public async Task<ErrorOr<ArticleReadModel>> Handle(ArticleDetailsQuery query, CancellationToken cancellationToken)
     {
         var viewerUsername = currentUserAccessor.GetCurrentUsername();
-
         var article = await articlesReadRepository.GetBySlugAsync(query.Slug, viewerUsername, cancellationToken);
-        if (article is null)
-        {
-            return Error.NotFound("Article.NotFound", "The article does not exist.");
-        }
 
-        var readModels = await AuthorProfileResolver.ToReadModelsAsync(
-            [article],
-            profileReader,
-            viewerUsername,
-            cancellationToken);
-
-        return readModels.First();
+        return await article.ToErrorOr(Error.NotFound("Article.NotFound", "The article does not exist."))
+            .ThenAsync(async a => (await AuthorProfileResolver.ToReadModelsAsync(
+                [a],
+                profileReader,
+                viewerUsername,
+                cancellationToken)).First());
     }
 }

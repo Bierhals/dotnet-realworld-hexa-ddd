@@ -17,22 +17,24 @@ public sealed class EditArticleHandler(
     ITagCatalog tagCatalog,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<EditArticleCommand, string>
 {
-    public async Task<ErrorOr<string>> Handle(EditArticleCommand command, CancellationToken cancellationToken)
+    public Task<ErrorOr<string>> Handle(EditArticleCommand command, CancellationToken cancellationToken) =>
+        CurrentUser.Resolve(currentUserAccessor)
+            .ThenAsync(async editor =>
+            {
+                var article = await articlesRepository.GetBySlugAsync(
+                    ArticleSlug.Rehydrate(command.Slug),
+                    cancellationToken);
+
+                return await article.ToErrorOr(Error.NotFound("Article.NotFound", "The article does not exist."))
+                    .ThenAsync(a => ApplyEditAsync(a, editor, command, cancellationToken));
+            });
+
+    private async Task<ErrorOr<string>> ApplyEditAsync(
+        Article article,
+        Username editor,
+        EditArticleCommand command,
+        CancellationToken cancellationToken)
     {
-        var editor = CurrentUser.Resolve(currentUserAccessor);
-        if (editor.IsError)
-        {
-            return editor.Errors;
-        }
-
-        var article = await articlesRepository.GetBySlugAsync(
-            ArticleSlug.Rehydrate(command.Slug),
-            cancellationToken);
-        if (article is null)
-        {
-            return Error.NotFound("Article.NotFound", "The article does not exist.");
-        }
-
         ArticleTitle? title = null;
         if (command.Title.IsSpecified)
         {
@@ -81,30 +83,17 @@ public sealed class EditArticleHandler(
             tagNames = created.Value;
         }
 
-        var tagChanges = article.Edit(editor.Value, title, description, body, tagNames, DateTime.UtcNow);
-        if (tagChanges.IsError)
-        {
-            return tagChanges.Errors;
-        }
-
         // Announce the tags this article starts using before persisting, so that a rejected tag
-        // name does not leave a half-applied edit behind.
-        var reference = await tagCatalog.ReferenceTagsAsync(
-            TagNameList.ToValues(tagChanges.Value.Added),
-            cancellationToken);
-        if (reference.IsError)
-        {
-            return reference.Errors;
-        }
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        // The article no longer uses these tags; the Tags module drops the ones that nothing
-        // references anymore.
-        await tagCatalog.ReleaseTagsAsync(
-            TagNameList.ToValues(tagChanges.Value.Removed),
-            cancellationToken);
-
-        return article.Slug.Value;
+        // name does not leave a half-applied edit behind. The article no longer uses the removed
+        // tags only once persisted; the Tags module drops the ones that nothing references anymore.
+        return await article.Edit(editor, title, description, body, tagNames, DateTime.UtcNow)
+            .ThenAsync(async tagChanges =>
+            {
+                var reference = await tagCatalog.ReferenceTagsAsync(TagNameList.ToValues(tagChanges.Added), cancellationToken);
+                return await reference
+                    .ThenDoAsync(_ => unitOfWork.SaveChangesAsync(cancellationToken))
+                    .ThenDoAsync(_ => tagCatalog.ReleaseTagsAsync(TagNameList.ToValues(tagChanges.Removed), cancellationToken))
+                    .Then(_ => article.Slug.Value);
+            });
     }
 }

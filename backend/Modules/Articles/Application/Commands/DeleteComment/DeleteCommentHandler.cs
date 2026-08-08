@@ -14,41 +14,32 @@ public sealed class DeleteCommentHandler(
     IUnitOfWork unitOfWork,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<DeleteCommentCommand>
 {
-    public async Task<ErrorOr<Success>> Handle(DeleteCommentCommand command, CancellationToken cancellationToken)
-    {
-        var requester = CurrentUser.Resolve(currentUserAccessor);
-        if (requester.IsError)
-        {
-            return requester.Errors;
-        }
+    public Task<ErrorOr<Success>> Handle(DeleteCommentCommand command, CancellationToken cancellationToken) =>
+        CurrentUser.Resolve(currentUserAccessor)
+            .ThenAsync(async requester =>
+            {
+                var articleId = await articlesRepository.GetIdBySlugAsync(
+                    ArticleSlug.Rehydrate(command.Slug),
+                    cancellationToken);
 
-        var articleId = await articlesRepository.GetIdBySlugAsync(
-            ArticleSlug.Rehydrate(command.Slug),
-            cancellationToken);
-        if (articleId is null)
-        {
-            return Error.NotFound("Article.NotFound", "The article does not exist.");
-        }
+                return await articleId.ToErrorOr(Error.NotFound("Article.NotFound", "The article does not exist."))
+                    .ThenAsync(async id =>
+                    {
+                        var comment = await commentsRepository.GetAsync(CommentId.From(command.CommentId), cancellationToken);
+                        var notFound = Error.NotFound("Comment.NotFound", "The comment does not exist.");
 
-        var comment = await commentsRepository.GetAsync(CommentId.From(command.CommentId), cancellationToken);
-
-        // Comment numbers are unique across all articles, so a comment that belongs to a different
-        // article is simply not found under this one.
-        if (comment is null || !comment.BelongsTo(articleId.Value))
-        {
-            return Error.NotFound("Comment.NotFound", "The comment does not exist.");
-        }
-
-        var check = comment.EnsureCanBeDeletedBy(requester.Value);
-        if (check.IsError)
-        {
-            return check.Errors;
-        }
-
-        comment.Delete();
-        commentsRepository.Remove(comment);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result.Success;
-    }
+                        // Comment numbers are unique across all articles, so a comment that belongs to a different
+                        // article is simply not found under this one.
+                        return await comment.ToErrorOr(notFound)
+                            .Then<Comment>(c => c.BelongsTo(id) ? c : notFound)
+                            .Then(c => c.EnsureCanBeDeletedBy(requester).Then(_ => c))
+                            .ThenDoAsync(async c =>
+                            {
+                                c.Delete();
+                                commentsRepository.Remove(c);
+                                await unitOfWork.SaveChangesAsync(cancellationToken);
+                            })
+                            .Then(_ => Result.Success);
+                    });
+            });
 }

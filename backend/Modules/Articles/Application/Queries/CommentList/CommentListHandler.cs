@@ -18,17 +18,12 @@ public sealed class CommentListHandler(
         CancellationToken cancellationToken)
     {
         var comments = await articlesReadRepository.GetCommentsAsync(query.Slug, cancellationToken);
-        if (comments is null)
-        {
-            return Error.NotFound("Article.NotFound", "The article does not exist.");
-        }
 
-        var readModels = await AuthorProfileResolver.ToReadModelsAsync(
-            comments,
-            profileReader,
-            currentUserAccessor.GetCurrentUsername(),
-            cancellationToken);
-
-        return ErrorOrFactory.From(readModels);
+        return await comments.ToErrorOr(Error.NotFound("Article.NotFound", "The article does not exist."))
+            .ThenAsync(async c => await AuthorProfileResolver.ToReadModelsAsync(
+                c,
+                profileReader,
+                currentUserAccessor.GetCurrentUsername(),
+                cancellationToken));
     }
 }

@@ -16,35 +16,30 @@ public sealed class UnfollowUserHandler(
     IUnitOfWork unitOfWork
 ) : ICommandHandler<UnfollowUserCommand>
 {
-    public async Task<ErrorOr<Success>> Handle(UnfollowUserCommand message, CancellationToken cancellationToken)
+    public Task<ErrorOr<Success>> Handle(UnfollowUserCommand message, CancellationToken cancellationToken)
     {
         var currentUsername = currentUserAccessor.GetCurrentUsername()
             ?? throw new UnauthorizedAccessException("No authenticated user.");
 
-        var follower = await Username.Create(currentUsername)
-            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
-        if (follower.IsError)
-        {
-            return follower.Errors;
-        }
+        return Username.Create(currentUsername)
+            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken))
+            .ThenAsync(async follower =>
+            {
+                var target = await Username.Create(message.Username)
+                    .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
 
-        var target = await Username.Create(message.Username)
-            .ThenAsync(username => usersRepository.GetByUsernameAsync(username, cancellationToken));
-        if (target.IsError)
-        {
-            return target.Errors;
-        }
+                return await target.ThenDoAsync(async t =>
+                {
+                    var userFollow = await userFollowsRepository.GetAsync(t.Id, follower.Id, cancellationToken);
+                    if (userFollow is null)
+                    {
+                        return;
+                    }
 
-        var userFollow = await userFollowsRepository.GetAsync(target.Value.Id, follower.Value.Id, cancellationToken);
-        if (userFollow is null)
-        {
-            return Result.Success;
-        }
-
-        userFollow.Unfollow();
-        await userFollowsRepository.RemoveAsync(userFollow, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Result.Success;
+                    userFollow.Unfollow();
+                    await userFollowsRepository.RemoveAsync(userFollow, cancellationToken);
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
+                }).Then(_ => Result.Success);
+            });
     }
 }
