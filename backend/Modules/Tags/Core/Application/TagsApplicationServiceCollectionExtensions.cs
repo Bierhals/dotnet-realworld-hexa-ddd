@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.EventHandling;
 using Conduit.Tags.Contracts.Catalog;
 using Conduit.Tags.Core.Application.Commands.ReferenceTags;
 using Conduit.Tags.Core.Application.Commands.ReleaseTags;
@@ -13,6 +14,7 @@ public static class TagsApplicationServiceCollectionExtensions
     public static IServiceCollection AddTagsApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
+        services.AddDomainEventLogging();
 
         services.AddScoped<ICommandHandler<ReferenceTagsCommand>, ReferenceTagsHandler>();
         services.AddScoped<ICommandHandler<ReleaseTagsCommand>, ReleaseTagsHandler>();
