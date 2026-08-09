@@ -11,6 +11,7 @@ using Conduit.Articles.Application.Queries.ArticleFeed;
 using Conduit.Articles.Application.Queries.ArticleList;
 using Conduit.Articles.Application.Queries.CommentList;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.EventHandling;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Conduit.Articles.Application;
@@ -20,6 +21,7 @@ public static class ArticlesApplicationServiceCollectionExtensions
     public static IServiceCollection AddArticlesApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
+        services.AddDomainEventLogging();
 
         services.AddScoped<ICommandHandler<CreateArticleCommand, string>, CreateArticleHandler>();
         services.AddScoped<ICommandHandler<EditArticleCommand, string>, EditArticleHandler>();

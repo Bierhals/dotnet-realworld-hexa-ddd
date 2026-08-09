@@ -8,6 +8,7 @@ using Conduit.Identity.Application.Queries.Profile;
 using Conduit.Identity.Contracts.Queries;
 using Conduit.Identity.Domain.Services;
 using Conduit.Shared.Application.Cqrs;
+using Conduit.Shared.Application.EventHandling;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Conduit.Identity.Application;
@@ -17,6 +18,7 @@ public static class IdentityApplicationServiceCollectionExtensions
     public static IServiceCollection AddIdentityApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
+        services.AddDomainEventLogging();
 
         services.AddScoped<ICommandHandler<RegisterUserCommand, string>, RegisterUserHandler>();
         services.AddScoped<ICommandHandler<AuthenticateUserCommand, string>, AuthenticateUserHandler>();
