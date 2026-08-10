@@ -18,8 +18,8 @@ var api = builder.AddProject<Projects.Conduit_Host_WebApi>("api")
     .WithReference(conduitDb)
     .WaitFor(conduitDb);
 
-#pragma warning disable ASPIRECERTIFICATES001 // Der Typ dient nur zu Testzwecken und kann in zukünftigen Aktualisierungen geändert oder entfernt werden. Unterdrücken Sie diese Diagnose, um fortzufahren.
-var viteApp = builder.AddViteApp("ui", "../../frontend")
+#pragma warning disable ASPIRECERTIFICATES001
+var viteApp = builder.AddViteApp("ui", "../../../frontend")
     .WithHttpsDeveloperCertificate()
     .WithReference(api);
 
@@ -38,6 +38,6 @@ var gateway = builder.AddYarp("gateway")
         }
     })
     .PublishWithStaticFiles(viteApp);
-#pragma warning restore ASPIRECERTIFICATES001 // Der Typ dient nur zu Testzwecken und kann in zukünftigen Aktualisierungen geändert oder entfernt werden. Unterdrücken Sie diese Diagnose, um fortzufahren.
+#pragma warning restore ASPIRECERTIFICATES001
 
 builder.Build().Run();
