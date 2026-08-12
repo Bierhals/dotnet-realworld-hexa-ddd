@@ -162,6 +162,80 @@ public sealed class DomainEventDispatcherTests
         handlerMock.Verify(h => h.Handle(It.IsAny<TestDomainEvent>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
     }
 
+    [Fact]
+    public void GetHandlerTypes_MultipleHandlersRegistered_ReturnsEachConcreteType()
+    {
+        // Arrange
+        SetupHandlers(new RecordingTestHandler(), new OtherRecordingTestHandler());
+
+        // Act
+        var handlerTypes = _sut.GetHandlerTypes(typeof(TestDomainEvent)).ToArray();
+
+        // Assert
+        handlerTypes.ShouldBe([typeof(RecordingTestHandler), typeof(OtherRecordingTestHandler)], ignoreOrder: true);
+    }
+
+    [Fact]
+    public void GetHandlerTypes_NoHandlersRegistered_ReturnsEmpty()
+    {
+        // Arrange
+        SetupHandlers<TestDomainEvent>();
+
+        // Act
+        var handlerTypes = _sut.GetHandlerTypes(typeof(TestDomainEvent));
+
+        // Assert
+        handlerTypes.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DispatchToHandlerAsync_MultipleHandlersRegistered_InvokesOnlyTheNamedHandler()
+    {
+        // Arrange
+        var domainEvent = new TestDomainEvent();
+        var namedHandler = new RecordingTestHandler();
+        var otherHandler = new OtherRecordingTestHandler();
+        SetupHandlers(namedHandler, otherHandler);
+
+        // Act
+        await _sut.DispatchToHandlerAsync(domainEvent, typeof(RecordingTestHandler), CancellationToken.None);
+
+        // Assert
+        namedHandler.CallCount.ShouldBe(1);
+        otherHandler.CallCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task DispatchToHandlerAsync_HandlerNoLongerRegistered_Throws()
+    {
+        // Arrange - the handler this row was written for was since removed/renamed.
+        var domainEvent = new TestDomainEvent();
+        SetupHandlers(new RecordingTestHandler());
+
+        // Act
+        async Task act() =>
+            await _sut.DispatchToHandlerAsync(domainEvent, typeof(OtherRecordingTestHandler), CancellationToken.None);
+
+        // Assert
+        await Should.ThrowAsync<InvalidOperationException>(act);
+    }
+
+    [Fact]
+    public async Task DispatchToHandlerAsync_PassesProvidedCancellationTokenToHandler()
+    {
+        // Arrange
+        using var cts = new CancellationTokenSource();
+        var domainEvent = new TestDomainEvent();
+        var handler = new RecordingTestHandler();
+        SetupHandlers(handler);
+
+        // Act
+        await _sut.DispatchToHandlerAsync(domainEvent, typeof(RecordingTestHandler), cts.Token);
+
+        // Assert
+        handler.LastCancellationToken.ShouldBe(cts.Token);
+    }
+
     private void SetupHandlers<TEvent>(params IDomainEventHandler<TEvent>[] handlers)
         where TEvent : IDomainEvent
     {
@@ -174,4 +248,30 @@ public sealed class DomainEventDispatcherTests
 
     public record OtherTestDomainEvent : DomainEvent;
 
+    public sealed class RecordingTestHandler : IDomainEventHandler<TestDomainEvent>
+    {
+        public int CallCount { get; private set; }
+
+        public CancellationToken LastCancellationToken { get; private set; }
+
+        public Task Handle(TestDomainEvent domainEvent, CancellationToken ct)
+        {
+            CallCount++;
+            LastCancellationToken = ct;
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public sealed class OtherRecordingTestHandler : IDomainEventHandler<TestDomainEvent>
+    {
+        public int CallCount { get; private set; }
+
+        public Task Handle(TestDomainEvent domainEvent, CancellationToken ct)
+        {
+            CallCount++;
+
+            return Task.CompletedTask;
+        }
+    }
 }

@@ -62,6 +62,9 @@ public static class Extensions
             .WithTracing(tracing =>
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
+                    // Must match Shared.Infrastructure.Outbox.OutboxActivitySource.Name - kept as a
+                    // literal here since ServiceDefaults has no reference to that project.
+                    .AddSource("Conduit.Outbox")
                     .AddAspNetCoreInstrumentation(tracing =>
                         // Exclude health check requests from tracing
                         tracing.Filter = context =>

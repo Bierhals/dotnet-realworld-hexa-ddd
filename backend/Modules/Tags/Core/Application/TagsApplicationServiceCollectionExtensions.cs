@@ -14,7 +14,7 @@ public static class TagsApplicationServiceCollectionExtensions
     public static IServiceCollection AddTagsApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
-        services.AddDomainEventLogging();
+        services.AddDomainEventDispatching();
 
         services.AddScoped<ICommandHandler<ReferenceTagsCommand>, ReferenceTagsHandler>();
         services.AddScoped<ICommandHandler<ReleaseTagsCommand>, ReleaseTagsHandler>();

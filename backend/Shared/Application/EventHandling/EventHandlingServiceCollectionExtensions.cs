@@ -6,14 +6,14 @@ namespace Conduit.Shared.Application.EventHandling;
 public static class EventHandlingServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers a logging handler for every domain event type. Every module that dispatches
-    /// domain events calls this from its own Add{Module}Application(); TryAddEnumerable keeps
-    /// the registration idempotent no matter how many modules call it.
+    /// Registers DomainEventDispatcher (used by the OutboxProcessor to invoke handlers for
+    /// processed outbox rows) and IDomainEventPublisher (the synchronous, pre-response escape
+    /// hatch for Application handlers). Call once from the composition root.
     /// </summary>
-    public static IServiceCollection AddDomainEventLogging(this IServiceCollection services)
+    public static IServiceCollection AddDomainEventDispatching(this IServiceCollection services)
     {
-        services.TryAddEnumerable(
-            ServiceDescriptor.Scoped(typeof(IDomainEventHandler<>), typeof(LoggingDomainEventHandler<>)));
+        services.TryAddScoped<DomainEventDispatcher>();
+        services.TryAddScoped<IDomainEventPublisher, DomainEventPublisher>();
 
         return services;
     }

@@ -21,7 +21,7 @@ public static class ArticlesApplicationServiceCollectionExtensions
     public static IServiceCollection AddArticlesApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
-        services.AddDomainEventLogging();
+        services.AddDomainEventDispatching();
 
         services.AddScoped<ICommandHandler<CreateArticleCommand, string>, CreateArticleHandler>();
         services.AddScoped<ICommandHandler<EditArticleCommand, string>, EditArticleHandler>();

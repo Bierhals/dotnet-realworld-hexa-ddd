@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Conduit.Articles.Application;
 using Conduit.Articles.Domain;
 using Conduit.Articles.Infrastructure.Persistence.CommentNumbers;
+using Conduit.Shared.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Articles.Infrastructure.Persistence;
@@ -27,6 +28,8 @@ public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> option
     // these rows and keeps them consistent.
     public DbSet<ArticleFavorite> ArticleFavorites => Set<ArticleFavorite>();
 
+    public DbSet<OutboxDomainEvent> OutboxDomainEvents => Set<OutboxDomainEvent>();
+
     /// <summary>
     /// EF Core models sequences only for providers that actually have them - SQLite, for instance,
     /// does not. Declaring one anyway would make table creation fail there.
@@ -39,6 +42,8 @@ public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> option
     {
         modelBuilder.HasDefaultSchema(SchemaName);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ArticlesDbContext).Assembly);
+        modelBuilder.Entity<OutboxDomainEvent>(builder =>
+            OutboxDomainEventConfiguration.Configure(builder, Database.ProviderName, SchemaName));
 
         if (SupportsSequences(Database.ProviderName))
         {

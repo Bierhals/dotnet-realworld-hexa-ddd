@@ -18,7 +18,7 @@ public static class IdentityApplicationServiceCollectionExtensions
     public static IServiceCollection AddIdentityApplication(this IServiceCollection services)
     {
         services.AddCqrsMediator();
-        services.AddDomainEventLogging();
+        services.AddDomainEventDispatching();
 
         services.AddScoped<ICommandHandler<RegisterUserCommand, string>, RegisterUserHandler>();
         services.AddScoped<ICommandHandler<AuthenticateUserCommand, string>, AuthenticateUserHandler>();
