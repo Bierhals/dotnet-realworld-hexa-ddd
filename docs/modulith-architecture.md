@@ -224,11 +224,6 @@ the event into a call against the consuming module's own `Application`
 command/use case. `Application` itself is never given the other module's
 event type directly.
 
-Events are processed **in-process** today (e.g. via a lightweight in-process
-event bus or `MediatR`-style notifications), optionally combined with the
-Outbox pattern described in [DDD Patterns §4](ddd-patterns.md#4-domain-event) for delivery
-guarantees.
-
 ### Naming conventions
 
 | Purpose | Namespace | Naming convention |
@@ -253,9 +248,22 @@ module-specific business logic itself:
 
 ```csharp
 // Program.cs in the Host
-builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddArticlesModule(builder.Configuration);
-builder.Services.AddTagsModule(builder.Configuration);
+builder.Services.AddIdentityApplication();
+builder.Services.AddTagsApplication();
+builder.Services.AddArticlesApplication();
+
+builder.Services.AddIdentityPersistence(options => options.UseNpgsql(connectionString));
+builder.Services.AddTagsPersistence(options => options.UseNpgsql(connectionString));
+builder.Services.AddArticlesPersistence(options => options.UseNpgsql(connectionString));
+
+// Concerns that are neither a use case nor persistence
+builder.Services.AddIdentitySecurity();  // password hashing
+builder.Services.AddArticlesAdapters();  // the adapters onto Identity and Tags
+
+builder.UseWolverine(options => options
+    .AddIdentityMessaging(useRabbitMq)
+    .AddTagsMessaging(useRabbitMq)
+    .AddArticlesMessaging(useRabbitMq));
 
 var app = builder.Build();
 app.MapIdentityEndpoints();
@@ -263,9 +271,14 @@ app.MapArticlesEndpoints();
 app.MapTagsEndpoints();
 ```
 
-Each module brings its own registration extension (`Add{Module}Module`,
-`Map{Module}Endpoints`), so `Program.cs` stays thin and modules can be
-registered/tested independently of each other.
+Each module exposes one registration extension **per concern**
+(`Add{Module}Application`, `Add{Module}Persistence`, `Add{Module}Messaging`,
+plus one per further concern a module happens to have) rather than a single
+`Add{Module}Module` umbrella. The Host is the only place that knows which
+concerns exist, which keeps `Program.cs` thin while still letting it decide
+things a module cannot — the database provider to configure, or whether
+messaging goes through RabbitMQ — and lets a test compose just the slice it
+needs. Endpoints follow the same shape via `Map{Module}Endpoints`.
 
 `AppHost` (using .NET Aspire) orchestrates the Host process together with
 external resources for local development and deployment:
