@@ -2,13 +2,13 @@ using System;
 using System.Security.Cryptography;
 using Conduit.Identity.Domain.Services;
 
-namespace Conduit.Identity.Infrastructure;
+namespace Conduit.Identity.Infrastructure.Security;
 
 public sealed class UserPasswordHasher : IPasswordHasher
 {
     private const int SaltSize = 16;        // 128 bit
     private const int HashSize = 32;        // 256 bit
-    private const int Iterations = 210_000; // OWASP-Empfehlung (Stand 2024) für PBKDF2-SHA256
+    private const int Iterations = 210_000; // OWASP recommendation (as of 2024) for PBKDF2-SHA256
     private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
 
     public string Hash(string plainPassword)
@@ -21,7 +21,7 @@ public sealed class UserPasswordHasher : IPasswordHasher
         var salt = RandomNumberGenerator.GetBytes(SaltSize);
         var hash = Rfc2898DeriveBytes.Pbkdf2(plainPassword, salt, Iterations, Algorithm, HashSize);
 
-        // Format: {iterations}.{salt}.{hash}  – base64-kodiert, damit als string speicherbar
+        // Format: {iterations}.{salt}.{hash} - base64-encoded so that it can be stored as a string
         return $"{Iterations}.{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
     }
 
@@ -56,7 +56,7 @@ public sealed class UserPasswordHasher : IPasswordHasher
 
         var actualHash = Rfc2898DeriveBytes.Pbkdf2(plainPassword, salt, iterations, Algorithm, expectedHash.Length);
 
-        // Konstante Laufzeit gegen Timing-Angriffe – niemals hash1 == hash2 per ==
+        // Constant time against timing attacks - never compare two hashes with ==
         return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
     }
 }

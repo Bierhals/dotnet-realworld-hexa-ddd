@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Conduit.Articles.Infrastructure;
 
-public static class ArticlesModuleInitializer
+public static class ArticlesInfrastructureInitializer
 {
     /// <summary>
     /// Prepares the module's storage once its tables exist. On providers with real sequences there

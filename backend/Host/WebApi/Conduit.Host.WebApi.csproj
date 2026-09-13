@@ -5,6 +5,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="WolverineFx.Postgresql" />
+    <PackageReference Include="WolverineFx.RabbitMQ" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+    <PackageReference Include="WolverineFx.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../ServiceDefaults/Conduit.Host.ServiceDefaults.csproj" />

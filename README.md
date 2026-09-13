@@ -47,7 +47,7 @@ Frontend:
 The preferred local startup path is the Aspire AppHost:
 
 ```bash
-dotnet run --project backend/Conduit.AppHost/Conduit.AppHost.csproj
+dotnet run --project backend/Host/AppHost/Conduit.Host.AppHost.csproj
 ```
 
 The AppHost starts and wires together:
@@ -62,14 +62,18 @@ The AppHost starts and wires together:
 The API can also be started directly without Aspire. By default, it uses SQLite with `realworld.db`.
 
 ```bash
-dotnet run --project backend/Conduit/Conduit.csproj
+dotnet run --project backend/Host/WebApi/Conduit.Host.WebApi.csproj
 ```
 
-The API uses `/api` as its path base. The API documentation is available at:
+The API serves its documentation at:
 
 ```text
-/api/api-docs
+/api-docs
 ```
+
+Behind the Aspire gateway the API sits under the `/api` prefix, which the
+gateway strips before forwarding, so the same page is at `/api/api-docs`
+there.
 
 ## Tests
 

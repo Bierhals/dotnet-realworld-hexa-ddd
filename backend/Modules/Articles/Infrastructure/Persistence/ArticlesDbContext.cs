@@ -1,7 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Conduit.Articles.Application;
 using Conduit.Articles.Domain;
 using Conduit.Articles.Infrastructure.Persistence.CommentNumbers;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Conduit.Articles.Infrastructure.Persistence;
 
 public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> options)
-    : DbContext(options), IUnitOfWork
+    : DbContext(options)
 {
     public const string SchemaName = "Articles";
 
@@ -55,7 +52,4 @@ public sealed class ArticlesDbContext(DbContextOptions<ArticlesDbContext> option
             });
         }
     }
-
-    async Task IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken) =>
-        await SaveChangesAsync(cancellationToken);
 }

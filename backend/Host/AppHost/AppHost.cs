@@ -1,9 +1,6 @@
 using Aspire.Hosting.Yarp.Transforms;
 using Yarp.ReverseProxy.Transforms;
 
-// The public path prefix under which the API is exposed by the gateway. Kept
-// as a single constant so the route pattern and the X-Forwarded-Prefix header
-// sent to the API (see Conduit/Program.cs) always stay in sync.
 const string apiPathPrefix = "/api";
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -12,11 +9,17 @@ var postgres = builder.AddPostgres("postgres")
     .WithDataVolume(isReadOnly: false);
 var conduitDb = postgres.AddDatabase("conduit-db");
 
+var rabbitMq = builder.AddRabbitMQ("rabbitmq")
+    .WithDataVolume(isReadOnly: false)
+    .WithManagementPlugin();
+
 var api = builder.AddProject<Projects.Conduit_Host_WebApi>("api")
     .WithEnvironment("DATABASE_PROVIDER", "postgresql")
     .WithHttpsEndpoint()
     .WithReference(conduitDb)
-    .WaitFor(conduitDb);
+    .WaitFor(conduitDb)
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq);
 
 #pragma warning disable ASPIRECERTIFICATES001
 var viteApp = builder.AddViteApp("ui", "../../../frontend")

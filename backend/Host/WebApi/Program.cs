@@ -4,14 +4,18 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Conduit.Articles.Api;
+using Conduit.Articles.Application;
 using Conduit.Articles.Infrastructure;
 using Conduit.Articles.Infrastructure.Persistence;
 using Conduit.Host.WebApi;
 using Conduit.Identity.Api;
+using Conduit.Identity.Application;
 using Conduit.Identity.Infrastructure;
 using Conduit.Identity.Infrastructure.Persistence;
 using Conduit.Shared.Application.Optional;
+using Conduit.Shared.Infrastructure.Messaging;
 using Conduit.Tags.Core.Api;
+using Conduit.Tags.Core.Application;
 using Conduit.Tags.Core.Infrastructure;
 using Conduit.Tags.Core.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -20,12 +24,18 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using Wolverine;
+using Wolverine.ErrorHandling;
+using Wolverine.Postgresql;
+using Wolverine.RabbitMQ;
+using Wolverine.Sqlite;
 
 var defaultDatabaseConnectionString = "Filename=realworld.db";
 var defaultDatabaseProvider = "sqlite";
@@ -41,20 +51,26 @@ var connectionString = defaultDatabaseConnectionString;
 // take the database provider from the environment variable or use hard-coded database provider
 var databaseProvider = Environment.GetEnvironmentVariable("DATABASE_PROVIDER") ?? defaultDatabaseProvider;
 
-if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison.Ordinal))
+builder.Services.AddIdentityApplication();
+builder.Services.AddTagsApplication();
+builder.Services.AddArticlesApplication();
+
+var usePostgres = databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal);
+
+if (usePostgres)
 {
-    builder.Services.AddIdentityModule(options => options.UseSqlite(connectionString));
-    builder.Services.AddTagsModule(options => options.UseSqlite(connectionString));
-    builder.Services.AddArticlesModule(options => options.UseSqlite(connectionString));
+    connectionString = builder.Configuration.GetConnectionString("conduit-db")
+        ?? throw new InvalidOperationException("Connection string 'conduit-db' is not configured.");
+
+    builder.Services.AddIdentityPersistence(options => options.UseNpgsql(connectionString));
+    builder.Services.AddTagsPersistence(options => options.UseNpgsql(connectionString));
+    builder.Services.AddArticlesPersistence(options => options.UseNpgsql(connectionString));
 }
-else if (databaseProvider.ToLowerInvariant().Trim().Equals("postgresql", StringComparison.Ordinal))
+else if (databaseProvider.ToLowerInvariant().Trim().Equals("sqlite", StringComparison.Ordinal))
 {
-    builder.Services.AddIdentityModule(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
-    builder.Services.AddTagsModule(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
-    builder.Services.AddArticlesModule(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("conduit-db")));
+    builder.Services.AddIdentityPersistence(options => options.UseSqlite(connectionString));
+    builder.Services.AddTagsPersistence(options => options.UseSqlite(connectionString));
+    builder.Services.AddArticlesPersistence(options => options.UseSqlite(connectionString));
 }
 else
 {
@@ -62,6 +78,47 @@ else
         "Database provider unknown. Please check configuration"
     );
 }
+
+// Provider-independent, unlike the persistence registrations above.
+builder.Services.AddIdentitySecurity();
+builder.Services.AddArticlesAdapters();
+
+var rabbitMqConnectionString = builder.Configuration.GetConnectionString("rabbitmq");
+var useRabbitMq = !string.IsNullOrWhiteSpace(rabbitMqConnectionString);
+
+builder.UseWolverine(options =>
+{
+    if (usePostgres)
+    {
+        options.PersistMessagesWithPostgresql(connectionString, "wolverine");
+    }
+    else
+    {
+        options.PersistMessagesWithSqlite(connectionString);
+    }
+
+    options.MultipleHandlerBehavior = MultipleHandlerBehavior.Separated;
+    options.Durability.MessageIdentity = MessageIdentity.IdAndDestination;
+    options.Policies.AutoApplyTransactions();
+    options.Policies.UseDurableLocalQueues();
+
+    options.OnAnyException()
+        .RetryWithCooldown(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+
+    if (useRabbitMq)
+    {
+        options.UseRabbitMqUsingNamedConnection("rabbitmq")
+            .UseQuorumQueues()
+            .AutoProvision()
+            .EnableWolverineControlQueues();
+
+        options.Policies.UseDurableOutboxOnAllSendingEndpoints();
+    }
+
+    options.AddIdentityMessaging(useRabbitMq)
+        .AddTagsMessaging(useRabbitMq)
+        .AddArticlesMessaging(useRabbitMq);
+});
 
 builder.Services.AddLocalization(x => x.ResourcesPath = "Resources");
 builder.Services.AddAuthorization();
@@ -171,6 +228,8 @@ app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapDefaultEndpoints();
+
 app.MapArticlesEndpoints();
 app.MapTagsEndpoints();
 app.MapIdentityEndpoints();
@@ -186,16 +245,13 @@ app.MapScalarApiReference(
 
 using (var scope = app.Services.CreateScope())
 {
-    // The module contexts can share one physical database. EnsureCreated() and
-    // IRelationalDatabaseCreator.HasTables() only check whether *any* table exists in that
-    // database, not whether this context's own tables do, so they can't reliably decide whether
-    // a module's tables still need to be created. Create them directly instead, and treat
-    // "already exists" as success (they were created by a previous run of this same host).
+    // The module contexts can share one physical database, so each of them creates its own tables
+    // behind a guard of its own - see CreateModuleTables.
     CreateModuleTables(scope.ServiceProvider.GetRequiredService<IdentityDbContext>());
     CreateModuleTables(scope.ServiceProvider.GetRequiredService<TagsDbContext>());
     CreateModuleTables(scope.ServiceProvider.GetRequiredService<ArticlesDbContext>());
 
-    ArticlesModuleInitializer.EnsureCommentNumbersReady(
+    ArticlesInfrastructureInitializer.EnsureCommentNumbersReady(
         scope.ServiceProvider.GetRequiredService<ArticlesDbContext>());
 }
 
@@ -218,4 +274,5 @@ static void CreateModuleTables(DbContext moduleDbContext)
         // The module's tables already exist from a previous run.
     }
 }
+
 app.Run();

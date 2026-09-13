@@ -37,5 +37,6 @@
     <Project Path="Shared/Domain/Conduit.Shared.Domain.csproj" />
     <Project Path="Shared/Domain.UnitTests/Conduit.Shared.Domain.UnitTests.csproj" />
     <Project Path="Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
+    <Project Path="Shared/Infrastructure.IntegrationTests/Conduit.Shared.Infrastructure.IntegrationTests.csproj" />
   </Folder>
 </Solution>
