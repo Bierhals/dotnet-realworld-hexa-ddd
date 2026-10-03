@@ -146,7 +146,7 @@ public sealed class Article : AggregateRoot<ArticleId>
         return added.Count > 0 || removed.Count > 0;
     }
 
-    private void AnnounceTagChanges(IReadOnlyCollection<TagName> added, IReadOnlyCollection<TagName> removed)
+    private void AnnounceTagChanges(List<TagName> added, List<TagName> removed)
     {
         if (added.Count == 0 && removed.Count == 0)
         {

@@ -981,6 +981,7 @@
         "type": "Project",
         "dependencies": {
           "Conduit.Articles.Application": "[1.0.0, )",
+          "Conduit.Articles.Contracts": "[1.0.0, )",
           "Conduit.Articles.Domain": "[1.0.0, )",
           "Conduit.Identity.Contracts": "[1.0.0, )",
           "Conduit.Shared.Application": "[1.0.0, )",
