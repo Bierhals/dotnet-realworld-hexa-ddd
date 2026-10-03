@@ -414,15 +414,19 @@ articles.
 - `ArticleTag` is owned by **Articles**, not **Tags** — it's the join between
   an article and a tag, and tagging an article is part of the `Article`
   aggregate's own lifecycle (set on create/edit, deleted when the article is
-  deleted). **Tags** owns only the `Tag` catalog itself and exposes a single
-  write contract, `ITagCatalogService`:
-  - `ReferenceTagsAsync(tagNames)` — called when an article starts using a
-    tag. Names that aren't in the catalog yet are added, and each name's
-    reference count goes up by one.
-  - `ReleaseTagsAsync(tagNames)` — called when an article stops using a tag
-    (on edit, or when the article is deleted). A tag that loses its last
-    reference is removed from the catalog, so `Tags/List` never returns a tag
-    that no article uses.
+  deleted). **Tags** owns only the `Tag` catalog itself and keeps it in step
+  with the articles asynchronously: **Articles** raises an
+  `ArticleTagsChangedDomainEvent` when an article is published, edited or
+  deleted, translates it into the `ArticleTagsReferenced` /
+  `ArticleTagsReleased` integration events (`Articles.Contracts.Events`), and
+  the **Tags** module reacts to them through `ITagCatalogService`:
+  - `ReferenceTagsAsync(tagNames)` — on `ArticleTagsReferenced`. Names that
+    aren't in the catalog yet are added, and each name's reference count goes
+    up by one.
+  - `ReleaseTagsAsync(tagNames)` — on `ArticleTagsReleased` (an edit dropped
+    the tag, or the article was deleted). A tag that loses its last reference
+    is removed from the catalog, so `Tags/List` never returns a tag that no
+    article uses - eventually, since delivery is asynchronous.
 
 ### Module boundary diagram
 
@@ -434,7 +438,8 @@ articles.
               │  Salt, Bio, Image;│                                 │  ArticleTag)              │
               │  FollowedPeople)  │                                 └───────────────────────────┘
               └───────────────────┘                                              │
-                                                                                 │ ITagCatalogService (contract)
+                                                                                 │ ArticleTagsReferenced / Released
+                                                                                 │ (integration events)
                                                                                  ▼
                                                                         ┌───────────────────┐
                                                                         │       Tags        │

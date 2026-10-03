@@ -12,7 +12,6 @@ namespace Conduit.Articles.Application.Commands.CreateArticle;
 public sealed class CreateArticleHandler(
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork,
-    ITagCatalog tagCatalog,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<CreateArticleCommand, string>
 {
     public async Task<ErrorOr<string>> Handle(CreateArticleCommand command, CancellationToken cancellationToken)
@@ -45,16 +44,6 @@ public sealed class CreateArticleHandler(
         if (tagNames.IsError)
         {
             return tagNames.Errors;
-        }
-
-        // The tag catalog is owned by the Tags module, so the article never creates tag rows
-        // itself - it only announces that it now uses these tags.
-        var reference = await tagCatalog.ReferenceTagsAsync(
-            TagNameList.ToValues(tagNames.Value),
-            cancellationToken);
-        if (reference.IsError)
-        {
-            return reference.Errors;
         }
 
         var article = Article.Publish(

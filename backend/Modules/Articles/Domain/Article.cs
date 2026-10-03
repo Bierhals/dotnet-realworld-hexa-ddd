@@ -61,15 +61,16 @@ public sealed class Article : AggregateRoot<ArticleId>
         article._tags.AddRange(tagNames.Distinct());
 
         article.AddDomainEvent(new ArticlePublishedDomainEvent(article.Id.Value, article.Slug.Value, author.Value));
+        article.AnnounceTagChanges(article._tags, []);
 
         return article;
     }
 
     /// <summary>
-    /// Applies the fields that were supplied - a <c>null</c> means "leave unchanged" - and reports
-    /// which tags the article started and stopped using, so the caller can update the tag catalog.
+    /// Applies the fields that were supplied - a <c>null</c> means "leave unchanged". The tags the
+    /// article started and stopped using are announced through a domain event.
     /// </summary>
-    public ErrorOr<TagChanges> Edit(
+    public ErrorOr<Success> Edit(
         Username editor,
         ArticleTitle? title,
         ArticleDescription? description,
@@ -104,23 +105,33 @@ public sealed class Article : AggregateRoot<ArticleId>
             changed = true;
         }
 
-        var tagChanges = tagNames is null ? TagChanges.None : ApplyTags(tagNames);
+        var tagsChanged = tagNames is not null && ApplyTags(tagNames);
 
-        if (!changed && tagChanges.Added.Count == 0 && tagChanges.Removed.Count == 0)
+        if (!changed && !tagsChanged)
         {
-            return tagChanges;
+            return Result.Success;
         }
 
         UpdatedAtUtc = nowUtc;
         AddDomainEvent(new ArticleEditedDomainEvent(Id.Value, Slug.Value));
 
-        return tagChanges;
+        return Result.Success;
     }
 
-    public ErrorOr<Success> EnsureCanBeDeletedBy(Username requester) =>
-        new OnlyTheAuthorCanChangeTheArticle(Author, requester).Check();
+    /// <summary>
+    /// Checks that the requester may delete the article and announces that it gives up all of its
+    /// tags. Removing the aggregate from the store stays with the caller.
+    /// </summary>
+    public ErrorOr<Success> Delete(Username requester) =>
+        new OnlyTheAuthorCanChangeTheArticle(Author, requester).Check()
+            .Then(_ =>
+            {
+                AnnounceTagChanges([], _tags);
 
-    private TagChanges ApplyTags(IReadOnlyCollection<TagName> tagNames)
+                return Result.Success;
+            });
+
+    private bool ApplyTags(IReadOnlyCollection<TagName> tagNames)
     {
         var wanted = tagNames.Distinct().ToList();
 
@@ -130,6 +141,21 @@ public sealed class Article : AggregateRoot<ArticleId>
         _tags.RemoveAll(removed.Contains);
         _tags.AddRange(added);
 
-        return new TagChanges(added, removed);
+        AnnounceTagChanges(added, removed);
+
+        return added.Count > 0 || removed.Count > 0;
+    }
+
+    private void AnnounceTagChanges(IReadOnlyCollection<TagName> added, IReadOnlyCollection<TagName> removed)
+    {
+        if (added.Count == 0 && removed.Count == 0)
+        {
+            return;
+        }
+
+        AddDomainEvent(new ArticleTagsChangedDomainEvent(
+            Id.Value,
+            [.. added.Select(tagName => tagName.Value)],
+            [.. removed.Select(tagName => tagName.Value)]));
     }
 }

@@ -18,10 +18,9 @@ public class DeleteArticleHandlerTests
     private readonly FakeCommentsRepository _comments = new();
     private readonly FakeArticleFavoritesRepository _favorites = new();
     private readonly FakeUnitOfWork _unitOfWork = new();
-    private readonly FakeTagCatalog _tagCatalog = new();
 
     private Task<ErrorOr<Success>> Delete(string slug, string? requester = "alice") =>
-        new DeleteArticleHandler(_articles, _comments, _favorites, _unitOfWork, _tagCatalog, new StubCurrentUserAccessor(requester))
+        new DeleteArticleHandler(_articles, _comments, _favorites, _unitOfWork, new StubCurrentUserAccessor(requester))
             .Handle(new DeleteArticleCommand { Slug = slug }, CancellationToken.None);
 
     [Fact]
@@ -34,29 +33,6 @@ public class DeleteArticleHandlerTests
         result.IsError.ShouldBeFalse();
         _articles.Articles.ShouldBeEmpty();
         _unitOfWork.SaveCount.ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task A_deleted_article_gives_up_the_tags_it_used()
-    {
-        _articles.Seed("How to train your dragon", "alice", "dragons");
-        _tagCatalog.Seed("dragons");
-
-        await Delete("how-to-train-your-dragon");
-
-        _tagCatalog.Tags.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public async Task A_tag_another_article_still_uses_stays_in_the_catalog()
-    {
-        _articles.Seed("How to train your dragon", "alice", "dragons");
-        _tagCatalog.Seed("dragons");
-        _tagCatalog.Seed("dragons");
-
-        await Delete("how-to-train-your-dragon");
-
-        _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
     }
 
     [Fact]

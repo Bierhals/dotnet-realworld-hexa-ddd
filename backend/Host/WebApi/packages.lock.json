@@ -814,7 +814,6 @@
           "Conduit.Identity.Contracts": "[1.0.0, )",
           "Conduit.Shared.Application": "[1.0.0, )",
           "Conduit.Shared.Infrastructure": "[1.0.0, )",
-          "Conduit.Tags.Contracts": "[1.0.0, )",
           "Microsoft.EntityFrameworkCore": "[10.0.12, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.12, )",
           "WolverineFx.EntityFrameworkCore": "[6.36.0, )",
@@ -904,6 +903,7 @@
       "conduit.tags.core": {
         "type": "Project",
         "dependencies": {
+          "Conduit.Articles.Contracts": "[1.0.0, )",
           "Conduit.Shared.Application": "[1.0.0, )",
           "Conduit.Shared.Domain": "[1.0.0, )",
           "Conduit.Shared.Infrastructure": "[1.0.0, )",

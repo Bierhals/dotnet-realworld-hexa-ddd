@@ -13,7 +13,6 @@ public class EditArticleHandlerTests
 {
     private readonly FakeArticlesRepository _articles = new();
     private readonly FakeUnitOfWork _unitOfWork = new();
-    private readonly FakeTagCatalog _tagCatalog = new();
 
     private Task<ErrorOr<string>> Edit(
         string slug,
@@ -21,7 +20,7 @@ public class EditArticleHandlerTests
         Optional<string> title = default,
         Optional<string> body = default,
         Optional<string[]> tags = default) =>
-        new EditArticleHandler(_articles, _unitOfWork, _tagCatalog, new StubCurrentUserAccessor(editor))
+        new EditArticleHandler(_articles, _unitOfWork, new StubCurrentUserAccessor(editor))
             .Handle(
                 new EditArticleCommand { Slug = slug, Title = title, Body = body, TagList = tags },
                 CancellationToken.None);
@@ -36,30 +35,6 @@ public class EditArticleHandlerTests
         result.IsError.ShouldBeFalse();
         result.Value.ShouldBe("how-to-tame-your-dragon");
         _unitOfWork.SaveCount.ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task Swapping_a_tag_references_the_new_one_and_releases_the_old_one()
-    {
-        _articles.Seed("How to train your dragon", "alice", "dragons", "training");
-        _tagCatalog.Seed("dragons", "training");
-
-        await Edit("how-to-train-your-dragon", tags: new Optional<string[]>(["dragons", "flying"]));
-
-        _tagCatalog.Tags.ShouldBe(["dragons", "flying"], ignoreOrder: true);
-        _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
-        _tagCatalog.ReferenceCountOf("flying").ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task Leaving_the_tags_out_of_an_edit_does_not_touch_the_catalog()
-    {
-        _articles.Seed("How to train your dragon", "alice", "dragons");
-        _tagCatalog.Seed("dragons");
-
-        await Edit("how-to-train-your-dragon", body: new Optional<string>("Believe harder"));
-
-        _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
     }
 
     [Fact]
@@ -85,12 +60,11 @@ public class EditArticleHandlerTests
     }
 
     [Fact]
-    public async Task An_edit_the_catalog_rejects_the_tags_of_is_not_persisted()
+    public async Task An_edit_with_an_unusable_tag_name_is_not_persisted()
     {
         _articles.Seed();
-        _tagCatalog.RejectReferencesWith = Error.Validation("Tag.NameTooLong", "too long");
 
-        var result = await Edit("how-to-train-your-dragon", tags: new Optional<string[]>(["flying"]));
+        var result = await Edit("how-to-train-your-dragon", tags: new Optional<string[]>([new string('x', 200)]));
 
         result.IsError.ShouldBeTrue();
         _unitOfWork.SaveCount.ShouldBe(0);

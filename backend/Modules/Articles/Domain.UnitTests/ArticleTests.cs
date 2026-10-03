@@ -84,28 +84,59 @@ public class ArticleTests
     }
 
     [Fact]
-    public void Editing_the_tags_reports_which_ones_were_added_and_which_were_given_up()
+    public void A_published_article_announces_the_tags_it_starts_using()
     {
         var article = AnArticle("alice", "dragons", "training");
+
+        var changed = article.DomainEvents.OfType<ArticleTagsChangedDomainEvent>().Single();
+        changed.Added.ShouldBe(["dragons", "training"], ignoreOrder: true);
+        changed.Removed.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void A_published_article_without_tags_announces_no_tag_change()
+    {
+        var article = AnArticle();
+
+        article.DomainEvents.OfType<ArticleTagsChangedDomainEvent>().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Editing_the_tags_announces_which_ones_were_added_and_which_were_given_up()
+    {
+        var article = AnArticle("alice", "dragons", "training");
+        article.ClearDomainEvents();
 
         var result = article.Edit(User("alice"), null, null, null, [Tag("dragons"), Tag("flying")], EditedAt);
 
         result.IsError.ShouldBeFalse();
-        result.Value.Added.ShouldHaveSingleItem().Value.ShouldBe("flying");
-        result.Value.Removed.ShouldHaveSingleItem().Value.ShouldBe("training");
+        var changed = article.DomainEvents.OfType<ArticleTagsChangedDomainEvent>().Single();
+        changed.Added.ShouldHaveSingleItem().ShouldBe("flying");
+        changed.Removed.ShouldHaveSingleItem().ShouldBe("training");
         article.Tags.Select(tag => tag.Value).ShouldBe(["dragons", "flying"], ignoreOrder: true);
     }
 
     [Fact]
-    public void Leaving_the_tags_out_of_an_edit_keeps_them_as_they_are()
+    public void Leaving_the_tags_out_of_an_edit_keeps_them_and_announces_nothing()
     {
         var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
 
-        var result = article.Edit(User("alice"), null, null, ArticleBody.Create("Believe harder").Value, null, EditedAt);
+        article.Edit(User("alice"), null, null, ArticleBody.Create("Believe harder").Value, null, EditedAt);
 
-        result.Value.Added.ShouldBeEmpty();
-        result.Value.Removed.ShouldBeEmpty();
+        article.DomainEvents.OfType<ArticleTagsChangedDomainEvent>().ShouldBeEmpty();
         article.Tags.ShouldHaveSingleItem().Value.ShouldBe("dragons");
+    }
+
+    [Fact]
+    public void Resubmitting_the_same_tags_announces_nothing()
+    {
+        var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
+
+        article.Edit(User("alice"), null, null, null, [Tag("dragons")], EditedAt);
+
+        article.DomainEvents.ShouldBeEmpty();
     }
 
     [Fact]
@@ -125,7 +156,31 @@ public class ArticleTests
     {
         var article = AnArticle("alice");
 
-        article.EnsureCanBeDeletedBy(User("bob")).FirstError.Type.ShouldBe(ErrorType.Forbidden);
-        article.EnsureCanBeDeletedBy(User("alice")).IsError.ShouldBeFalse();
+        article.Delete(User("bob")).FirstError.Type.ShouldBe(ErrorType.Forbidden);
+        article.Delete(User("alice")).IsError.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void A_deleted_article_announces_that_it_gives_up_all_its_tags()
+    {
+        var article = AnArticle("alice", "dragons", "training");
+        article.ClearDomainEvents();
+
+        article.Delete(User("alice"));
+
+        var changed = article.DomainEvents.OfType<ArticleTagsChangedDomainEvent>().Single();
+        changed.Added.ShouldBeEmpty();
+        changed.Removed.ShouldBe(["dragons", "training"], ignoreOrder: true);
+    }
+
+    [Fact]
+    public void A_refused_delete_announces_nothing()
+    {
+        var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
+
+        article.Delete(User("bob"));
+
+        article.DomainEvents.ShouldBeEmpty();
     }
 }

@@ -331,6 +331,9 @@
           "WolverineFx": "6.36.0"
         }
       },
+      "conduit.articles.contracts": {
+        "type": "Project"
+      },
       "conduit.shared.application": {
         "type": "Project",
         "dependencies": {

@@ -14,7 +14,6 @@ public static class ArticlesAdaptersServiceCollectionExtensions
     public static IServiceCollection AddArticlesAdapters(this IServiceCollection services)
     {
         services.AddScoped<IProfileReader, IdentityProfileReaderAdapter>();
-        services.AddScoped<ITagCatalog, TagsCatalogAdapter>();
 
         return services;
     }

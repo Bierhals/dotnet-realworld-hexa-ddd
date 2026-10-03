@@ -16,6 +16,7 @@
     <ProjectReference Include="../../../Shared/Application/Conduit.Shared.Application.csproj" />
     <ProjectReference Include="../../../Shared/Domain/Conduit.Shared.Domain.csproj" />
     <ProjectReference Include="../../../Shared/Infrastructure/Conduit.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="../../Articles/Contracts/Conduit.Articles.Contracts.csproj" />
     <ProjectReference Include="../Contracts/Conduit.Tags.Contracts.csproj" />
   </ItemGroup>
 

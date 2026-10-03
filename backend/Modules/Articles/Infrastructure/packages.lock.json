@@ -697,12 +697,6 @@
           "WolverineFx.EntityFrameworkCore": "[6.36.0, )"
         }
       },
-      "conduit.tags.contracts": {
-        "type": "Project",
-        "dependencies": {
-          "ErrorOr": "[2.1.1, )"
-        }
-      },
       "ErrorOr": {
         "type": "CentralTransitive",
         "requested": "[2.1.1, )",
