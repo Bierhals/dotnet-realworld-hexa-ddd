@@ -1,68 +1,50 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Conduit.Articles.Contracts.Events;
-using Conduit.Tags.Contracts.Catalog;
+using Conduit.Tags.Core.Application.Commands.ReferenceTags;
+using Conduit.Tags.Core.Application.Commands.ReleaseTags;
 using Conduit.Tags.Core.Infrastructure.EventHandling;
-using ErrorOr;
+using Conduit.Tags.Core.UnitTests.TestDoubles;
 using Shouldly;
 
 namespace Conduit.Tags.Core.UnitTests.Infrastructure;
 
 public class ArticleTagsHandlerTests
 {
-    private readonly RecordingTagCatalogService _catalog = new();
+    private readonly FakeTagsRepository _tags = new();
+    private readonly FakeUnitOfWork _unitOfWork = new();
 
-    private ArticleTagsHandler Handler => new(_catalog);
+    private ArticleTagsHandler Handler => new(
+        new ReferenceTagsHandler(_tags, _unitOfWork),
+        new ReleaseTagsHandler(_tags, _unitOfWork));
 
     [Fact]
-    public async Task Tags_an_article_started_using_are_referenced_in_the_catalog()
+    public async Task Tags_an_article_started_using_are_added_to_the_catalog()
     {
         await Handler.Handle(new ArticleTagsReferenced(Guid.NewGuid(), ["dragons", "training"]), CancellationToken.None);
 
-        _catalog.Referenced.ShouldBe(["dragons", "training"]);
-        _catalog.Released.ShouldBeEmpty();
+        _tags.Tags.Select(tag => tag.Id.Value).ShouldBe(["dragons", "training"], ignoreOrder: true);
     }
 
     [Fact]
-    public async Task Tags_an_article_stopped_using_are_released_in_the_catalog()
+    public async Task Tags_an_article_stopped_using_leave_the_catalog_when_nothing_else_uses_them()
     {
-        await Handler.Handle(new ArticleTagsReleased(Guid.NewGuid(), ["dragons"]), CancellationToken.None);
+        _tags.Seed("dragons", referenceCount: 1);
+        _tags.Seed("training", referenceCount: 2);
 
-        _catalog.Released.ShouldBe(["dragons"]);
-        _catalog.Referenced.ShouldBeEmpty();
+        await Handler.Handle(new ArticleTagsReleased(Guid.NewGuid(), ["dragons", "training"]), CancellationToken.None);
+
+        var remaining = _tags.Tags.ShouldHaveSingleItem();
+        remaining.Id.Value.ShouldBe("training");
+        remaining.ReferenceCount.ShouldBe(1);
     }
 
     [Fact]
-    public async Task A_catalog_that_rejects_the_tags_fails_the_message_so_it_is_retried()
+    public async Task A_tag_name_the_catalog_rejects_fails_the_message_so_it_is_retried()
     {
-        _catalog.Rejection = Error.Validation("Tag.NameTooLong", "too long");
-
         await Should.ThrowAsync<InvalidOperationException>(() =>
-            Handler.Handle(new ArticleTagsReferenced(Guid.NewGuid(), ["dragons"]), CancellationToken.None));
-    }
-
-    private sealed class RecordingTagCatalogService : ITagCatalogService
-    {
-        public List<string> Referenced { get; } = [];
-
-        public List<string> Released { get; } = [];
-
-        public Error? Rejection { get; set; }
-
-        public Task<ErrorOr<Success>> ReferenceTagsAsync(IReadOnlyCollection<string> tagNames, CancellationToken cancellationToken = default)
-        {
-            Referenced.AddRange(tagNames);
-
-            return Task.FromResult(Rejection is { } error ? (ErrorOr<Success>)error : Result.Success);
-        }
-
-        public Task<ErrorOr<Success>> ReleaseTagsAsync(IReadOnlyCollection<string> tagNames, CancellationToken cancellationToken = default)
-        {
-            Released.AddRange(tagNames);
-
-            return Task.FromResult<ErrorOr<Success>>(Result.Success);
-        }
+            Handler.Handle(new ArticleTagsReferenced(Guid.NewGuid(), [new string('x', 200)]), CancellationToken.None));
     }
 }
