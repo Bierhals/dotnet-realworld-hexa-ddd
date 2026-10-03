@@ -25,6 +25,7 @@ namespace Conduit.Shared.Infrastructure.IntegrationTests;
 /// Covers the path every module takes when it saves an aggregate: the domain events it raised are
 /// committed together with the change and then delivered to their handlers out of band.
 /// </summary>
+[Collection(WolverineHostCollection.Name)]
 public sealed class DomainEventPublishingTests : IAsyncLifetime
 {
     // Wolverine does not support in-memory SQLite for durable messaging, so the store has to be a
