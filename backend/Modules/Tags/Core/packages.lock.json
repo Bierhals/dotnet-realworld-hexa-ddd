@@ -29,26 +29,26 @@
       },
       "WolverineFx.EntityFrameworkCore": {
         "type": "Direct",
-        "requested": "[6.36.0, )",
-        "resolved": "6.36.0",
-        "contentHash": "Oz4PRaUNO9P9WOPfgYh2wkcFUEep3C6a1MDpYXzIS4RVV9O3uJU33ZpB/WaRIFCFlhHUBDeGvL5sZ7kGXkjomA==",
+        "requested": "[6.45.0, )",
+        "resolved": "6.45.0",
+        "contentHash": "sVOMxHRNhmrn/83r95cJ07njQTikuIAubWM4KW4T7SzBiJQGuHgHn5lj1JmQScyw+myIW8xCHt3rD86WhDywVA==",
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "10.0.4",
           "Microsoft.EntityFrameworkCore.Design": "10.0.4",
           "Microsoft.EntityFrameworkCore.Relational": "10.0.4",
-          "Weasel.EntityFrameworkCore": "9.30.0",
-          "WolverineFx.RDBMS": "6.36.0"
+          "Weasel.EntityFrameworkCore": "9.38.0",
+          "WolverineFx.RDBMS": "6.45.0"
         }
       },
       "WolverineFx.RabbitMQ": {
         "type": "Direct",
-        "requested": "[6.36.0, )",
-        "resolved": "6.36.0",
-        "contentHash": "g9U8ahE0s67nnOz4XRE8Ra+2jDFBJvW6d58ZEbOX/EkYH4DOAIHt0GZQlRe/o9h2Q4M+oif4z7Z8oMbumiG9oQ==",
+        "requested": "[6.45.0, )",
+        "resolved": "6.45.0",
+        "contentHash": "X0fpbv+2QR8UbWy+hNwWpaMsyRZi1PzcUBPQYzijXKNfZL+B83QHUVRO6icHCgjVgd8Bm3dC63m4nn8yl6Xmpw==",
         "dependencies": {
           "RabbitMQ.Client": "7.2.2",
-          "WolverineFx": "6.36.0",
-          "WolverineFx.Newtonsoft": "6.36.0"
+          "WolverineFx": "6.45.0",
+          "WolverineFx.Newtonsoft": "6.45.0"
         }
       },
       "Cronos": {
@@ -73,8 +73,8 @@
       },
       "JasperFx": {
         "type": "Transitive",
-        "resolved": "2.66.1",
-        "contentHash": "BZHNkIcuwv6cGg0tV6Rpbz4PatCRdVuV74/qK8bK1N+Cul2KQNJ3ndPCNfXZV04RIAz6C7M0dBi+rpJDHRBBjQ==",
+        "resolved": "2.79.1",
+        "contentHash": "WLnJ5sQjpk9HooyGZnUHfFkXaivpK2t3bZzkQ8l564r0gxPhEHW5RiOAyYXAlHbwy/J/mQI5obghsn85Dw/Hkw==",
         "dependencies": {
           "FastExpressionCompiler": "5.4.1",
           "ImTools": "4.0.0",
@@ -85,16 +85,16 @@
       },
       "JasperFx.Events": {
         "type": "Transitive",
-        "resolved": "2.66.1",
-        "contentHash": "zV9p/iZyj4g9fUU3FQ1OoMCZND4fVLFHJl+RjYLRg0ZKDORHSpRXJla/e4miujiOyG6PqZcZST8f6LSR5oZwUQ==",
+        "resolved": "2.79.1",
+        "contentHash": "C/Lgvb+l9rpK+2x5H/SWn4qyf2ReMX9uPCjDXZdqHLygcCJNYCWfpihVfKUzHXfBqc10Oh2dgUAfd1xBi8AgLw==",
         "dependencies": {
-          "JasperFx": "2.66.1"
+          "JasperFx": "2.79.1"
         }
       },
       "JasperFx.SourceGenerator": {
         "type": "Transitive",
-        "resolved": "2.66.1",
-        "contentHash": "CYKBTozTQxwLXxmjO2HD/uIJ3/Ib/w64eCA/ceLGmWox+ssHWtlWskCLiq2DUHOrxP3uynB7HFstqQBF31im0g=="
+        "resolved": "2.79.1",
+        "contentHash": "T4N6f318e7IrKgDc6lx58F5vvF6DJ0dXqDNZUF3CIofKqpkL00Vtk0nH+HSYdKB6uE77NuwLrTE1C/WdxTw0vg=="
       },
       "Microsoft.Bcl.TimeProvider": {
         "type": "Transitive",
@@ -298,37 +298,37 @@
       },
       "Weasel.Core": {
         "type": "Transitive",
-        "resolved": "9.30.0",
-        "contentHash": "qxTZjySPzWWWNZxI3Z0aOQsLzqpByC0ovTy/hH/BPiq30xwyFU7ro01kxDFkVWAxA45zXjj6A6jkeudDzNy6yQ==",
+        "resolved": "9.38.0",
+        "contentHash": "0ul9MSX/BDL2MdpSATUU1VlNrNzaBiSD76laQqpTGB9Fdmf/Rcr/Led1zoNjuWrb2yC6yvPegsGiuHiiEZpLVQ==",
         "dependencies": {
-          "JasperFx": "2.46.0"
+          "JasperFx": "2.76.0"
         }
       },
       "Weasel.EntityFrameworkCore": {
         "type": "Transitive",
-        "resolved": "9.30.0",
-        "contentHash": "W1tcBCK9/WsAkvOtFLlGW4QaTy718liL+WboSRnspBzU/h9LiA2ScbaZQ1MtVA7rRiS1oz3WaVZr5eW/TGgKcw==",
+        "resolved": "9.38.0",
+        "contentHash": "9902JBrMNIv4lu3S7c2ERx9E/knuUpr+T6CVPpftxQcuNaDKcnkcK1RzxTycB1jwLQHzwDzyUnbFCWCgHkKiRg==",
         "dependencies": {
           "Microsoft.EntityFrameworkCore.Relational": "10.0.0",
-          "Weasel.Core": "9.30.0"
+          "Weasel.Core": "9.38.0"
         }
       },
       "WolverineFx.Newtonsoft": {
         "type": "Transitive",
-        "resolved": "6.36.0",
-        "contentHash": "7zlymdJNUBXPm9goFrmrioTeyQ+mvo3Avx7HEeOIwI7rSm9+G84qej+hILi1DUG6jU0hQoPrjt2peDT5I4JKww==",
+        "resolved": "6.45.0",
+        "contentHash": "HOiRKCUSIokvgcudbWMVIla6+JKTZg3Mu0afXyfI6+ggjszpUEI+IL5lT5kQ6cy8nBktYF2QSK8JYcvZrudgDg==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
-          "WolverineFx": "6.36.0"
+          "WolverineFx": "6.45.0"
         }
       },
       "WolverineFx.RDBMS": {
         "type": "Transitive",
-        "resolved": "6.36.0",
-        "contentHash": "hYfb9YkeMVx8AV3nApUs6Dm6vuMCmfW6uardUGuGj0u+JERLwnuEJ1cSQqVHnu+0fmXZ9lH2HTTJTYvMSz7Q/Q==",
+        "resolved": "6.45.0",
+        "contentHash": "LHvWJpJ5bcBKpQ3P/ix+jiddUnQtuNQF6rK+t69aHes4viIDLckFZ4ago9rCqPS1jFcUFCo4hRZd416a+On4HA==",
         "dependencies": {
-          "Weasel.Core": "9.30.0",
-          "WolverineFx": "6.36.0"
+          "Weasel.Core": "9.38.0",
+          "WolverineFx": "6.45.0"
         }
       },
       "conduit.articles.contracts": {
@@ -354,7 +354,7 @@
           "Conduit.Shared.Domain": "[1.0.0, )",
           "ErrorOr": "[2.1.1, )",
           "Microsoft.EntityFrameworkCore": "[10.0.12, )",
-          "WolverineFx.EntityFrameworkCore": "[6.36.0, )"
+          "WolverineFx.EntityFrameworkCore": "[6.45.0, )"
         }
       },
       "conduit.tags.contracts": {
@@ -365,14 +365,14 @@
       },
       "WolverineFx": {
         "type": "CentralTransitive",
-        "requested": "[6.36.0, )",
-        "resolved": "6.36.0",
-        "contentHash": "UQYJfZMOT+qND4ekFQp0eiwyAHfd6f+L2hVY65keLrQfNhm4+IMWuGj0I75yxHfKA8Wjw1UJC7XNVPf60kUtUA==",
+        "requested": "[6.45.0, )",
+        "resolved": "6.45.0",
+        "contentHash": "6IRYkx0Rnmt702Z8ZwlKqI6UXuFU8AWUso3Usn7g5q4nwN91+j2DmwZmMCw7j7eeG9f9N9klFljdkkUNTZM7tw==",
         "dependencies": {
           "Cronos": "0.11.0",
-          "JasperFx": "2.66.1",
-          "JasperFx.Events": "2.66.1",
-          "JasperFx.SourceGenerator": "2.66.1",
+          "JasperFx": "2.79.1",
+          "JasperFx.Events": "2.79.1",
+          "JasperFx.SourceGenerator": "2.79.1",
           "NewId": "4.0.1"
         }
       }
