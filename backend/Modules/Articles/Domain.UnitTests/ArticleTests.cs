@@ -35,7 +35,7 @@ public class ArticleTests
         article.Slug.Value.ShouldBe("how-to-train-your-dragon");
         article.CreatedAtUtc.ShouldBe(PublishedAt);
         article.UpdatedAtUtc.ShouldBe(PublishedAt);
-        article.DomainEvents.OfType<ArticlePublishedDomainEvent>().Single().Author.ShouldBe("alice");
+        article.DomainEvents.OfType<ArticlePublishedDomainEvent>().Single().Article.Author.ShouldBe("alice");
     }
 
     [Fact]
@@ -84,28 +84,62 @@ public class ArticleTests
     }
 
     [Fact]
-    public void Editing_the_tags_reports_which_ones_were_added_and_which_were_given_up()
+    public void A_published_article_announces_its_state_as_revision_one()
     {
         var article = AnArticle("alice", "dragons", "training");
 
-        var result = article.Edit(User("alice"), null, null, null, [Tag("dragons"), Tag("flying")], EditedAt);
+        var state = article.DomainEvents.OfType<ArticlePublishedDomainEvent>().Single().Article;
+        state.ArticleId.ShouldBe(article.Id.Value);
+        state.Revision.ShouldBe(1);
+        state.Slug.ShouldBe("how-to-train-your-dragon");
+        state.Title.ShouldBe("How to train your dragon");
+        state.Description.ShouldBe("Ever wonder how?");
+        state.Author.ShouldBe("alice");
+        state.Tags.ShouldBe(["dragons", "training"], ignoreOrder: true);
+        state.CreatedAtUtc.ShouldBe(PublishedAt);
+        state.UpdatedAtUtc.ShouldBe(PublishedAt);
+    }
 
-        result.IsError.ShouldBeFalse();
-        result.Value.Added.ShouldHaveSingleItem().Value.ShouldBe("flying");
-        result.Value.Removed.ShouldHaveSingleItem().Value.ShouldBe("training");
+    [Fact]
+    public void An_edit_announces_the_whole_new_state_under_the_next_revision()
+    {
+        var article = AnArticle("alice", "dragons", "training");
+        article.ClearDomainEvents();
+
+        article.Edit(User("alice"), ArticleTitle.Create("How to tame your dragon").Value, null, null, [Tag("dragons"), Tag("flying")], EditedAt);
+
+        var state = article.DomainEvents.OfType<ArticleEditedDomainEvent>().Single().Article;
+        article.Revision.ShouldBe(2);
+        state.Revision.ShouldBe(2);
+        state.Slug.ShouldBe("how-to-tame-your-dragon");
+        state.Title.ShouldBe("How to tame your dragon");
+        state.Description.ShouldBe("Ever wonder how?");
+        state.Tags.ShouldBe(["dragons", "flying"], ignoreOrder: true);
+        state.UpdatedAtUtc.ShouldBe(EditedAt);
         article.Tags.Select(tag => tag.Value).ShouldBe(["dragons", "flying"], ignoreOrder: true);
     }
 
     [Fact]
-    public void Leaving_the_tags_out_of_an_edit_keeps_them_as_they_are()
+    public void An_edit_that_leaves_the_tags_out_keeps_them_in_the_announced_state()
     {
         var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
 
-        var result = article.Edit(User("alice"), null, null, ArticleBody.Create("Believe harder").Value, null, EditedAt);
+        article.Edit(User("alice"), null, null, ArticleBody.Create("Believe harder").Value, null, EditedAt);
 
-        result.Value.Added.ShouldBeEmpty();
-        result.Value.Removed.ShouldBeEmpty();
-        article.Tags.ShouldHaveSingleItem().Value.ShouldBe("dragons");
+        article.DomainEvents.OfType<ArticleEditedDomainEvent>().Single().Article.Tags.ShouldBe(["dragons"]);
+    }
+
+    [Fact]
+    public void An_edit_that_changes_nothing_does_not_move_the_revision()
+    {
+        var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
+
+        article.Edit(User("alice"), null, null, null, [Tag("dragons")], EditedAt);
+
+        article.Revision.ShouldBe(1);
+        article.DomainEvents.ShouldBeEmpty();
     }
 
     [Fact]
@@ -125,7 +159,31 @@ public class ArticleTests
     {
         var article = AnArticle("alice");
 
-        article.EnsureCanBeDeletedBy(User("bob")).FirstError.Type.ShouldBe(ErrorType.Forbidden);
-        article.EnsureCanBeDeletedBy(User("alice")).IsError.ShouldBeFalse();
+        article.Delete(User("bob")).FirstError.Type.ShouldBe(ErrorType.Forbidden);
+        article.Delete(User("alice")).IsError.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void A_deleted_article_announces_its_deletion_under_a_newer_revision()
+    {
+        var article = AnArticle("alice", "dragons", "training");
+        article.ClearDomainEvents();
+
+        article.Delete(User("alice"));
+
+        var deleted = article.DomainEvents.OfType<ArticleDeletedDomainEvent>().Single();
+        deleted.ArticleId.ShouldBe(article.Id.Value);
+        deleted.Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public void A_refused_delete_announces_nothing()
+    {
+        var article = AnArticle("alice", "dragons");
+        article.ClearDomainEvents();
+
+        article.Delete(User("bob"));
+
+        article.DomainEvents.ShouldBeEmpty();
     }
 }

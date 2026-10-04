@@ -12,13 +12,12 @@ public class CreateArticleHandlerTests
 {
     private readonly FakeArticlesRepository _articles = new();
     private readonly FakeUnitOfWork _unitOfWork = new();
-    private readonly FakeTagCatalog _tagCatalog = new();
 
     private Task<ErrorOr<string>> Create(
         string title = "How to train your dragon",
         string? author = "alice",
         params string[] tags) =>
-        new CreateArticleHandler(_articles, _unitOfWork, _tagCatalog, new StubCurrentUserAccessor(author))
+        new CreateArticleHandler(_articles, _unitOfWork, new StubCurrentUserAccessor(author))
             .Handle(
                 new CreateArticleCommand
                 {
@@ -41,28 +40,9 @@ public class CreateArticleHandlerTests
     }
 
     [Fact]
-    public async Task The_tags_an_article_uses_are_announced_to_the_catalog()
+    public async Task An_article_with_an_unusable_tag_name_is_not_stored()
     {
-        await Create(tags: ["dragons", "training"]);
-
-        _tagCatalog.Tags.ShouldBe(["dragons", "training"], ignoreOrder: true);
-        _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task The_same_tag_listed_twice_is_announced_once()
-    {
-        await Create(tags: ["dragons", "dragons"]);
-
-        _tagCatalog.ReferenceCountOf("dragons").ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task An_article_the_catalog_rejects_the_tags_of_is_not_stored()
-    {
-        _tagCatalog.RejectReferencesWith = Error.Validation("Tag.NameTooLong", "too long");
-
-        var result = await Create(tags: ["dragons"]);
+        var result = await Create(tags: [new string('x', 200)]);
 
         result.IsError.ShouldBeTrue();
         result.FirstError.Type.ShouldBe(ErrorType.Validation);

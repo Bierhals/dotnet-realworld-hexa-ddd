@@ -414,15 +414,23 @@ articles.
 - `ArticleTag` is owned by **Articles**, not **Tags** — it's the join between
   an article and a tag, and tagging an article is part of the `Article`
   aggregate's own lifecycle (set on create/edit, deleted when the article is
-  deleted). **Tags** owns only the `Tag` catalog itself and exposes a single
-  write contract, `ITagCatalogService`:
-  - `ReferenceTagsAsync(tagNames)` — called when an article starts using a
-    tag. Names that aren't in the catalog yet are added, and each name's
-    reference count goes up by one.
-  - `ReleaseTagsAsync(tagNames)` — called when an article stops using a tag
-    (on edit, or when the article is deleted). A tag that loses its last
-    reference is removed from the catalog, so `Tags/List` never returns a tag
-    that no article uses.
+  deleted). **Tags** owns only the `Tag` catalog itself and keeps it in step
+  with the articles asynchronously, through event-carried state transfer:
+  - **Articles** raises `ArticlePublished`, `ArticleEdited` and `ArticleDeleted`
+    domain events and translates them into integration events of the same
+    names (`Articles.Contracts.Events`). The first two carry an
+    `ArticleSnapshot` - the whole public state of the article (everything but
+    the body) and its `Revision`; the last carries the id and the revision of
+    the deletion. They never say what changed.
+  - **Tags** keeps a record of its own of which tags each article uses
+    (`ArticleTagUsage`). When an event arrives it compares the snapshot with that
+    record, references the tags that came in, releases the ones that went out, and
+    saves the record together with the catalog. A tag that loses its last
+    reference leaves the catalog, so `Tags/List` never returns a tag that no
+    article uses - eventually, since delivery is asynchronous.
+  - Delivery is at-least-once and unordered. An event whose revision is not newer
+    than the recorded one is ignored, and a deletion stays on record, so
+    redelivered or late events change nothing.
 
 ### Module boundary diagram
 
@@ -434,7 +442,8 @@ articles.
               │  Salt, Bio, Image;│                                 │  ArticleTag)              │
               │  FollowedPeople)  │                                 └───────────────────────────┘
               └───────────────────┘                                              │
-                                                                                 │ ITagCatalogService (contract)
+                                                                                 │ ArticlePublished / Edited / Deleted
+                                                                                 │ (integration events)
                                                                                  ▼
                                                                         ┌───────────────────┐
                                                                         │       Tags        │

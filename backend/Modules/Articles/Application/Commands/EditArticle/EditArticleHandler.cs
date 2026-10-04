@@ -14,7 +14,6 @@ namespace Conduit.Articles.Application.Commands.EditArticle;
 public sealed class EditArticleHandler(
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork,
-    ITagCatalog tagCatalog,
     ICurrentUserAccessor currentUserAccessor) : ICommandHandler<EditArticleCommand, string>
 {
     public Task<ErrorOr<string>> Handle(EditArticleCommand command, CancellationToken cancellationToken) =>
@@ -83,17 +82,8 @@ public sealed class EditArticleHandler(
             tagNames = created.Value;
         }
 
-        // Announce the tags this article starts using before persisting, so that a rejected tag
-        // name does not leave a half-applied edit behind. The article no longer uses the removed
-        // tags only once persisted; the Tags module drops the ones that nothing references anymore.
         return await article.Edit(editor, title, description, body, tagNames, DateTime.UtcNow)
-            .ThenAsync(async tagChanges =>
-            {
-                var reference = await tagCatalog.ReferenceTagsAsync(TagNameList.ToValues(tagChanges.Added), cancellationToken);
-                return await reference
-                    .ThenDoAsync(_ => unitOfWork.SaveChangesAsync(cancellationToken))
-                    .ThenDoAsync(_ => tagCatalog.ReleaseTagsAsync(TagNameList.ToValues(tagChanges.Removed), cancellationToken))
-                    .Then(_ => article.Slug.Value);
-            });
+            .ThenDoAsync(_ => unitOfWork.SaveChangesAsync(cancellationToken))
+            .Then(_ => article.Slug.Value);
     }
 }

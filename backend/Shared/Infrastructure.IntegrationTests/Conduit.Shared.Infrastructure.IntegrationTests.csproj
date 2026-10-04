@@ -28,6 +28,9 @@
          shared one, but it only has meaning together with a real aggregate and DbContext. -->
     <ProjectReference Include="../Infrastructure/Conduit.Shared.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/Articles/Infrastructure/Conduit.Articles.Infrastructure.csproj" />
+    <!-- Tags is the consumer of the Articles integration events, so the tag sync can only be tested
+         with both modules in one host. -->
+    <ProjectReference Include="../../Modules/Tags/Core/Conduit.Tags.Core.csproj" />
   </ItemGroup>
 
 </Project>

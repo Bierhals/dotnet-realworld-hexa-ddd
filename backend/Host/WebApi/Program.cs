@@ -18,6 +18,7 @@ using Conduit.Tags.Core.Api;
 using Conduit.Tags.Core.Application;
 using Conduit.Tags.Core.Infrastructure;
 using Conduit.Tags.Core.Infrastructure.Persistence;
+using JasperFx.CodeGeneration.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -98,6 +99,10 @@ builder.UseWolverine(options =>
     }
 
     options.MultipleHandlerBehavior = MultipleHandlerBehavior.Separated;
+
+    // The modules keep their adapters internal, which Wolverine's generated handler code cannot
+    // construct directly. Those dependencies are resolved from the scoped container instead.
+    options.ServiceLocationPolicy = ServiceLocationPolicy.AllowedButWarn;
     options.Durability.MessageIdentity = MessageIdentity.IdAndDestination;
     options.Policies.AutoApplyTransactions();
     options.Policies.UseDurableLocalQueues();

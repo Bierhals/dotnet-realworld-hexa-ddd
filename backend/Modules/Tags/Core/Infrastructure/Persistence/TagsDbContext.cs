@@ -7,6 +7,8 @@ public sealed class TagsDbContext(DbContextOptions<TagsDbContext> options) : DbC
 {
     public DbSet<Tag> Tags => Set<Tag>();
 
+    public DbSet<ArticleTagUsage> ArticleTagUsages => Set<ArticleTagUsage>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("Tags");

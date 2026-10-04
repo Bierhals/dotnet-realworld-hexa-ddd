@@ -19,6 +19,7 @@ public static class TagsPersistenceServiceCollectionExtensions
         services.AddDbContextWithWolverineIntegration<TagsDbContext>(configureDbContext);
 
         services.AddScoped<ITagsRepository, TagsRepository>();
+        services.AddScoped<IArticleTagUsageRepository, ArticleTagUsageRepository>();
         services.AddScoped<ITagsReadRepository, TagsReadRepository>();
         services.AddScoped<IUnitOfWork, TagsUnitOfWork>();
 

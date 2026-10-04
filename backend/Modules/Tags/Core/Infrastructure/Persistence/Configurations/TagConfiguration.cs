@@ -17,6 +17,8 @@ public sealed class TagConfiguration : IEntityTypeConfiguration<Tag>
             .HasMaxLength(TagNameLengthIsInRange.MaximumLength)
             .ValueGeneratedNever();
 
-        builder.Property(t => t.ReferenceCount).IsRequired();
+        // Several articles may reference one tag at the same time. A write that builds on a count
+        // somebody else has changed since fails and is retried, instead of losing a use.
+        builder.Property(t => t.ReferenceCount).IsRequired().IsConcurrencyToken();
     }
 }
