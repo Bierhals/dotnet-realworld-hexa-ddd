@@ -96,7 +96,7 @@ public sealed class DomainEventPublishingTests : IAsyncLifetime
 
         // Assert
         var handled = RecordingArticlePublishedHandler.Handled.ShouldHaveSingleItem();
-        handled.ArticleId.ShouldBe(article.Id.Value);
+        handled.Article.ArticleId.ShouldBe(article.Id.Value);
 
         // The event survives the round trip through the outbox unchanged. Without the init
         // accessors on DomainEvent these would be a fresh Guid and "whenever it was read".

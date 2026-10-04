@@ -895,12 +895,6 @@
           "WolverineFx.EntityFrameworkCore": "[6.45.0, )"
         }
       },
-      "conduit.tags.contracts": {
-        "type": "Project",
-        "dependencies": {
-          "ErrorOr": "[2.1.1, )"
-        }
-      },
       "conduit.tags.core": {
         "type": "Project",
         "dependencies": {
@@ -908,7 +902,6 @@
           "Conduit.Shared.Application": "[1.0.0, )",
           "Conduit.Shared.Domain": "[1.0.0, )",
           "Conduit.Shared.Infrastructure": "[1.0.0, )",
-          "Conduit.Tags.Contracts": "[1.0.0, )",
           "ErrorOr": "[2.1.1, )",
           "Microsoft.EntityFrameworkCore": "[10.0.12, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.12, )",

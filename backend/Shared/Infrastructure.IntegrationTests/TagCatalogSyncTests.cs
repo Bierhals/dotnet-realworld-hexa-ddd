@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Conduit.Articles.Contracts.Events;
 using Conduit.Articles.Domain;
 using Conduit.Articles.Domain.ValueObjects;
 using Conduit.Articles.Infrastructure;
@@ -135,6 +136,56 @@ public sealed class TagCatalogSyncTests : IAsyncLifetime
         (await CatalogAsync()).ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task An_event_that_is_delivered_twice_is_counted_once()
+    {
+        var published = new ArticlePublished(Snapshot(revision: 1, "dragons"));
+
+        await SendAsync(published);
+        await SendAsync(published);
+
+        (await CatalogAsync()).ShouldBe(new Dictionary<string, int> { ["dragons"] = 1 });
+    }
+
+    [Fact]
+    public async Task An_edit_that_arrives_after_the_deletion_does_not_bring_the_tags_back()
+    {
+        var snapshot = Snapshot(revision: 1, "dragons");
+        await SendAsync(new ArticlePublished(snapshot));
+        await SendAsync(new ArticleDeleted(snapshot.Id, Revision: 3));
+
+        await SendAsync(new ArticleEdited(snapshot with { Revision = 2, Tags = ["dragons", "flying"] }));
+
+        (await CatalogAsync()).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Articles_published_at_the_same_time_all_count_towards_a_shared_tag()
+    {
+        const int articles = 40;
+
+        await TrackAsync(() => Task.WhenAll(Enumerable.Range(0, articles)
+            .Select(_ => Task.Run(() => SendWithoutTrackingAsync(new ArticlePublished(Snapshot(revision: 1, "dragons")))))));
+
+        (await CatalogAsync()).ShouldBe(new Dictionary<string, int> { ["dragons"] = articles });
+    }
+
+    private static ArticleSnapshot Snapshot(int revision, params string[] tagNames) =>
+        new(Guid.NewGuid(), revision, "a-slug", "A title", "A description", "the-author", tagNames, DateTime.UtcNow, DateTime.UtcNow);
+
+    private async Task SendAsync(object message) =>
+        await _host.TrackActivity().Timeout(TimeSpan.FromSeconds(30)).SendMessageAndWaitAsync(message);
+
+    private async Task SendWithoutTrackingAsync(object message)
+    {
+        using var scope = _host.Services.CreateScope();
+
+        await scope.ServiceProvider.GetRequiredService<IMessageBus>().InvokeAsync(message);
+    }
+
+    private async Task TrackAsync(Func<Task> action) =>
+        await _host.TrackActivity().Timeout(TimeSpan.FromSeconds(30)).ExecuteAndWaitAsync(_ => action());
+
     private Task PublishAsync(string title, params string[] tagNames) =>
         ChangeArticlesAsync(async (articles, unitOfWork) =>
         {
@@ -185,7 +236,7 @@ public sealed class TagCatalogSyncTests : IAsyncLifetime
     /// caused - across both modules - has been handled. A handler that fails fails the test.
     /// </summary>
     private async Task ChangeArticlesAsync(Func<IArticlesRepository, ArticlesUnitOfWork, Task> change) =>
-        await _host.TrackActivity().ExecuteAndWaitAsync((Func<IMessageContext, Task>)(async _ =>
+        await _host.TrackActivity().Timeout(TimeSpan.FromSeconds(30)).ExecuteAndWaitAsync((Func<IMessageContext, Task>)(async _ =>
         {
             using var scope = _host.Services.CreateScope();
 

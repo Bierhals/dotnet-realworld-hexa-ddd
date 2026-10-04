@@ -45,6 +45,7 @@ public sealed class ArticleConfiguration : IEntityTypeConfiguration<Article>
 
         builder.Property(article => article.CreatedAtUtc).IsRequired();
         builder.Property(article => article.UpdatedAtUtc).IsRequired();
+        builder.Property(article => article.Revision).IsRequired();
 
         // A tag on an article is just a name, so the aggregate holds plain tag names and the
         // mapping - not the domain - is what spreads them over their own table.

@@ -24,6 +24,7 @@ public sealed class Article : AggregateRoot<ArticleId>
     public Username Author { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public DateTime UpdatedAtUtc { get; private set; }
+    public int Revision { get; private set; }
 
     public IReadOnlyCollection<TagName> Tags => _tags.AsReadOnly();
 
@@ -46,6 +47,7 @@ public sealed class Article : AggregateRoot<ArticleId>
         Slug = ArticleSlug.FromTitle(title);
         CreatedAtUtc = createdAtUtc;
         UpdatedAtUtc = createdAtUtc;
+        Revision = 1;
     }
 
     public static Article Publish(
@@ -60,15 +62,14 @@ public sealed class Article : AggregateRoot<ArticleId>
 
         article._tags.AddRange(tagNames.Distinct());
 
-        article.AddDomainEvent(new ArticlePublishedDomainEvent(article.Id.Value, article.Slug.Value, author.Value));
-        article.AnnounceTagChanges(article._tags, []);
+        article.AddDomainEvent(new ArticlePublishedDomainEvent(article.State()));
 
         return article;
     }
 
     /// <summary>
-    /// Applies the fields that were supplied - a <c>null</c> means "leave unchanged". The tags the
-    /// article started and stopped using are announced through a domain event.
+    /// Applies the fields that were supplied - a <c>null</c> means "leave unchanged". An edit that
+    /// changes nothing leaves the article, its revision and its events untouched.
     /// </summary>
     public ErrorOr<Success> Edit(
         Username editor,
@@ -113,23 +114,36 @@ public sealed class Article : AggregateRoot<ArticleId>
         }
 
         UpdatedAtUtc = nowUtc;
-        AddDomainEvent(new ArticleEditedDomainEvent(Id.Value, Slug.Value));
+        Revision++;
+        AddDomainEvent(new ArticleEditedDomainEvent(State()));
 
         return Result.Success;
     }
 
     /// <summary>
-    /// Checks that the requester may delete the article and announces that it gives up all of its
-    /// tags. Removing the aggregate from the store stays with the caller.
+    /// Checks that the requester may delete the article and announces the deletion. Removing the
+    /// aggregate from the store stays with the caller.
     /// </summary>
     public ErrorOr<Success> Delete(Username requester) =>
         new OnlyTheAuthorCanChangeTheArticle(Author, requester).Check()
             .Then(_ =>
             {
-                AnnounceTagChanges([], _tags);
+                Revision++;
+                AddDomainEvent(new ArticleDeletedDomainEvent(Id.Value, Revision));
 
                 return Result.Success;
             });
+
+    private ArticleState State() => new(
+        Id.Value,
+        Revision,
+        Slug.Value,
+        Title.Value,
+        Description.Value,
+        Author.Value,
+        [.. _tags.Select(tagName => tagName.Value)],
+        CreatedAtUtc,
+        UpdatedAtUtc);
 
     private bool ApplyTags(IReadOnlyCollection<TagName> tagNames)
     {
@@ -141,21 +155,6 @@ public sealed class Article : AggregateRoot<ArticleId>
         _tags.RemoveAll(removed.Contains);
         _tags.AddRange(added);
 
-        AnnounceTagChanges(added, removed);
-
         return added.Count > 0 || removed.Count > 0;
-    }
-
-    private void AnnounceTagChanges(List<TagName> added, List<TagName> removed)
-    {
-        if (added.Count == 0 && removed.Count == 0)
-        {
-            return;
-        }
-
-        AddDomainEvent(new ArticleTagsChangedDomainEvent(
-            Id.Value,
-            [.. added.Select(tagName => tagName.Value)],
-            [.. removed.Select(tagName => tagName.Value)]));
     }
 }

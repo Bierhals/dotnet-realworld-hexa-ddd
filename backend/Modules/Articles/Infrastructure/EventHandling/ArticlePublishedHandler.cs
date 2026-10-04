@@ -22,5 +22,5 @@ public sealed class ArticlePublishedHandler(ILogger<ArticlePublishedHandler> log
             "Handled ArticlePublished for article {Slug} ({ArticleId}) by {Author}");
 
     public void Handle(ArticlePublishedDomainEvent domainEvent) =>
-        LogArticlePublished(logger, domainEvent.Slug, domainEvent.ArticleId, domainEvent.Author, null);
+        LogArticlePublished(logger, domainEvent.Article.Slug, domainEvent.Article.ArticleId, domainEvent.Article.Author, null);
 }
